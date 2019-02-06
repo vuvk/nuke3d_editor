@@ -20,11 +20,12 @@ Nuke3D uses a number of open source projects to work properly:
 
 ### Installation
 
-Nuke3D requires JRE >= 1.8 to run.
+Nuke3D requires JRE >= 8 to run and/or JDK >= 8 for build.
 
 Install maven and run it for build Nuke3D Editor:
 
 ```sh
+$ sudo apt install maven
 $ mvn clean install
 ```
 
