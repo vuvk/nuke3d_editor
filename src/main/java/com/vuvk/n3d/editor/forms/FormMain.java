@@ -1,0 +1,1287 @@
+/**
+    Main form of Nuke3D Editor
+    Copyright (C) 2019 Anton "Vuvk" Shcherbatykh <vuvk69@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
+package com.vuvk.n3d.editor.forms;
+
+import com.bulenkov.darcula.DarculaLaf;
+import com.vuvk.n3d.Const;
+import com.vuvk.n3d.Global;
+import com.vuvk.n3d.Utils;
+import com.vuvk.n3d.components.PreviewElement;
+import com.vuvk.n3d.components.PreviewElement.Type;
+import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Texture;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import static javax.swing.SwingConstants.BOTTOM;
+import static javax.swing.SwingConstants.CENTER;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
+/**
+ *
+ * @author Anton "Vuvk" Shcherbatykh
+ */
+public class FormMain extends javax.swing.JFrame {
+        
+    /** ссылка на главную форму */
+    public static FormMain formMain;
+    /** ссылка на форму редактора текстуры */
+    public static FormTextureEditor formTextureEditor = null;
+    /** ссылка на форму редактора материала */
+    public static FormMaterialEditor formMaterialEditor = null;
+        
+    /** проект открыт? */
+    public static boolean isProjectOpened = false;
+        
+    
+    /** текущий выбранный путь, в котором находится пользователь */
+    static Path currentPath = null;
+    //static Path resourcesPath = null;
+    /** пути для копирования */
+    static List<Path> copyPaths = null;
+    /** Режим выезания */
+    static boolean isCutMode = false;
+    
+    
+    /**
+     * кастомный рендерер для ячеек списка
+     */
+    class ProjectViewCellRenderer extends JLabel implements ListCellRenderer {
+        public ProjectViewCellRenderer() {        
+            setOpaque(true);
+            setHorizontalAlignment(CENTER);
+            setVerticalAlignment(CENTER);
+            setHorizontalTextPosition(CENTER);
+            setVerticalTextPosition(BOTTOM);
+            
+            Font font = getFont().deriveFont(Font.BOLD);
+            setFont(font);
+        }
+        
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {        
+            if (isSelected) {
+                setBackground(list.getSelectionBackground());
+                setForeground(list.getSelectionForeground());
+            } else {
+                setBackground(list.getBackground());
+                setForeground(list.getForeground());
+            }         
+            
+            PreviewElement element = (PreviewElement) value;
+            BufferedImage img = element.getIcon();
+            ImageIcon icon = new ImageIcon();
+            int iconWidth  = 64;
+            int iconHeight = 64;
+            
+            if (img != null) {
+                double imageWidth  = img.getWidth();
+                double imageHeight = img.getHeight();
+
+                if (imageWidth != imageHeight) {
+                    if (imageWidth > imageHeight) {
+                        iconHeight = (int)((double)iconHeight * (imageHeight / imageWidth ));
+                    } else {
+                        iconWidth  = (int)((double)iconWidth  * (imageWidth  / imageHeight));
+                    }
+                }
+
+                icon.setImage(Utils.resizeImage(img, iconWidth, iconHeight));
+            } else {
+                icon.setImage(new BufferedImage(iconWidth, iconHeight, BufferedImage.TYPE_INT_ARGB));
+            }
+            
+            setIcon(icon);            
+            setText(element.getName());   
+
+            return this;
+        }        
+    }
+    
+    /**
+     * Открыть проект
+     */
+    void projectOpen() {
+        if (isProjectOpened) {
+            return;
+        }
+        
+        closeChildWindows();
+        Texture.loadAll();
+        Material.loadAll();
+
+        MenuItemOpenProject.setEnabled (false);
+        MenuItemSaveProject.setEnabled (true );
+        MenuItemCloseProject.setEnabled(true );
+        
+        isProjectOpened = true; 
+        fillTreeFolders(true);
+        listProjectView.setEnabled(true);
+        treeFolders.setEnabled(true);
+        
+        JOptionPane.showMessageDialog(this, "Проект открыт.");  
+    }
+    
+    /**
+     * Сохранить проект
+     */
+    void projectSave() {
+        if (!isProjectOpened) {
+            return;
+        }
+        
+        if (!Texture.saveConfig()) {
+            Utils.showMessageError("Не удалось сохранить текстуры проекта! Повторите попытку.");
+        }
+        
+        if (!Material.saveAll()) {
+            Utils.showMessageError("Не удалось сохранить материалы проекта! Повторите попытку.");
+        }
+        
+        JOptionPane.showMessageDialog(this, "Процедура сохранения проекта завершена.");   
+    }
+    
+    /**
+     * Закрыть проект
+     * @return true если операция закрытия завершена, false если закрывать нечего или выбрана кнопка CANCEL
+     */
+    boolean projectClose() {
+        if (!isProjectOpened) {
+            return true;
+        }        
+        
+        switch (JOptionPane.showConfirmDialog(this, 
+                                              "Сохранить проект перед его закрытием? Все несохраненные данные будут утеряны.", 
+                                              "Предупреждение", 
+                                              JOptionPane.YES_NO_CANCEL_OPTION, 
+                                              JOptionPane.QUESTION_MESSAGE)) {
+            case JOptionPane.YES_OPTION : 
+                projectSave();
+            case JOptionPane.NO_OPTION : 
+                closeChildWindows();
+                Texture.closeAll();
+                Material.closeAll();
+
+                MenuItemOpenProject.setEnabled (true );
+                MenuItemSaveProject.setEnabled (false);
+                MenuItemCloseProject.setEnabled(false);
+                
+                isProjectOpened = false;
+                clearTreeFolders();
+                clearListProjectView();
+                listProjectView.setEnabled(false);
+                treeFolders.setEnabled(false);
+                                
+                
+                JOptionPane.showMessageDialog(this, "Проект закрыт");
+                return true;
+            
+            case JOptionPane.CANCEL_OPTION :
+            default :
+                return false;
+        }        
+    }
+    
+    /** 
+     * Закрыть все вызванные ранее дочерние окна
+     */
+    void closeChildWindows() {
+        if (formTextureEditor != null) {
+            formTextureEditor.dispose();
+            formTextureEditor = null;
+        }
+        
+        if (formMaterialEditor != null) {
+            formMaterialEditor.dispose();
+            formMaterialEditor = null;
+        }
+    }
+        
+    /**
+     * Проверка папки и обход подпапок
+     * @param node Нода, к которой добавлять ветку с подпапкой, если есть
+     * @param path Путь, в котором искать подпапки
+     */
+    void fillNodeTreeFolders(DefaultMutableTreeNode node, File path) {
+        
+        class FolderFilter implements FileFilter {
+            @Override
+            public boolean accept(File path) {
+                return path.isDirectory();
+            }            
+        }
+        
+        if (path.isDirectory()) {
+            File[] files = path.listFiles(new FolderFilter());
+            Arrays.sort(files);
+            for (File file : files) {
+                DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(file.getName());
+                node.add(newNode);
+                fillNodeTreeFolders(newNode, file);
+            }
+        }
+    }
+    
+    /**
+     * Получить ноду в TreeFolders, которой соответствует currentPath
+     * @return Возвращает искомую ноду или корнеь, если не нашёл
+     */
+    DefaultMutableTreeNode getNodeFromCurrentPath() {
+        DefaultTreeModel model = (DefaultTreeModel) treeFolders.getModel();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) model.getRoot();
+                
+        if (currentPath != null) {
+            Path checkPath = currentPath;
+            LinkedList<String> pathToRoot = new LinkedList<>();
+
+            // собираем имена папок для перехода в путь от корня (resources)
+            while (checkPath.compareTo(Global.RESOURCES_PATH) != 0) {
+                pathToRoot.addFirst(checkPath.getFileName().toString());
+                checkPath = checkPath.getParent();
+                if (checkPath == null) {
+                    break;
+                }
+            }
+
+            // для каждого имени ищем ноду, которую нужно выбрать
+            for (String nodeName : pathToRoot) {
+                for (int i = 0; i < node.getChildCount(); ++i) {
+                    DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
+                    if (((String)child.getUserObject()).equals(nodeName)) {
+                        node = child;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return node;
+    }
+    
+    /**
+     * Выделить в дереве TreeFolders выбранный путь (используется currentPath)
+     */
+    void selectNodeTreeFolders() {        
+        TreePath treePath = new TreePath(getNodeFromCurrentPath().getPath());
+        treeFolders.scrollPathToVisible(treePath);
+        treeFolders.setSelectionPath(treePath);
+    }
+    
+    /**
+     * Очистить дерево TreeFolders
+     * */
+    void clearTreeFolders() {
+        treeFolders.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("resources")));
+    }
+    
+    /**
+     * Заполнить дерево TreeFolders папками проекта
+     * @param reloadAll Перегрузить всё дерево или только измененный путь currentPath
+     */
+    void fillTreeFolders(boolean reloadAll) {
+        DefaultTreeModel model = (DefaultTreeModel) treeFolders.getModel();
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+        root.setUserObject("resources");
+        
+        // создать папку ресурсов, если такой нет
+        if (Files.notExists(Global.RESOURCES_PATH) || !Files.isDirectory(Global.RESOURCES_PATH)) {
+            try {
+                Files.createDirectories(Global.RESOURCES_PATH);
+            } catch (IOException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(this, "Не удалось создать папку ресурсов проекта!");
+            }
+        }
+                
+        // перегрузить всё дерево?
+        if (reloadAll) {
+            root.removeAllChildren();
+            // рекурсивно обходим дерево папок и рисуем дерево
+            fillNodeTreeFolders(root, Global.RESOURCES_PATH.toFile());
+            model.reload();
+        // перегрузить только лист 
+        } else {                            
+            DefaultMutableTreeNode node = getNodeFromCurrentPath();
+            node.removeAllChildren();
+            fillNodeTreeFolders(node, currentPath.toFile());
+            model.reload(node);            
+        }
+                    
+        selectNodeTreeFolders();
+    }
+    
+    /**
+     * Очистить представление содержимого папки
+     */
+    void clearListProjectView() {
+        listProjectView.setModel(new DefaultListModel());        
+    }
+    
+    /**
+     * Заполнить представление содержимого папки
+     */
+    void fillListProjectView() {
+        DefaultListModel listModel = new DefaultListModel();
+        
+        if (currentPath == null) {
+            currentPath = Global.RESOURCES_PATH;
+        }
+        
+        File path = currentPath.toFile();
+        if (path != null) {
+            // добавить кнопку "Вверх", если это не корень
+            if (currentPath.compareTo(Global.RESOURCES_PATH) != 0) {
+                Path parent = currentPath.getParent();
+                if (parent != null) {
+                    listModel.addElement(new PreviewElement(parent, true));
+                }
+            }
+            
+            File[] listFiles = path.listFiles();
+            if (listFiles != null && listFiles.length > 0) {
+                // теперь собираем массив папок и файлов
+                List<File> folders = new LinkedList<>();
+                List<File> files   = new LinkedList<>();
+                for (File file : listFiles) {
+                    if (file.isDirectory()) {
+                        folders.add(file);
+                    } else {
+                        files.add(file);
+                    }
+                }
+                
+                // первые для отображения папки
+                if (folders.size() > 0) {
+                    Collections.sort(folders);
+                    for (File file : folders) {
+                        listModel.addElement(new PreviewElement(file));            
+                    }
+                }
+                
+                // а затем файлы
+                if (files.size() > 0) {
+                    Collections.sort(files);
+                    for (File file : files) {
+                        listModel.addElement(new PreviewElement(file));            
+                    }
+                }
+            }
+        }
+        
+        listProjectView.setModel(listModel);
+
+        //selectNodeTreeFolders();
+    }
+    
+    /**
+     * Обновить окно предпросмотра, если путь отображается в нём
+     * @param path Путь, который нужно обновить, если он просматривается
+     */
+    public void updateListProjectView(String path) {
+        Path checkPath = Paths.get(path);
+        if (currentPath.equals(checkPath.getParent())) {
+            fillListProjectView();
+        }
+    }
+    
+    /**
+     * Получить строковое представление пути из выбранной ноды в дереве
+     * @param node Нода, для которой нужно вернуть путь
+     * @return Путь в виде строки с корнем в resources/
+     */
+    String getPathFromTreeFolders(DefaultMutableTreeNode node) {
+        String path = "";
+        
+        while (!node.isRoot()) {
+            path = node.getUserObject().toString() + "/" + path;
+            node = (DefaultMutableTreeNode) node.getParent();
+        }        
+        path = Const.RESOURCES_STRING + path;
+        //System.out.println(path);
+        
+        return path;
+    }
+    
+    
+    /**
+     * Выбрать файлы для копирования из выбранных имён в ListProjectView
+     */
+    void chooseFilesForCopy() {
+        if (listProjectView.getSelectedIndex() != -1) {
+            List list = listProjectView.getSelectedValuesList();
+            copyPaths = new LinkedList<>();
+            
+            // получить пути из реальных элементов
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                PreviewElement element = (PreviewElement) it.next();
+                if (element.getType() != PreviewElement.Type.LEVELUP) {
+                    Path path = Paths.get(element.getPath());
+                    if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+                        copyPaths.add(path);
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Открыть форму редактирования текстуры
+     */
+    void openFormTextureEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.TEXTURE) {
+                
+                for (Texture txr : Texture.TEXTURES) {
+                    if (txr.getPath().equals(element.getPath())) {
+                        if (formTextureEditor == null) {
+                            formTextureEditor = new FormTextureEditor();
+                            Desktop.add(formTextureEditor);                            
+                        }
+
+                        formTextureEditor.selectedTexture = txr;
+                        formTextureEditor.prepareForm();
+                        formTextureEditor.setVisible(true);  
+                        
+                        return;
+                    }
+                }
+                
+                // если всё ещё не нашёл, а файл есть, значит он проект битый 
+                // или файл был "подброшен"
+                Utils.showMessageError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                       "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+            }
+        }
+    }
+    
+    /**
+     * Creates new form FormMain
+     */
+    public FormMain() {
+        initComponents();   
+        
+        Global.initPathResources();
+        Global.initPathConfig();
+                
+        setLocationRelativeTo(null);
+        //fillListProjectView();
+        
+        // задаем кастомный рендерер
+        listProjectView.setCellRenderer(new ProjectViewCellRenderer());
+        
+        // кастомные иконки для дерева
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeFolders.getCellRenderer();
+        Icon leafIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp__.png"));
+        Icon openIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_open_white_18dp__.png"));
+        Icon closedIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp__.png"));
+        renderer.setOpenIcon(openIcon);
+        renderer.setClosedIcon(closedIcon);
+        renderer.setLeafIcon(leafIcon);
+        
+        clearTreeFolders();
+        clearListProjectView();
+        listProjectView.setEnabled(false);
+        treeFolders.setEnabled(false);
+    }
+
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        popupPV = new javax.swing.JPopupMenu();
+        popupPVMenuAdd = new javax.swing.JMenu();
+        popupPVMIFolder = new javax.swing.JMenuItem();
+        popupPVMITexture = new javax.swing.JMenuItem();
+        popupPVMICopy = new javax.swing.JMenuItem();
+        popupPVMICut = new javax.swing.JMenuItem();
+        popuvPVMIPaste = new javax.swing.JMenuItem();
+        popupPVMIRename = new javax.swing.JMenuItem();
+        popupPVMIRemove = new javax.swing.JMenuItem();
+        jSplitPane3 = new javax.swing.JSplitPane();
+        Desktop = new javax.swing.JDesktopPane();
+        splProjectManager = new javax.swing.JSplitPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        treeFolders = new javax.swing.JTree();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        listProjectView = new javax.swing.JList<>();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        MenuFile = new javax.swing.JMenu();
+        MenuItemOpenProject = new javax.swing.JMenuItem();
+        MenuItemSaveProject = new javax.swing.JMenuItem();
+        MenuItemCloseProject = new javax.swing.JMenuItem();
+        jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        MenuItemExit = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+
+        popupPVMenuAdd.setText("Добавить");
+
+        popupPVMIFolder.setText("Папка");
+        popupPVMIFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMIFolderActionPerformed(evt);
+            }
+        });
+        popupPVMenuAdd.add(popupPVMIFolder);
+
+        popupPVMITexture.setText("Текстура");
+        popupPVMITexture.setToolTipText("");
+        popupPVMITexture.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMITextureActionPerformed(evt);
+            }
+        });
+        popupPVMenuAdd.add(popupPVMITexture);
+
+        popupPV.add(popupPVMenuAdd);
+
+        popupPVMICopy.setText("Копировать");
+        popupPVMICopy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMICopyActionPerformed(evt);
+            }
+        });
+        popupPV.add(popupPVMICopy);
+
+        popupPVMICut.setText("Вырезать");
+        popupPVMICut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMICutActionPerformed(evt);
+            }
+        });
+        popupPV.add(popupPVMICut);
+
+        popuvPVMIPaste.setText("Вставить");
+        popuvPVMIPaste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popuvPVMIPasteActionPerformed(evt);
+            }
+        });
+        popupPV.add(popuvPVMIPaste);
+
+        popupPVMIRename.setText("Переименовать");
+        popupPVMIRename.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMIRenameActionPerformed(evt);
+            }
+        });
+        popupPV.add(popupPVMIRename);
+
+        popupPVMIRemove.setText("Удалить");
+        popupPVMIRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMIRemoveActionPerformed(evt);
+            }
+        });
+        popupPV.add(popupPVMIRemove);
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Nuke3D Editor");
+        setName("mainForm"); // NOI18N
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+        });
+
+        jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        Desktop.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.focus"));
+        Desktop.setMinimumSize(new java.awt.Dimension(512, 384));
+
+        org.jdesktop.layout.GroupLayout DesktopLayout = new org.jdesktop.layout.GroupLayout(Desktop);
+        Desktop.setLayout(DesktopLayout);
+        DesktopLayout.setHorizontalGroup(
+            DesktopLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 1053, Short.MAX_VALUE)
+        );
+        DesktopLayout.setVerticalGroup(
+            DesktopLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 384, Short.MAX_VALUE)
+        );
+
+        jSplitPane3.setLeftComponent(Desktop);
+
+        splProjectManager.setMinimumSize(new java.awt.Dimension(128, 32));
+        splProjectManager.setPreferredSize(new java.awt.Dimension(340, 200));
+
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(128, 128));
+        jScrollPane1.setPreferredSize(new java.awt.Dimension(200, 386));
+
+        treeFolders.setMaximumSize(new java.awt.Dimension(32767, 32767));
+        treeFolders.setMinimumSize(new java.awt.Dimension(128, 128));
+        treeFolders.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                treeFoldersMousePressed(evt);
+            }
+        });
+        treeFolders.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+            public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+                treeFoldersValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(treeFolders);
+
+        splProjectManager.setLeftComponent(jScrollPane1);
+
+        jScrollPane3.setMinimumSize(new java.awt.Dimension(128, 128));
+
+        listProjectView.setModel(new javax.swing.AbstractListModel<String>() {
+            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10", "Item 11", "Item 12", "Item 13", "Item 14", "Item 15", "Item 16", "Item 17", "Item 18", "Item 19", "Item 20", "Item 21", "Item 22", "Item 23", "Item 24", "Item 25", "Item 26", "Item 27", "Item 28", "Item 29" };
+            public int getSize() { return strings.length; }
+            public String getElementAt(int i) { return strings[i]; }
+        });
+        listProjectView.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        listProjectView.setAutoscrolls(false);
+        listProjectView.setComponentPopupMenu(popupPV);
+        listProjectView.setDoubleBuffered(true);
+        listProjectView.setFixedCellHeight(128);
+        listProjectView.setFixedCellWidth(128);
+        listProjectView.setInheritsPopupMenu(true);
+        listProjectView.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
+        listProjectView.setMaximumSize(new java.awt.Dimension(32767, 32767));
+        listProjectView.setMinimumSize(new java.awt.Dimension(128, 128));
+        listProjectView.setVisibleRowCount(-1);
+        listProjectView.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listProjectViewMouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(listProjectView);
+
+        splProjectManager.setRightComponent(jScrollPane3);
+
+        jSplitPane3.setRightComponent(splProjectManager);
+
+        MenuFile.setText("File");
+
+        MenuItemOpenProject.setText("Open Project");
+        MenuItemOpenProject.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemOpenProjectActionPerformed(evt);
+            }
+        });
+        MenuFile.add(MenuItemOpenProject);
+
+        MenuItemSaveProject.setText("Save Project");
+        MenuItemSaveProject.setEnabled(false);
+        MenuItemSaveProject.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemSaveProjectActionPerformed(evt);
+            }
+        });
+        MenuFile.add(MenuItemSaveProject);
+
+        MenuItemCloseProject.setText("Close Project");
+        MenuItemCloseProject.setEnabled(false);
+        MenuItemCloseProject.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemCloseProjectActionPerformed(evt);
+            }
+        });
+        MenuFile.add(MenuItemCloseProject);
+        MenuFile.add(jSeparator1);
+
+        MenuItemExit.setText("Exit");
+        MenuItemExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                MenuItemExitActionPerformed(evt);
+            }
+        });
+        MenuFile.add(MenuItemExit);
+
+        jMenuBar1.add(MenuFile);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, jSplitPane3)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(layout.createSequentialGroup()
+                .addContainerGap()
+                .add(jSplitPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+    
+    private void MenuItemSaveProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemSaveProjectActionPerformed
+        projectSave();     
+    }//GEN-LAST:event_MenuItemSaveProjectActionPerformed
+
+    private void MenuItemCloseProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemCloseProjectActionPerformed
+        projectClose();
+    }//GEN-LAST:event_MenuItemCloseProjectActionPerformed
+
+    private void MenuItemOpenProjectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemOpenProjectActionPerformed
+        projectOpen();
+    }//GEN-LAST:event_MenuItemOpenProjectActionPerformed
+
+    private void MenuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuItemExitActionPerformed
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
+    }//GEN-LAST:event_MenuItemExitActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        if (JOptionPane.showConfirmDialog(this, 
+                                          "Вы действительно хотите закрыть программу?",
+                                          "Внимание",
+                                          JOptionPane.YES_NO_OPTION,
+                                          JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION        
+           ) {
+            if (!projectClose()) {
+                setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            } else {
+                setDefaultCloseOperation(EXIT_ON_CLOSE);                    
+            }
+        } else {
+            setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        }
+    }//GEN-LAST:event_formWindowClosing
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        
+    }//GEN-LAST:event_formWindowActivated
+    
+    private void treeFoldersMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeFoldersMousePressed
+        if (evt.getButton() == MouseEvent.BUTTON1) {  
+            
+        }
+    }//GEN-LAST:event_treeFoldersMousePressed
+
+    private void listProjectViewMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listProjectViewMouseClicked
+        if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() > 1) {  
+            
+            List list = listProjectView.getSelectedValuesList();
+            if (list.size() > 0) {
+                PreviewElement element = (PreviewElement)list.get(0);
+                switch (element.getType()) {
+                    case LEVELUP:
+                    case FOLDER:
+                        currentPath = Paths.get(element.getPath());
+                        selectNodeTreeFolders();    // выберет в списке папку, а выбор 
+                                                    // папки перезагрузит представление вьюхи
+                        break;
+                        
+                    case TEXTURE:                        
+                        openFormTextureEditor();
+                        break;
+                        
+                    default:
+                        break;
+                }
+            }
+        }
+    }//GEN-LAST:event_listProjectViewMouseClicked
+
+    private void treeFoldersValueChanged(javax.swing.event.TreeSelectionEvent evt) {//GEN-FIRST:event_treeFoldersValueChanged
+        if (treeFolders.getSelectionCount() > 0) {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode)treeFolders.getSelectionPath().getLastPathComponent();
+            currentPath = Paths.get(getPathFromTreeFolders(node));
+            fillListProjectView();
+        }
+    }//GEN-LAST:event_treeFoldersValueChanged
+
+    private void popupPVMIFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIFolderActionPerformed
+        String folderName = JOptionPane.showInputDialog(null, 
+                                                        "Введите имя новой папки",
+                                                        "Необходим ввод", 
+                                                        JOptionPane.INFORMATION_MESSAGE);
+        if (folderName != null) {
+            String newFolderPath = currentPath.toString() + "/" + folderName;
+            File newFolder = new File(newFolderPath);
+            if (newFolder != null) {
+                newFolder.mkdirs();
+
+                fillTreeFolders(false);
+                fillListProjectView();
+            }
+        }
+    }//GEN-LAST:event_popupPVMIFolderActionPerformed
+
+    private void popupPVMIRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRenameActionPerformed
+        if (listProjectView.getSelectedIndex() != -1) {
+            List list = listProjectView.getSelectedValuesList();
+            PreviewElement element = (PreviewElement) list.get(0);
+            
+            String name = element.getName();            
+            String newName = (String) JOptionPane.showInputDialog(null, 
+                                                                  "Введите новое имя объекта", 
+                                                                  "Необходим ввод", 
+                                                                  JOptionPane.INFORMATION_MESSAGE, 
+                                                                  null, 
+                                                                  null, 
+                                                                  name);
+            if (newName != null && !newName.equals(name)) {
+                Path path = Paths.get(element.getPath());
+                try {
+                    String newPathStr = path.getParent().toString() + File.separator + newName;
+                    switch (element.getType()) {
+                        case TEXTURE:
+                        case MATERIAL:
+                        case SOUND:
+                            newPathStr += "." + element.getExtension();
+                            break;
+                    }
+                    Path newPath = Paths.get(newPathStr);
+                    if (Files.exists(newPath)) {
+                        Utils.showMessageError("Файл \"" + newPathStr + "\" уже существует!");
+                        return;
+                    }
+                    
+                    Files.move(path, newPath);
+                    //FileUtils.moveFile(path.toFile(), newPath.toFile());
+                    //element.setName(newName);
+                    
+                    fillTreeFolders(false);
+                    fillListProjectView();
+                } catch (Exception ex) {
+                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                    Utils.showMessageException(ex);
+                }
+            }
+        }
+    }//GEN-LAST:event_popupPVMIRenameActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        //fillTreeFolders(true); // заполнит дерево и выберет ветку, что спровоцирует отрисовку вьюшки
+    }//GEN-LAST:event_formWindowOpened
+
+    private void popupPVMIRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRemoveActionPerformed
+        if (listProjectView.getSelectedIndex() != -1) {
+            List list = listProjectView.getSelectedValuesList();
+            // удалить все абстрактные элементы (типа "Вверх")
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                PreviewElement element = (PreviewElement) it.next();
+                if (element.getType() == PreviewElement.Type.LEVELUP) {
+                    it.remove();
+                }
+            }
+                      
+            // Элемент один? Спросить с именем
+            String message;
+            if (list.size() == 1) {
+                message = "Действительно удалить \"" + ((PreviewElement)list.get(0)).getName() + "\"?";     
+            // с количеством
+            } else if (list.size() > 1) {
+                message = "Действительно удалить " + list.size() + " элемента(-ов)?";                
+            // нечего удалять!
+            } else {
+                return;
+            }
+            
+            // последний шанс ничего не удалять
+            if (JOptionPane.showConfirmDialog(null, 
+                                              message,
+                                              "Внимание",
+                                              JOptionPane.YES_NO_OPTION,
+                                              JOptionPane.QUESTION_MESSAGE
+                                             ) == JOptionPane.NO_OPTION
+               ) {
+                return;
+            }
+            
+            // удаляем рекурсивно выбранные объекты
+            for (Object obj : list) {
+                PreviewElement element = (PreviewElement) obj;
+                String name = element.getName();
+                
+                switch (element.getType()) {
+                    case FOLDER:
+                    case TEXTURE:
+                    case MATERIAL:
+                    case SOUND:
+                    default:
+                        //if (!Utils.recursiveRemoveFiles(element.getPath())) {
+                        if (!Utils.removeFiles(Paths.get(element.getPath()))) {
+                            Utils.showMessageError("Возникли ошибки во время удаления \"" + name + "\"");
+                        }
+                        fillTreeFolders(false);
+                        fillListProjectView();
+                        break;
+
+                    case LEVELUP:
+                        continue;
+                }                
+            }            
+        }
+    }//GEN-LAST:event_popupPVMIRemoveActionPerformed
+    
+    private void popupPVMICopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMICopyActionPerformed
+        chooseFilesForCopy();
+        isCutMode = false;
+    }//GEN-LAST:event_popupPVMICopyActionPerformed
+
+    private void popuvPVMIPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popuvPVMIPasteActionPerformed
+        if (copyPaths != null && copyPaths.size() > 0) {            
+            
+            for (Iterator it = copyPaths.iterator(); it.hasNext();) {
+                Path path = (Path) it.next();
+                Path dest = Paths.get(currentPath.toString() + "/" + path.getFileName()); 
+                                
+                File fPath = path.toFile();
+                File fDest = dest.toFile();
+
+                // нельзя вставить папку во вложенную в неё же папку
+                /*if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS) && 
+                    Files.isDirectory(dest, LinkOption.NOFOLLOW_LINKS)) {
+                    try {
+                        if (FileUtils.directoryContains(fPath, fDest)) {
+                            Utils.showMessageError("Невозможно вставить папку в дочернюю!");
+                            continue;
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                        continue;
+                    }
+                }*/
+                    
+                // существует?
+                if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
+                    // нельзя вырезать себя и поместить в себя
+                    if (path.compareTo(dest) == 0 && isCutMode) {
+                        continue;
+                    }
+                    
+                    // последнее предупреждение!
+                    if (JOptionPane.showConfirmDialog(null, 
+                                                      "\"" + dest.toString() + "\"\nуже существует! Перезаписать?",
+                                                      "Ошибка",
+                                                      JOptionPane.YES_NO_OPTION,
+                                                      JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION
+                       ) {
+                        // решил переименовать
+                        while (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
+                            String newName = (String) JOptionPane.showInputDialog(null,
+                                                                                  "Введите новое имя для объекта\n\"" + dest.toString() + "\":", 
+                                                                                  "Новое имя",
+                                                                                  JOptionPane.INFORMATION_MESSAGE,
+                                                                                  null,
+                                                                                  null,
+                                                                                  path.getFileName());
+                            if (newName == null) {
+                                return;
+                            } else {
+                                dest = Paths.get(currentPath.toString() + "/" + newName);
+                                fDest = dest.toFile();
+                            }
+                        }
+                    }                    
+                }
+                
+                // пишем!
+                // копирование
+                if (!isCutMode) {
+                    if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+                        try {
+                            FileUtils.copyDirectory(fPath, fDest);
+                        } catch (IOException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            Utils.showMessageException(ex);
+                        }
+                    } else {
+                        try {
+                            FileUtils.copyFile(fPath, fDest);
+                        } catch (IOException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            Utils.showMessageException(ex);
+                        }
+                    }
+                // перенос
+                } else {
+                    if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+                        try {
+                            FileUtils.moveDirectory(fPath, fDest);
+                        } catch (IOException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            Utils.showMessageException(ex);
+                        }
+                    } else {
+                        try {
+                            FileUtils.moveFile(fPath, fDest);
+                        } catch (IOException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            Utils.showMessageException(ex);
+                        }
+                    }                    
+                }
+            }
+            
+            // вырезаем?
+            if (isCutMode) {   
+                isCutMode = false;
+                copyPaths.clear();
+                copyPaths = null;
+            }
+            
+            fillTreeFolders(false);
+            fillListProjectView();
+        }
+    }//GEN-LAST:event_popuvPVMIPasteActionPerformed
+
+    private void popupPVMICutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMICutActionPerformed
+        chooseFilesForCopy();
+        isCutMode = true;
+    }//GEN-LAST:event_popupPVMICutActionPerformed
+
+    private void popupPVMITextureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMITextureActionPerformed
+        DialogOpenTexture dlg = new DialogOpenTexture(this, true);
+        dlg.setVisible(true);
+        
+        File txrFile = DialogOpenTexture.selectedFile;
+        if (txrFile != null) {
+            // копируем текстуру к себе в папку ресурсов
+            String baseName = FilenameUtils.getBaseName(txrFile.getName());     
+            File newPath = new File(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+            
+            // файл с таким же именем существует?
+            if (newPath.exists()) {
+                if (JOptionPane.showConfirmDialog(null, 
+                                                  "\"" + baseName + "\" уже существует! Перезаписать?",
+                                                  "Ошибка",
+                                                  JOptionPane.YES_NO_OPTION,
+                                                  JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION
+                   ) {
+                    // решил переименовать
+                    while (newPath.exists()) {
+                        String newName = (String) JOptionPane.showInputDialog(null,
+                                                                              "Введите новое имя для \"" + baseName + "\":", 
+                                                                              "Новое имя",
+                                                                              JOptionPane.QUESTION_MESSAGE,
+                                                                              null,
+                                                                              null,
+                                                                              baseName);
+                        if (newName == null) {
+                            return;
+                        } else {
+                            newPath = new File(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+                        }
+                    }
+                }         
+            }
+            
+            // создаем файл у себя
+            try {
+                BufferedImage img = Utils.prepareImage(ImageIO.read(txrFile));
+                ImageIO.write(img, "png", newPath);
+            } catch (Exception ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                Utils.showMessageException(ex);
+                return;
+            }
+            
+            fillListProjectView();            
+            new Texture(newPath);
+            
+            DefaultListModel model = (DefaultListModel) listProjectView.getModel();
+            for (Object obj : model.toArray()) {
+                PreviewElement element = (PreviewElement)obj;
+                if (element.getType() == PreviewElement.Type.TEXTURE && 
+                    element.getName().equals(baseName)
+                   ) {                    
+                    listProjectView.setSelectedValue(element, true);
+                    openFormTextureEditor();
+                    break;
+                }
+            }    
+        }
+    }//GEN-LAST:event_popupPVMITextureActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */           
+        /*
+        UIManager.put( "info", new Color(128,128,128) );
+        UIManager.put( "nimbusBase", new Color( 18, 30, 49) );
+        UIManager.put( "nimbusAlertYellow", new Color( 248, 187, 0) );
+        UIManager.put( "nimbusDisabledText", new Color( 128, 128, 128) );
+        UIManager.put( "nimbusFocus", new Color(115,164,209) );
+        UIManager.put( "nimbusGreen", new Color(176,179,50) );
+        UIManager.put( "nimbusInfoBlue", new Color( 66, 139, 221) );
+        UIManager.put( "nimbusLightBackground", new Color( 18, 30, 49) );
+        UIManager.put( "nimbusOrange", new Color(191,98,4) );
+        UIManager.put( "nimbusRed", new Color(169,46,34) );
+        UIManager.put( "nimbusSelectedText", new Color( 255, 255, 255) );
+        UIManager.put( "nimbusSelectionBackground", new Color( 104, 93, 156) );
+        UIManager.put( "text", new Color( 230, 230, 230) );
+        */
+        /*try {            
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Metal".equals(info.getName()) 
+                    //|| "GTK+".equals(info.getName()) 
+                    //"Nimbus".equals(info.getName()) 
+                    //|| "Windows".equals(info.getName()) 
+                    //|| "Windows Classic".equals(info.getName())    
+                    ) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());    
+                    break;
+                }
+            }
+            
+            // GTK
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+
+            // motif
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+
+            // nimbus                    
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+
+            // windows classic
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsClassicLookAndFeel");
+
+            // windows
+            //UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");  
+            
+            // metal
+            //UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+            
+            //UIManager.setLookAndFeel("com.bulenkov.darcula.DarculaLaf");
+            
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(FormMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(FormMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(FormMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FormMain.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }*/
+        try {            
+            UIManager.getFont("Label.font");
+            UIManager.setLookAndFeel(new DarculaLaf());
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+            Utils.showMessageException(ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+                
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                formMain = new FormMain();
+                formMain.setVisible(true);
+            }
+        });        
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JDesktopPane Desktop;
+    private javax.swing.JMenu MenuFile;
+    private javax.swing.JMenuItem MenuItemCloseProject;
+    private javax.swing.JMenuItem MenuItemExit;
+    private javax.swing.JMenuItem MenuItemOpenProject;
+    private javax.swing.JMenuItem MenuItemSaveProject;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JSplitPane jSplitPane3;
+    private javax.swing.JList<String> listProjectView;
+    private javax.swing.JPopupMenu popupPV;
+    private javax.swing.JMenuItem popupPVMICopy;
+    private javax.swing.JMenuItem popupPVMICut;
+    private javax.swing.JMenuItem popupPVMIFolder;
+    private javax.swing.JMenuItem popupPVMIRemove;
+    private javax.swing.JMenuItem popupPVMIRename;
+    private javax.swing.JMenuItem popupPVMITexture;
+    private javax.swing.JMenu popupPVMenuAdd;
+    private javax.swing.JMenuItem popuvPVMIPaste;
+    private javax.swing.JSplitPane splProjectManager;
+    private javax.swing.JTree treeFolders;
+    // End of variables declaration//GEN-END:variables
+
+}
