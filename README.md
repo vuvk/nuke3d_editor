@@ -1,6 +1,6 @@
-# Nuke3D - FPS Game Constructor 
+# Level Editor of Nuke3D - FPS Game Constructor 
 
-[![Build Status](https://travis-ci.org/vuvk/nuke3d.svg?branch=master)](https://travis-ci.org/vuvk/nuke3d)
+[![Build Status](https://travis-ci.org/vuvk/nuke3d_editor.svg?branch=master)](https://travis-ci.org/vuvk/nuke3d_editor)
 
 Nuke3D is the game constructor of first-person shooters.
 
@@ -22,10 +22,9 @@ Nuke3D uses a number of open source projects to work properly:
 
 Nuke3D requires JRE >= 1.8 to run.
 
-Install maven and run it for build Nuke3D.
+Install maven and run it for build Nuke3D Editor:
 
 ```sh
-$ cd N3DEditor
 $ mvn clean install
 ```
 
