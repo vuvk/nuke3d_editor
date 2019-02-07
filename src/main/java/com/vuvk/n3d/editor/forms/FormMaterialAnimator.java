@@ -19,7 +19,6 @@ package com.vuvk.n3d.editor.forms;
 
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.resources.Material;
-import com.vuvk.n3d.resources.Material.MaterialFrame;
 import javax.swing.ImageIcon;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -90,7 +89,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             }
             
             while (isAnimationPlay) {
-                MaterialFrame frame = selectedMaterial.getFrame(curFrame);
+                Material.Frame frame = selectedMaterial.getFrame(curFrame);
                 long delay = (long)(frame.getDelay() * 1000);
                 long time = System.currentTimeMillis();
 
@@ -137,7 +136,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
         DefaultTableModel tableFramesModel = (DefaultTableModel)TableFrames.getModel();
         tableFramesModel.setRowCount(0);
         for (int i = 0; i < selectedMaterial.getFramesCount(); ++i) {
-            Material.MaterialFrame frame = selectedMaterial.getFrame(i);
+            Material.Frame frame = selectedMaterial.getFrame(i);
             if (frame != null) {
                 tableFramesModel.addRow(new Object[]{"Frame #" + i, frame.getDelay()});
             }
@@ -166,7 +165,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
                 
                 if (TableFrames.getSelectedRowCount() > 0) {
                     selectedFrameIndex = TableFrames.getSelectedRow();
-                    MaterialFrame frame = selectedMaterial.getFrame(selectedFrameIndex);
+                    Material.Frame frame = selectedMaterial.getFrame(selectedFrameIndex);
                     imagePreview.image = frame.getImage();
                     CheckStretched.setEnabled(true);
                     ButtonChooseTexture.setEnabled(true);
@@ -476,7 +475,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
         
         if (selectedMaterial != null) {
             int index;
-            MaterialFrame frame = new MaterialFrame();
+            Material.Frame frame = new Material.Frame();
             if (selectedFrameIndex == -1) {
                 selectedMaterial.addFrame(frame);
                 index = selectedMaterial.getFramesCount() - 1;
@@ -487,7 +486,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             
             // попробуем взять задержку с предыдущего кадра
             double prevDelay = 0.5;
-            MaterialFrame prev = selectedMaterial.getFrame(index - 1);
+            Material.Frame prev = selectedMaterial.getFrame(index - 1);
             if (prev != null) {
                 prevDelay = prev.getDelay();
             }
@@ -558,7 +557,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             }
             
             // меняем кадры местами
-            MaterialFrame frameTemp = selectedMaterial.getFrame(prevRow - 1);
+            Material.Frame frameTemp = selectedMaterial.getFrame(prevRow - 1);
             selectedMaterial.setFrame(prevRow - 1, selectedMaterial.getFrame(prevRow));
             selectedMaterial.setFrame(prevRow, frameTemp);
             
@@ -609,7 +608,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             }
             
             // меняем кадры местами
-            MaterialFrame frameTemp = selectedMaterial.getFrame(prevRow);
+            Material.Frame frameTemp = selectedMaterial.getFrame(prevRow);
             selectedMaterial.setFrame(prevRow, selectedMaterial.getFrame(prevRow + 1));
             selectedMaterial.setFrame(prevRow + 1, frameTemp);
             

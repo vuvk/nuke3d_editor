@@ -40,26 +40,26 @@ import java.util.logging.Logger;
 public class Material extends Resource {
     
     /** енумератор типа материала */
-    public static enum MaterialType {
+    public static enum Type {
         Default,
         AlphaChannel,
         Transparent
     }
     
     /** один кадр анимации */
-    public static class MaterialFrame {
+    public static class Frame {
         /** ссылка на текстуру кадра */
         private Texture texture;
         /** задержка на кадре в сек */
         private double delay;
         
         /** конструктор */
-        public MaterialFrame() {
+        public Frame() {
             texture = null;
             delay = 0.5;
         }
         /** конструктор с переданной текстурой */
-        public MaterialFrame(Texture texture) {
+        public Frame(Texture texture) {
             this.texture = texture;
             delay = 0.5;
         }
@@ -119,9 +119,9 @@ public class Material extends Resource {
     }
     
     /** тип материала */
-    private MaterialType materialType = MaterialType.Default;    
+    private Type type = Type.Default;    
     /** Список кадров материала */
-    private final ArrayList<MaterialFrame> frames = new ArrayList<>();
+    private final ArrayList<Frame> frames = new ArrayList<>();
     
     /** Список всех материалов (контейнер) */
     public static final ArrayList<Material> list = new ArrayList<>();
@@ -152,14 +152,14 @@ public class Material extends Resource {
                 
                 // дергаем имя и тип
                 String name = jsonMaterial.get("name").getAsString();
-                MaterialType type = MaterialType.Default;
+                Type type = Type.Default;
                 switch (jsonMaterial.get("type").getAsString()) {
                     case "AlphaChannel" : 
-                        type = MaterialType.AlphaChannel;
+                        type = Type.AlphaChannel;
                         break;
                         
                     case "Transparent" : 
-                        type = MaterialType.Transparent;
+                        type = Type.Transparent;
                         break;  
                 }
                 
@@ -170,7 +170,7 @@ public class Material extends Resource {
                 JsonArray jsonFrames = jsonMaterial.getAsJsonArray("frames");
                 mat.setFramesCount(jsonFrames.size());
                 for (int f = 0; f < jsonFrames.size(); ++f) {
-                    MaterialFrame frame = new MaterialFrame();
+                    Frame frame = new Frame();
                     
                     JsonObject jsonFrame = jsonFrames.get(f).getAsJsonObject();
                     int index = jsonFrame.get("texture").getAsInt();
@@ -222,7 +222,7 @@ public class Material extends Resource {
                 
                 // массив кадров
                 JsonArray jsonFrames = new JsonArray(mat.getFramesCount());
-                for (MaterialFrame frame : mat.frames) {
+                for (Frame frame : mat.frames) {
                     JsonObject jsonFrame = new JsonObject();
                     
                     // ищем номер текстуры
@@ -280,7 +280,7 @@ public class Material extends Resource {
      */
     public Material() {
         name = "material_" + list.size();
-        materialType = MaterialType.Default;
+        type = Type.Default;
         
         // имя подходящее?
         for (int i = 0; i < list.size(); ++i) {
@@ -291,7 +291,7 @@ public class Material extends Resource {
             }
         }
         
-        frames.add(new MaterialFrame());
+        frames.add(new Frame());
         
         list.add(this);
     }    
@@ -320,8 +320,8 @@ public class Material extends Resource {
      * Установить тип материала
      * @param materialType новый тип
      */
-    public void setMaterialType(MaterialType materialType) {
-        this.materialType = materialType;
+    public void setMaterialType(Type materialType) {
+        this.type = materialType;
     }
     /**
      * Установить количество кадров (не менее 1).
@@ -339,23 +339,23 @@ public class Material extends Resource {
             // наращиваем
             } else if (count > frames.size()) {                
                 while (frames.size() < count) {
-                    frames.add(new MaterialFrame());
+                    frames.add(new Frame());
                 }
             }
         }
     }
     /**
      * Получить тип материала
-     * @return тип MaterialType
+     * @return тип Type
      */
-    public MaterialType getMaterialType() {
-        return materialType;
+    public Type getMaterialType() {
+        return type;
     }
     /**
      * Добавить кадр в конец (то же, что pushFrame)
      * @param frame Добавляемый кадр
      */
-    public void addFrame(MaterialFrame frame) {
+    public void addFrame(Frame frame) {
         pushFrame(frame);
     }
     /**
@@ -363,14 +363,14 @@ public class Material extends Resource {
      * @param position Позиция для добавления нового кадра
      * @param frame Добавляемый кадр
      */
-    public void addFrame(int position, MaterialFrame frame) {
+    public void addFrame(int position, Frame frame) {
         frames.add(position, frame);
     }
     /**
      * Добавить кадр в конец
      * @param frame Добавляемый кадр
      */
-    public void pushFrame(MaterialFrame frame) {
+    public void pushFrame(Frame frame) {
         frames.add(frame);
     }
     /**
@@ -393,7 +393,7 @@ public class Material extends Resource {
      * @param index номер кадра
      * @return кадр в классе MaterialFrame или null, если такого нет
      */
-    public MaterialFrame getFrame(int index) {
+    public Frame getFrame(int index) {
         if (index >= 0 && index < frames.size()) {
             return frames.get(index);
         } else {
@@ -412,7 +412,7 @@ public class Material extends Resource {
      * @param index позиция для замены
      * @param frame новый кадр
      */
-    public void setFrame(int index, MaterialFrame frame) {
+    public void setFrame(int index, Frame frame) {
         if (index >= 0 && index < frames.size()) {
             frames.set(index, frame);
         }

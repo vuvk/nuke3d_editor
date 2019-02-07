@@ -304,15 +304,15 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
             switch (ComboBoxMaterialType.getSelectedIndex()) {
                 default:
                 case 0 : 
-                    selectedMaterial.setMaterialType(Material.MaterialType.Default);
+                    selectedMaterial.setMaterialType(Material.Type.Default);
                     break;     
                     
                 case 1 : 
-                    selectedMaterial.setMaterialType(Material.MaterialType.AlphaChannel);
+                    selectedMaterial.setMaterialType(Material.Type.AlphaChannel);
                     break;
                     
                 case 2 : 
-                    selectedMaterial.setMaterialType(Material.MaterialType.Transparent);
+                    selectedMaterial.setMaterialType(Material.Type.Transparent);
                     break;
             }
         }
