@@ -309,9 +309,6 @@
                     </Property>
                     <Property name="selectionMode" type="int" value="1"/>
                     <Property name="autoscrolls" type="boolean" value="false"/>
-                    <Property name="componentPopupMenu" type="javax.swing.JPopupMenu" editor="org.netbeans.modules.form.ComponentChooserEditor">
-                      <ComponentRef name="popupPV"/>
-                    </Property>
                     <Property name="doubleBuffered" type="boolean" value="true"/>
                     <Property name="fixedCellHeight" type="int" value="128"/>
                     <Property name="fixedCellWidth" type="int" value="128"/>

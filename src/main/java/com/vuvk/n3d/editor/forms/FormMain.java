@@ -178,6 +178,7 @@ public class FormMain extends javax.swing.JFrame {
         fillTreeFolders(true);
         listProjectView.setEnabled(true);
         treeFolders.setEnabled(true);
+        listProjectView.setComponentPopupMenu(popupPV);
         
         JOptionPane.showMessageDialog(this, "Проект открыт.");  
     }
@@ -231,7 +232,10 @@ public class FormMain extends javax.swing.JFrame {
                 clearListProjectView();
                 listProjectView.setEnabled(false);
                 treeFolders.setEnabled(false);
-                                
+                listProjectView.setComponentPopupMenu(null);
+                currentPath = null;    
+                copyPaths = null;
+                isCutMode = false;
                 
                 JOptionPane.showMessageDialog(this, "Проект закрыт");
                 return true;
@@ -705,7 +709,6 @@ public class FormMain extends javax.swing.JFrame {
         });
         listProjectView.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         listProjectView.setAutoscrolls(false);
-        listProjectView.setComponentPopupMenu(popupPV);
         listProjectView.setDoubleBuffered(true);
         listProjectView.setFixedCellHeight(128);
         listProjectView.setFixedCellWidth(128);
