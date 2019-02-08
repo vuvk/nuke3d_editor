@@ -120,9 +120,13 @@ public final class Texture extends Resource {
                 continue;
             }
             
-            // добавляем в базу новую текстуру и задаём ей Id
-            new Texture(Paths.get(jsonPath.getAsString()))
-                .setId(jsonId.getAsInt());
+            // если текстура существует
+            Path path = Paths.get(jsonPath.getAsString());
+            if (Files.exists(path)) {
+                // добавляем в базу новую текстуру и задаём ей Id
+                new Texture(path)
+                    .setId(jsonId.getAsInt());
+            }
         }        
         
         return true;
