@@ -29,6 +29,14 @@ public final class MessageDialog {
     private MessageDialog(){}
     
     /**
+     * Отобразить простое сообщение
+     * @param msg Текст сообщения
+     */
+    public static void showMessage(String msg) {
+        JOptionPane.showMessageDialog(null, msg);       
+    }
+    
+    /**
      * Отобразить сообщение с ошибкой из исключения
      * @param ex Исключение, сообщение которого необходимо отобразить
      */
@@ -72,4 +80,49 @@ public final class MessageDialog {
                                              JOptionPane.YES_NO_OPTION, 
                                              JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION;
     }
+    
+    /**
+     * Отобразить сообщение с подтверждением (Да/Нет/Отмена)
+     * @param msg Текст сообщения
+     * @return Boolean.TRUE, если ответ Да, Boolean.FALSE, если нет, null - Отмена
+     */
+    public static Boolean showConfirmationYesNoCancel(String msg) {
+        switch (JOptionPane.showConfirmDialog(null, 
+                                             msg, 
+                                             "Confirmation", 
+                                             JOptionPane.YES_NO_CANCEL_OPTION, 
+                                             JOptionPane.QUESTION_MESSAGE)) {
+            case JOptionPane.YES_OPTION:
+                return Boolean.TRUE;
+            case JOptionPane.NO_OPTION:
+                return Boolean.FALSE;
+            default:
+                return null;
+        }
+    }
+    
+    /**
+     * Отобразить окно ввода значения
+     * @param msg Текст сообщения
+     * @return Введенное значение или null, если поле пустое или окно отменено
+     */
+    public static String showInput(String msg) {
+        return JOptionPane.showInputDialog(null, msg, "Input", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Отобразить окно ввода значения с дефолтным значением в поле ввода
+     * @param msg Текст сообщения
+     * @param initialValue Значение в поле ввода при вызове
+     * @return Введенное значение или null, если поле пустое или окно отменено
+     */
+    public static Object showInput(String msg, Object initialValue) {
+        return JOptionPane.showInputDialog(null, 
+                                           msg, 
+                                           "Input", 
+                                           JOptionPane.INFORMATION_MESSAGE,
+                                           null, 
+                                           null, 
+                                           initialValue);
+    }    
 }
