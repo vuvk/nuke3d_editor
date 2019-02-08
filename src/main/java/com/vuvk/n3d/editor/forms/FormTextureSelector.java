@@ -17,8 +17,8 @@
 */
 package com.vuvk.n3d.editor.forms;
 
-import com.vuvk.n3d.Utils;
 import com.vuvk.n3d.resources.Texture;
+import com.vuvk.n3d.utils.ImageUtils;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
@@ -81,7 +81,7 @@ public class FormTextureSelector extends javax.swing.JDialog {
                 }
             }
             
-            icon.setImage(Utils.resizeImage(txr.getImage(), iconWidth, iconHeight));
+            icon.setImage(ImageUtils.resizeImage(txr.getImage(), iconWidth, iconHeight));
             
             setIcon(icon);            
             setText(txr.getName());

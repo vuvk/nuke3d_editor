@@ -17,7 +17,6 @@
 */
 package com.vuvk.n3d.resources;
 
-import com.vuvk.n3d.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -25,6 +24,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
+import com.vuvk.n3d.utils.ImageUtils;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -82,7 +83,7 @@ public final class Texture extends Resource {
             config = gson.fromJson(reader, JsonObject.class);
         } catch (Exception ex) {
             Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
-            Utils.showMessageException(ex);
+            MessageDialog.showException(ex);
             return false;
         }
         
@@ -137,7 +138,7 @@ public final class Texture extends Resource {
                 Files.createDirectory(Global.CONFIG_PATH);
             } catch (IOException ex) {
                 Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
-                Utils.showMessageException(ex);
+                MessageDialog.showException(ex);
                 return false;
             }
         }
@@ -161,7 +162,7 @@ public final class Texture extends Resource {
             gson.toJson(config, writer);             
         } catch (IOException ex) {
             Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
-            Utils.showMessageException(ex);
+            MessageDialog.showException(ex);
             return false;
         }
         
@@ -232,7 +233,7 @@ public final class Texture extends Resource {
             FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
            ) {
             try {
-                image = Utils.prepareImage(ImageIO.read(path.toFile()));
+                image = ImageUtils.prepareImage(ImageIO.read(path.toFile()));
             } catch (IOException ex) {
                 Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
                 image = IMAGE_EMPTY;
@@ -250,7 +251,7 @@ public final class Texture extends Resource {
             ImageIO.write(image, "png", new File(path));
         } catch (IOException ex) {
             Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
-            Utils.showMessageException(ex);
+            MessageDialog.showException(ex);
         }
     }
     
@@ -287,7 +288,7 @@ public final class Texture extends Resource {
      * @param image новое изображение
      */
     public void setImage(BufferedImage image) {
-        this.image = Utils.prepareImage(image);
+        this.image = ImageUtils.prepareImage(image);
     }
     
     /**

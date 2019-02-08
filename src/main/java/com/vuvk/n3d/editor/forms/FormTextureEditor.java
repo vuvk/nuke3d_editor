@@ -17,24 +17,14 @@
 */
 package com.vuvk.n3d.editor.forms;
 
-import com.vuvk.n3d.Const;
-import com.vuvk.n3d.Utils;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.components.PanelImagePreview;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  *

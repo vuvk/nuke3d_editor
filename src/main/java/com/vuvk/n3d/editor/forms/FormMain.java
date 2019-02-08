@@ -20,11 +20,13 @@ package com.vuvk.n3d.editor.forms;
 import com.bulenkov.darcula.DarculaLaf;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
-import com.vuvk.n3d.Utils;
 import com.vuvk.n3d.components.PreviewElement;
 import com.vuvk.n3d.components.PreviewElement.Type;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Texture;
+import com.vuvk.n3d.utils.FileSystemUtils;
+import com.vuvk.n3d.utils.ImageUtils;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -146,7 +148,7 @@ public class FormMain extends javax.swing.JFrame {
                     }
                 }
 
-                icon.setImage(Utils.resizeImage(img, iconWidth, iconHeight));
+                icon.setImage(ImageUtils.resizeImage(img, iconWidth, iconHeight));
             } else {
                 icon.setImage(new BufferedImage(iconWidth, iconHeight, BufferedImage.TYPE_INT_ARGB));
             }
@@ -192,11 +194,11 @@ public class FormMain extends javax.swing.JFrame {
         }
         
         if (!Texture.saveConfig()) {
-            Utils.showMessageError("Не удалось сохранить текстуры проекта! Повторите попытку.");
+            MessageDialog.showError("Не удалось сохранить текстуры проекта! Повторите попытку.");
         }
         
         if (!Material.saveAll()) {
-            Utils.showMessageError("Не удалось сохранить материалы проекта! Повторите попытку.");
+            MessageDialog.showError("Не удалось сохранить материалы проекта! Повторите попытку.");
         }
         
         JOptionPane.showMessageDialog(this, "Процедура сохранения проекта завершена.");   
@@ -514,8 +516,8 @@ public class FormMain extends javax.swing.JFrame {
                 
                 // если всё ещё не нашёл, а файл есть, значит он проект битый 
                 // или файл был "подброшен"
-                Utils.showMessageError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
-                                       "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
             }
         }
     }
@@ -907,7 +909,7 @@ public class FormMain extends javax.swing.JFrame {
                     }
                     Path newPath = Paths.get(newPathStr);
                     if (Files.exists(newPath)) {
-                        Utils.showMessageError("Файл \"" + newPathStr + "\" уже существует!");
+                        MessageDialog.showError("Файл \"" + newPathStr + "\" уже существует!");
                         return;
                     }
                     
@@ -919,7 +921,7 @@ public class FormMain extends javax.swing.JFrame {
                     fillListProjectView();
                 } catch (Exception ex) {
                     Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                    Utils.showMessageException(ex);
+                    MessageDialog.showException(ex);
                 }
             }
         }
@@ -975,8 +977,8 @@ public class FormMain extends javax.swing.JFrame {
                     case SOUND:
                     default:
                         //if (!Utils.recursiveRemoveFiles(element.getPath())) {
-                        if (!Utils.removeFiles(Paths.get(element.getPath()))) {
-                            Utils.showMessageError("Возникли ошибки во время удаления \"" + name + "\"");
+                        if (!FileSystemUtils.removeFiles(Paths.get(element.getPath()))) {
+                            MessageDialog.showError("Возникли ошибки во время удаления \"" + name + "\"");
                         }
                         fillTreeFolders(false);
                         fillListProjectView();
@@ -1059,14 +1061,14 @@ public class FormMain extends javax.swing.JFrame {
                             FileUtils.copyDirectory(fPath, fDest);
                         } catch (IOException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            Utils.showMessageException(ex);
+                            MessageDialog.showException(ex);
                         }
                     } else {
                         try {
                             FileUtils.copyFile(fPath, fDest);
                         } catch (IOException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            Utils.showMessageException(ex);
+                            MessageDialog.showException(ex);
                         }
                     }
                 // перенос
@@ -1076,14 +1078,14 @@ public class FormMain extends javax.swing.JFrame {
                             FileUtils.moveDirectory(fPath, fDest);
                         } catch (IOException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            Utils.showMessageException(ex);
+                            MessageDialog.showException(ex);
                         }
                     } else {
                         try {
                             FileUtils.moveFile(fPath, fDest);
                         } catch (IOException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            Utils.showMessageException(ex);
+                            MessageDialog.showException(ex);
                         }
                     }                    
                 }
@@ -1144,11 +1146,11 @@ public class FormMain extends javax.swing.JFrame {
             
             // создаем файл у себя
             try {
-                BufferedImage img = Utils.prepareImage(ImageIO.read(txrFile));
+                BufferedImage img = ImageUtils.prepareImage(ImageIO.read(txrFile));
                 ImageIO.write(img, "png", newPath);
             } catch (Exception ex) {
                 Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                Utils.showMessageException(ex);
+                MessageDialog.showException(ex);
                 return;
             }
             
@@ -1240,7 +1242,7 @@ public class FormMain extends javax.swing.JFrame {
             UIManager.setLookAndFeel(new DarculaLaf());
         } catch (UnsupportedLookAndFeelException ex) {
             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-            Utils.showMessageException(ex);
+            MessageDialog.showException(ex);
         }
         //</editor-fold>
         //</editor-fold>

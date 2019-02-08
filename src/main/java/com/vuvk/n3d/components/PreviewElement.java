@@ -18,7 +18,9 @@
 package com.vuvk.n3d.components;
 
 import com.vuvk.n3d.Const;
-import com.vuvk.n3d.Utils;
+import com.vuvk.n3d.utils.FileSystemUtils;
+import com.vuvk.n3d.utils.ImageUtils;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -75,7 +77,7 @@ public class PreviewElement {
                 
             } catch (IOException ex) {
                 Logger.getLogger(PreviewElement.class.getName()).log(Level.SEVERE, null, ex);
-                Utils.showMessageException(ex);
+                MessageDialog.showException(ex);
             }
         }
     }
@@ -88,7 +90,7 @@ public class PreviewElement {
     private void init(Path path, boolean isUp) {
         loadIcons();
         
-        this.path = Utils.getProjectPath(path);      
+        this.path = FileSystemUtils.getProjectPath(path);      
         this.fileName = path.getFileName().toString();
         
         if (Files.isDirectory(path)) {
@@ -104,14 +106,14 @@ public class PreviewElement {
             
             extension = "";
         } else {
-            extension = Utils.getFileExtension(path.toFile());
+            extension = FileSystemUtils.getFileExtension(path.toFile());
             switch (extension) {
                 case "txr":
                     try {
-                        icon = Utils.resizeImage(ImageIO.read(path.toFile()), Const.ICON_PREVIEW_WIDTH, Const.ICON_PREVIEW_HEIGHT);
+                        icon = ImageUtils.resizeImage(ImageIO.read(path.toFile()), Const.ICON_PREVIEW_WIDTH, Const.ICON_PREVIEW_HEIGHT);
                     } catch (IOException ex) {
                         Logger.getLogger(PreviewElement.class.getName()).log(Level.SEVERE, null, ex);
-                        Utils.showMessageException(ex);
+                        MessageDialog.showException(ex);
                     }
                     type = Type.TEXTURE;
                     break;

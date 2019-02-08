@@ -18,8 +18,9 @@
 package com.vuvk.n3d.editor.forms;
 
 import com.vuvk.n3d.Const;
-import com.vuvk.n3d.Utils;
+import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.components.PanelImagePreview;
+import com.vuvk.n3d.utils.ImageUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -180,9 +181,9 @@ public class DialogOpenTexture extends javax.swing.JDialog {
                 File file = FileChooser.getSelectedFile();
                 if (file != null && file.isFile()) {
                     // если файл является текстурой, то попробовать его загрузить в предпросмотр
-                    if (Const.TEXTURE_EXTS.contains(Utils.getFileExtension(file))) {
+                    if (Const.TEXTURE_EXTS.contains(FileSystemUtils.getFileExtension(file))) {
                         try {
-                            panelImagePreview.image = Utils.prepareImage(ImageIO.read(file));
+                            panelImagePreview.image = ImageUtils.prepareImage(ImageIO.read(file));
                         } catch (IOException ex) {
                             Logger.getLogger(DialogOpenTexture.class.getName()).log(Level.SEVERE, null, ex);
                             panelImagePreview.image = null;

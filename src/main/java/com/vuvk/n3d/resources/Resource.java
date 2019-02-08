@@ -17,11 +17,9 @@
 */
 package com.vuvk.n3d.resources;
 
-import com.vuvk.n3d.Utils;
+import com.vuvk.n3d.utils.FileSystemUtils;
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -72,7 +70,7 @@ public class Resource {
      */
     protected void setPath(Path path) {
         if (path != null) {
-            this.path = Utils.getProjectPath(path);   
+            this.path = FileSystemUtils.getProjectPath(path);   
             setName(FilenameUtils.getBaseName(this.path));
         } else {
             this.path = "";
