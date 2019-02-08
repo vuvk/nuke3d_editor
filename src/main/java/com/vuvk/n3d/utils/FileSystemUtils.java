@@ -24,10 +24,14 @@ import com.vuvk.n3d.resources.Texture;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -110,6 +114,89 @@ public final class FileSystemUtils {
     }*/    
     
     /**
+     * Пробежаться по содержимому пути и добавить ссылки на файлы, если они нужного формата
+     * @param path Путь, в котором нужно произвести поиск
+     */
+    static void addResourcesFromPath(Path path) {
+        if (path != null) {
+            
+        }
+    }
+    
+    /**
+     * Рекурсивное копирование всех файлов и папок (включая вложенные подпапки и файлы) в новый путь
+     * @param copyPaths Путь, из которого нужно копировать, включая сам путь
+     * @param to Путь, в который нужно копировать from
+     * @return true, если всё копировано, false - возникла ошибка
+     */
+    public static boolean recursiveCopyFiles(List<Path> copyPaths, Path to) {
+        if (copyPaths == null || copyPaths.size() == 0 ||
+            to == null || !Files.isDirectory(to)) {
+            return false;
+        }
+        
+        try {
+            Files.createDirectories(to);
+        } catch (IOException ex) {
+            Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }
+        
+        boolean finished = true;
+                
+        for (Iterator it = copyPaths.iterator(); it.hasNext(); ) {
+            Path path = (Path) it.next();
+            Path dest = Paths.get(to.toString() + "/" + path.getFileName()); 
+
+            File fPath = path.toFile();
+            File fDest = dest.toFile();
+
+            // существует?
+            if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {                
+                if (path.compareTo(dest) == 0) {
+                    continue;
+                }
+
+                // последнее предупреждение!
+                if (MessageDialog.showConfirmationYesNo("\"" + dest.toString() + "\"\nуже существует! Перезаписать?")) {
+                    // решил переименовать
+                    while (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + dest.toString() + "\":", path.getFileName());
+                        if (newName == null) {
+                            continue;
+                        } else {
+                            dest = Paths.get(to.toString() + "/" + newName);
+                            fDest = dest.toFile();
+                        }
+                    }
+                }                    
+            }
+
+            // пишем!
+            if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+                try {
+                    FileUtils.copyDirectory(fPath, fDest);
+                } catch (IOException ex) {
+                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageDialog.showException(ex);
+                    finished = false;
+                }
+            } else {
+                try {
+                    FileUtils.copyFile(fPath, fDest);
+                } catch (IOException ex) {
+                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageDialog.showException(ex);
+                    finished = false;
+                }
+            }
+        }
+        
+        return finished;
+    }
+    
+    /**
      * Удалить файл с проверкой на тип объекта (с удалением из настроек проекта)
      * @param path Путь, по которому располагается файл
      * @return true, если удален, false - это не файл или возникла ошибка
@@ -138,11 +225,15 @@ public final class FileSystemUtils {
     }
     
     /**
-     * Рекурсивное удаление всех файлов и папок в пути
+     * Рекурсивное удаление всех файлов и папок (включая вложенные подпапки и файлы) в пути
      * @param path Путь, в котором будет удалено всё, включая сам путь
      * @return true, если удалены, false - возникла ошибка
      */
     public static boolean recursiveRemoveFiles(Path path) {
+        if (path == null || !Files.exists(path)) {
+            return false;
+        }
+        
         // пробежаться по содержимому
         boolean finished = true;        
         File fPath = path.toFile();
@@ -177,5 +268,4 @@ public final class FileSystemUtils {
         
         return finished;
     }
-
 }
