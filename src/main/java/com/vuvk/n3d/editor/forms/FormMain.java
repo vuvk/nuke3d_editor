@@ -243,19 +243,32 @@ public class FormMain extends javax.swing.JFrame {
         return true;
     }
     
-    /** 
-     * Закрыть все вызванные ранее дочерние окна
+    /**
+     * Закрыть окно редактирования текстур
      */
-    void closeChildWindows() {
+    public static void closeFormTextureEditor() {
         if (formTextureEditor != null) {
             formTextureEditor.dispose();
             formTextureEditor = null;
-        }
-        
+        }        
+    }
+    
+    /**
+     * Закрыть окно редактирования материалов
+     */
+    public static void closeFormMaterialEditor() {  
         if (formMaterialEditor != null) {
             formMaterialEditor.dispose();
             formMaterialEditor = null;
         }
+    }
+    
+    /** 
+     * Закрыть все вызванные ранее дочерние окна
+     */
+    public static void closeChildWindows() {
+        closeFormTextureEditor();
+        closeFormMaterialEditor();
     }
         
     /**
@@ -937,7 +950,7 @@ public class FormMain extends javax.swing.JFrame {
             }
             
             // последний шанс ничего не удалять
-            if (MessageDialog.showConfirmationYesNo(message)) {
+            if (!MessageDialog.showConfirmationYesNo(message)) {
                 return;
             }
             
@@ -952,8 +965,8 @@ public class FormMain extends javax.swing.JFrame {
                     case MATERIAL:
                     case SOUND:
                     default:
-                        //if (!Utils.recursiveRemoveFiles(element.getPath())) {
-                        if (!FileSystemUtils.removeFiles(Paths.get(element.getPath()))) {
+                        if (!FileSystemUtils.recursiveRemoveFiles(Paths.get(element.getPath()))) {
+                        //if (!FileSystemUtils.removeFiles(Paths.get(element.getPath()))) {
                             MessageDialog.showError("Возникли ошибки во время удаления \"" + name + "\"");
                         }
                         fillTreeFolders(false);
