@@ -19,11 +19,11 @@ package com.vuvk.n3d.editor.forms;
 
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.components.PanelImagePreview;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
 
 /**
@@ -156,12 +156,7 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
                             redraw();
 
                             // сохранить или отклонить изменения?
-                            if (JOptionPane.showConfirmDialog(null, 
-                                                              "Сохранить изменения? Это действие невозможно отменить!", 
-                                                              "Внимание!", 
-                                                              JOptionPane.YES_NO_OPTION,
-                                                              JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION
-                               ) {
+                            if (MessageDialog.showConfirmationYesNo("Сохранить изменения? Это действие невозможно отменить!")) {
                                 selectedTexture.setImage(newImage);
                                 setDeleteColorMode(false);
                                 tglDeleteColor.setSelected(false);

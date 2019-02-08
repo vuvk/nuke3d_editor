@@ -61,7 +61,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import static javax.swing.SwingConstants.BOTTOM;
@@ -182,7 +181,7 @@ public class FormMain extends javax.swing.JFrame {
         treeFolders.setEnabled(true);
         listProjectView.setComponentPopupMenu(popupPV);
         
-        JOptionPane.showMessageDialog(this, "Проект открыт.");  
+        MessageDialog.showInformation("Проект открыт.");  
     }
     
     /**
@@ -201,7 +200,7 @@ public class FormMain extends javax.swing.JFrame {
             MessageDialog.showError("Не удалось сохранить материалы проекта! Повторите попытку.");
         }
         
-        JOptionPane.showMessageDialog(this, "Процедура сохранения проекта завершена.");   
+        MessageDialog.showInformation("Процедура сохранения проекта завершена.");   
     }
     
     /**
@@ -211,41 +210,37 @@ public class FormMain extends javax.swing.JFrame {
     boolean projectClose() {
         if (!isProjectOpened) {
             return true;
-        }        
+        }  
         
-        switch (JOptionPane.showConfirmDialog(this, 
-                                              "Сохранить проект перед его закрытием? Все несохраненные данные будут утеряны.", 
-                                              "Предупреждение", 
-                                              JOptionPane.YES_NO_CANCEL_OPTION, 
-                                              JOptionPane.QUESTION_MESSAGE)) {
-            case JOptionPane.YES_OPTION : 
-                projectSave();
-            case JOptionPane.NO_OPTION : 
-                closeChildWindows();
-                Texture.closeAll();
-                Material.closeAll();
+        Boolean answer = MessageDialog.showConfirmationYesNoCancel("Сохранить проект перед его закрытием? Все несохраненные данные будут утеряны.");
+        // CANCEL
+        if (answer == null) {
+            return false;
+        // YES
+        } else if (answer.booleanValue()) {
+            projectSave();
+        }
+    
+        closeChildWindows();
+        Texture.closeAll();
+        Material.closeAll();
 
-                MenuItemOpenProject.setEnabled (true );
-                MenuItemSaveProject.setEnabled (false);
-                MenuItemCloseProject.setEnabled(false);
-                
-                isProjectOpened = false;
-                clearTreeFolders();
-                clearListProjectView();
-                listProjectView.setEnabled(false);
-                treeFolders.setEnabled(false);
-                listProjectView.setComponentPopupMenu(null);
-                currentPath = null;    
-                copyPaths = null;
-                isCutMode = false;
-                
-                JOptionPane.showMessageDialog(this, "Проект закрыт");
-                return true;
-            
-            case JOptionPane.CANCEL_OPTION :
-            default :
-                return false;
-        }        
+        MenuItemOpenProject.setEnabled (true );
+        MenuItemSaveProject.setEnabled (false);
+        MenuItemCloseProject.setEnabled(false);
+
+        isProjectOpened = false;
+        clearTreeFolders();
+        clearListProjectView();
+        listProjectView.setEnabled(false);
+        treeFolders.setEnabled(false);
+        listProjectView.setComponentPopupMenu(null);
+        currentPath = null;    
+        copyPaths = null;
+        isCutMode = false;
+
+        MessageDialog.showInformation("Проект закрыт");
+        return true;
     }
     
     /** 
@@ -355,7 +350,8 @@ public class FormMain extends javax.swing.JFrame {
                 Files.createDirectories(Global.RESOURCES_PATH);
             } catch (IOException ex) {
                 Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(this, "Не удалось создать папку ресурсов проекта!");
+                MessageDialog.showError("Не удалось создать папку ресурсов проекта!");
+                MessageDialog.showException(ex);
             }
         }
                 
@@ -807,12 +803,7 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_MenuItemExitActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        if (JOptionPane.showConfirmDialog(this, 
-                                          "Вы действительно хотите закрыть программу?",
-                                          "Внимание",
-                                          JOptionPane.YES_NO_OPTION,
-                                          JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION        
-           ) {
+        if (MessageDialog.showConfirmationYesNo("Вы действительно хотите закрыть программу?")) {
             if (!projectClose()) {
                 setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             } else {
@@ -867,10 +858,7 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_treeFoldersValueChanged
 
     private void popupPVMIFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIFolderActionPerformed
-        String folderName = JOptionPane.showInputDialog(null, 
-                                                        "Введите имя новой папки",
-                                                        "Необходим ввод", 
-                                                        JOptionPane.INFORMATION_MESSAGE);
+        String folderName = MessageDialog.showInput("Введите имя новой папки");
         if (folderName != null) {
             String newFolderPath = currentPath.toString() + "/" + folderName;
             File newFolder = new File(newFolderPath);
@@ -889,13 +877,7 @@ public class FormMain extends javax.swing.JFrame {
             PreviewElement element = (PreviewElement) list.get(0);
             
             String name = element.getName();            
-            String newName = (String) JOptionPane.showInputDialog(null, 
-                                                                  "Введите новое имя объекта", 
-                                                                  "Необходим ввод", 
-                                                                  JOptionPane.INFORMATION_MESSAGE, 
-                                                                  null, 
-                                                                  null, 
-                                                                  name);
+            String newName = (String) MessageDialog.showInput("Введите новое имя объекта", name);
             if (newName != null && !newName.equals(name)) {
                 Path path = Paths.get(element.getPath());
                 try {
@@ -955,13 +937,7 @@ public class FormMain extends javax.swing.JFrame {
             }
             
             // последний шанс ничего не удалять
-            if (JOptionPane.showConfirmDialog(null, 
-                                              message,
-                                              "Внимание",
-                                              JOptionPane.YES_NO_OPTION,
-                                              JOptionPane.QUESTION_MESSAGE
-                                             ) == JOptionPane.NO_OPTION
-               ) {
+            if (MessageDialog.showConfirmationYesNo(message)) {
                 return;
             }
             
@@ -1028,21 +1004,10 @@ public class FormMain extends javax.swing.JFrame {
                     }
                     
                     // последнее предупреждение!
-                    if (JOptionPane.showConfirmDialog(null, 
-                                                      "\"" + dest.toString() + "\"\nуже существует! Перезаписать?",
-                                                      "Ошибка",
-                                                      JOptionPane.YES_NO_OPTION,
-                                                      JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION
-                       ) {
+                    if (MessageDialog.showConfirmationYesNo("\"" + dest.toString() + "\"\nуже существует! Перезаписать?")) {
                         // решил переименовать
                         while (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
-                            String newName = (String) JOptionPane.showInputDialog(null,
-                                                                                  "Введите новое имя для объекта\n\"" + dest.toString() + "\":", 
-                                                                                  "Новое имя",
-                                                                                  JOptionPane.INFORMATION_MESSAGE,
-                                                                                  null,
-                                                                                  null,
-                                                                                  path.getFileName());
+                            String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + dest.toString() + "\":", path.getFileName());
                             if (newName == null) {
                                 return;
                             } else {
@@ -1120,21 +1085,10 @@ public class FormMain extends javax.swing.JFrame {
             
             // файл с таким же именем существует?
             if (newPath.exists()) {
-                if (JOptionPane.showConfirmDialog(null, 
-                                                  "\"" + baseName + "\" уже существует! Перезаписать?",
-                                                  "Ошибка",
-                                                  JOptionPane.YES_NO_OPTION,
-                                                  JOptionPane.QUESTION_MESSAGE) == JOptionPane.NO_OPTION
-                   ) {
+                if (MessageDialog.showConfirmationYesNo("\"" + baseName + "\" уже существует! Перезаписать?")) {
                     // решил переименовать
                     while (newPath.exists()) {
-                        String newName = (String) JOptionPane.showInputDialog(null,
-                                                                              "Введите новое имя для \"" + baseName + "\":", 
-                                                                              "Новое имя",
-                                                                              JOptionPane.QUESTION_MESSAGE,
-                                                                              null,
-                                                                              null,
-                                                                              baseName);
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для \"" + baseName + "\":", baseName);
                         if (newName == null) {
                             return;
                         } else {

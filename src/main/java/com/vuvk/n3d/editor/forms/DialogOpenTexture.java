@@ -21,6 +21,7 @@ import com.vuvk.n3d.Const;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.utils.ImageUtils;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -186,6 +187,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
                             panelImagePreview.image = ImageUtils.prepareImage(ImageIO.read(file));
                         } catch (IOException ex) {
                             Logger.getLogger(DialogOpenTexture.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
                             panelImagePreview.image = null;
                         }
                     }                   
