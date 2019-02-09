@@ -23,10 +23,13 @@ import com.vuvk.n3d.editor.forms.FormMain;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -130,7 +133,7 @@ public final class FileSystemUtils {
      * @return true, если всё копировано, false - возникла ошибка
      */
     public static boolean recursiveCopyFiles(List<Path> copyPaths, Path to) {
-        if (copyPaths == null || copyPaths.size() == 0 ||
+        if (copyPaths == null || copyPaths.isEmpty() ||
             to == null || !Files.isDirectory(to)) {
             return false;
         }
@@ -201,7 +204,7 @@ public final class FileSystemUtils {
      * @param path Путь, по которому располагается файл
      * @return true, если удален, false - это не файл или возникла ошибка
      */
-    static boolean deleteFile(Path path) {   
+    /*static boolean deleteFile(Path path) {   
         if (Files.exists(path) && !Files.isDirectory(path)) {
             
             // по расширению файла определяем что это
@@ -222,7 +225,7 @@ public final class FileSystemUtils {
         }
         
         return false;
-    }
+    }*/
     
     /**
      * Рекурсивное удаление всех файлов и папок (включая вложенные подпапки и файлы) в пути
@@ -230,7 +233,7 @@ public final class FileSystemUtils {
      * @return true, если удалены, false - возникла ошибка
      */
     public static boolean recursiveRemoveFiles(Path path) {
-        if (path == null || !Files.exists(path)) {
+        /*if (path == null || !Files.exists(path)) {
             return false;
         }
         
@@ -266,6 +269,57 @@ public final class FileSystemUtils {
             }
         }        
         
-        return finished;
+        return finished;*/
+        
+        
+        // это директория
+        if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
+            try {
+                Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        Files.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {                    
+                        // по расширению файла определяем что это
+                        // для того, чтобы удалить файл из настроек проекта
+                        switch (getFileExtension(file)) {
+                            case "txr" :
+                                String filePath = getProjectPath(file);
+                                for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
+                                    if (((Texture)it.next()).getPath().equals(filePath)) {
+                                        it.remove();
+                                    }
+                                }
+                                FormMain.closeFormTextureEditor();
+                                break;
+                        }
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+                
+                // Удаляем сам путь
+                Files.deleteIfExists(path);
+            } catch (IOException ex) {
+                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return false;
+            }
+        // это файл
+        } else {
+            try {
+                Files.deleteIfExists(path);
+            } catch (IOException ex) {
+                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return false;
+            }
+        }        
+ 
+        return Files.exists(path);
     }
 }
