@@ -989,25 +989,11 @@ public class FormMain extends javax.swing.JFrame {
         if (copyPaths != null && copyPaths.size() > 0) {            
             
             for (Iterator it = copyPaths.iterator(); it.hasNext();) {
-                Path path = (Path) it.next();
+                /*Path path = (Path) it.next();
                 Path dest = Paths.get(currentPath.toString() + "/" + path.getFileName()); 
                                 
                 File fPath = path.toFile();
                 File fDest = dest.toFile();
-
-                // нельзя вставить папку во вложенную в неё же папку
-                /*if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS) && 
-                    Files.isDirectory(dest, LinkOption.NOFOLLOW_LINKS)) {
-                    try {
-                        if (FileUtils.directoryContains(fPath, fDest)) {
-                            Utils.showMessageError("Невозможно вставить папку в дочернюю!");
-                            continue;
-                        }
-                    } catch (IOException ex) {
-                        Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                        continue;
-                    }
-                }*/
                     
                 // существует?
                 if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
@@ -1066,14 +1052,24 @@ public class FormMain extends javax.swing.JFrame {
                             MessageDialog.showException(ex);
                         }
                     }                    
+                }*/
+                
+                Path path = (Path) it.next();
+                Path dest = currentPath;
+                
+                // вырезаем?
+                if (!isCutMode) {
+                    if (!FileSystemUtils.recursiveCopyFiles(path, dest)) {
+                        MessageDialog.showError("Возникли ошибки при копировании файлов.");
+                    } 
+                } else {
+                    if (!FileSystemUtils.recursiveMoveFiles(path, dest)) {
+                        MessageDialog.showError("Возникли ошибки при переносе файлов.");
+                    }                     
+                    isCutMode = false;
+                    copyPaths.clear();
+                    copyPaths = null;                    
                 }
-            }
-            
-            // вырезаем?
-            if (isCutMode) {   
-                isCutMode = false;
-                copyPaths.clear();
-                copyPaths = null;
             }
             
             fillTreeFolders(false);
@@ -1098,17 +1094,22 @@ public class FormMain extends javax.swing.JFrame {
             
             // файл с таким же именем существует?
             if (newPath.exists()) {
-                if (MessageDialog.showConfirmationYesNo("\"" + baseName + "\" уже существует! Перезаписать?")) {
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return;
+                // NO
+                } else if (!answer.booleanValue()) {
                     // решил переименовать
                     while (newPath.exists()) {
-                        String newName = (String) MessageDialog.showInput("Введите новое имя для \"" + baseName + "\":", baseName);
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
                         if (newName == null) {
-                            return;
+                            return;    // отмена?
                         } else {
                             newPath = new File(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
                         }
-                    }
-                }         
+                    }       
+                }
             }
             
             // создаем файл у себя
