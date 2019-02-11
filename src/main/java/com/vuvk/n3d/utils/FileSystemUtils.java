@@ -97,26 +97,6 @@ public final class FileSystemUtils {
     }
     
     /**
-     * Рекурсивное удаление всех файлов и папок (включая вложенные подпапки и файлы) в пути
-     * @param path Путь, в котором будет удалено всё, включая сам путь
-     * @return true, если удалены, false - возникла ошибка
-     */
-    /*public static boolean removeFiles(Path path) { 
-        File fPath = path.toFile();
-        if (fPath.isDirectory()) {            
-            try {
-                org.apache.commons.io.FileUtils.deleteDirectory(fPath);
-            } catch (IOException ex) {
-                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
-                return false;
-            }
-            return true;
-        } else {
-            return fPath.delete();
-        }
-    }*/    
-    
-    /**
      * Пробежаться по содержимому пути и добавить ссылки на файлы, если они нужного формата
      * @param path Путь, в котором нужно произвести поиск
      */
@@ -198,80 +178,13 @@ public final class FileSystemUtils {
         
         return finished;
     }
-    
-    /**
-     * Удалить файл с проверкой на тип объекта (с удалением из настроек проекта)
-     * @param path Путь, по которому располагается файл
-     * @return true, если удален, false - это не файл или возникла ошибка
-     */
-    /*static boolean deleteFile(Path path) {   
-        if (Files.exists(path) && !Files.isDirectory(path)) {
-            
-            // по расширению файла определяем что это
-            // для того, чтобы удалить файл из настроек проекта
-            switch (getFileExtension(path)) {
-                case "txr" :
-                    String filePath = getProjectPath(path);
-                    for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
-                        if (((Texture)it.next()).getPath().equals(filePath)) {
-                            it.remove();
-                        }
-                    }
-                    FormMain.closeFormTextureEditor();
-                    break;
-            }
-
-            return path.toFile().delete();
-        }
         
-        return false;
-    }*/
-    
     /**
      * Рекурсивное удаление всех файлов и папок (включая вложенные подпапки и файлы) в пути
      * @param path Путь, в котором будет удалено всё, включая сам путь
      * @return true, если удалены, false - возникла ошибка
      */
-    public static boolean recursiveRemoveFiles(Path path) {
-        /*if (path == null || !Files.exists(path)) {
-            return false;
-        }
-        
-        // пробежаться по содержимому
-        boolean finished = true;        
-        File fPath = path.toFile();
-        // путь это папка?
-        if (fPath.isDirectory()) {
-            for (File file : fPath.listFiles()) {
-                if (file.isDirectory()) {
-                    if (!recursiveRemoveFiles(file.toPath())) {
-                        finished = false;
-                    }
-                } else {
-                    if (!deleteFile(path)) {
-                        finished = false;
-                    }
-                }
-            }
-            
-            // удалить сам путь
-            try {
-                Files.delete(path);
-            } catch (IOException ex) {
-                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                finished = false;
-            }
-        // по пути передан файл
-        } else {
-            if (!deleteFile(path)) {
-                finished = false;
-            }
-        }        
-        
-        return finished;*/
-        
-        
+    public static boolean recursiveRemoveFiles(Path path) {   
         // это директория
         if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
             try {
@@ -320,6 +233,6 @@ public final class FileSystemUtils {
             }
         }        
  
-        return Files.exists(path);
+        return !Files.exists(path);
     }
 }
