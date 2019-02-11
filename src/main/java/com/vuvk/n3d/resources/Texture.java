@@ -39,6 +39,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -202,7 +203,16 @@ public final class Texture extends Resource {
     } */
     
     private void init(Path path) {   
-        long newId = (TEXTURES.size() == 0) ? 1 : TEXTURES.get(TEXTURES.size() - 1).getId();
+        // ищем максимальный id и инкрементируем его
+        long newId = 0;
+        for (Iterator it = TEXTURES.iterator(); it.hasNext(); ) {
+            Texture txr = (Texture)it.next();
+            if (txr.getId() > newId) {
+                newId = txr.getId();
+            }
+        }
+        ++newId;
+        
         setId(newId);
         setPath(path);   
         load(path);
