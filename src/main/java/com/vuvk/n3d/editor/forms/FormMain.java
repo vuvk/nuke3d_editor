@@ -889,11 +889,21 @@ public class FormMain extends javax.swing.JFrame {
             List list = listProjectView.getSelectedValuesList();
             PreviewElement element = (PreviewElement) list.get(0);
             
-            String name = element.getName();            
-            String newName = (String) MessageDialog.showInput("Введите новое имя объекта", name);
-            if (newName != null && !newName.equals(name)) {
-                Path path = Paths.get(element.getPath());
-                try {
+            boolean done = false;
+            while (!done) {
+                String name = element.getName();            
+                String newName = (String) MessageDialog.showInput("Введите новое имя объекта", name);
+                
+                // пользователь отказался от ввода
+                if (newName == null) {
+                    return;
+                }
+
+                // имена идентичны - повторить ввод
+                if (newName.equals(name)) {
+                    continue;
+                } else {
+                    Path path = Paths.get(element.getPath());
                     String newPathStr = path.getParent().toString() + File.separator + newName;
                     switch (element.getType()) {
                         case TEXTURE:
@@ -902,23 +912,26 @@ public class FormMain extends javax.swing.JFrame {
                             newPathStr += "." + element.getExtension();
                             break;
                     }
+
                     Path newPath = Paths.get(newPathStr);
                     if (Files.exists(newPath)) {
                         MessageDialog.showError("Файл \"" + newPathStr + "\" уже существует!");
-                        return;
+                        continue;
                     }
-                    
-                    Files.move(path, newPath);
-                    //FileUtils.moveFile(path.toFile(), newPath.toFile());
-                    //element.setName(newName);
-                    
-                    fillTreeFolders(false);
-                    fillListProjectView();
-                } catch (Exception ex) {
-                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                    MessageDialog.showException(ex);
+
+                    try {
+                        Files.move(path, newPath);     
+                    } catch (Exception ex) {
+                        Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                        MessageDialog.showException(ex);
+                    }  
+                
+                    done = true;
                 }
             }
+
+            fillTreeFolders(false);
+            fillListProjectView();
         }
     }//GEN-LAST:event_popupPVMIRenameActionPerformed
 
@@ -988,72 +1001,7 @@ public class FormMain extends javax.swing.JFrame {
     private void popuvPVMIPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popuvPVMIPasteActionPerformed
         if (copyPaths != null && copyPaths.size() > 0) {            
             
-            for (Iterator it = copyPaths.iterator(); it.hasNext();) {
-                /*Path path = (Path) it.next();
-                Path dest = Paths.get(currentPath.toString() + "/" + path.getFileName()); 
-                                
-                File fPath = path.toFile();
-                File fDest = dest.toFile();
-                    
-                // существует?
-                if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
-                    // нельзя вырезать себя и поместить в себя
-                    if (path.compareTo(dest) == 0 && isCutMode) {
-                        continue;
-                    }
-                    
-                    // последнее предупреждение!
-                    if (MessageDialog.showConfirmationYesNo("\"" + dest.toString() + "\"\nуже существует! Перезаписать?")) {
-                        // решил переименовать
-                        while (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
-                            String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + dest.toString() + "\":", path.getFileName());
-                            if (newName == null) {
-                                return;
-                            } else {
-                                dest = Paths.get(currentPath.toString() + "/" + newName);
-                                fDest = dest.toFile();
-                            }
-                        }
-                    }                    
-                }
-                
-                // пишем!
-                // копирование
-                if (!isCutMode) {
-                    if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-                        try {
-                            FileUtils.copyDirectory(fPath, fDest);
-                        } catch (IOException ex) {
-                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            MessageDialog.showException(ex);
-                        }
-                    } else {
-                        try {
-                            FileUtils.copyFile(fPath, fDest);
-                        } catch (IOException ex) {
-                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            MessageDialog.showException(ex);
-                        }
-                    }
-                // перенос
-                } else {
-                    if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
-                        try {
-                            FileUtils.moveDirectory(fPath, fDest);
-                        } catch (IOException ex) {
-                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            MessageDialog.showException(ex);
-                        }
-                    } else {
-                        try {
-                            FileUtils.moveFile(fPath, fDest);
-                        } catch (IOException ex) {
-                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                            MessageDialog.showException(ex);
-                        }
-                    }                    
-                }*/
-                
+            for (Iterator it = copyPaths.iterator(); it.hasNext();) {                
                 Path path = (Path) it.next();
                 Path dest = currentPath;
                 

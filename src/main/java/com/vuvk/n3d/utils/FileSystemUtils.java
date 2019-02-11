@@ -143,9 +143,10 @@ public final class FileSystemUtils {
     
     /**
      * Рекурсивно переименовать путь. Имеется ввиду, что при переименовании папки должны измениться пути у содержащихся внутри ресурсов 
-     * @param path 
+     * @param path путь, в котором должны смениться ссылки и ресурсов
+     * @param newName Новое имя ресурса
      */
-    public static void recursiveRenameFiles(Path path) {
+    public static void recursiveRenameFiles(Path path, String newName) {
         
     }
     
