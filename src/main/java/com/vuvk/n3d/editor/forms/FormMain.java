@@ -919,12 +919,7 @@ public class FormMain extends javax.swing.JFrame {
                         continue;
                     }
 
-                    try {
-                        Files.move(path, newPath);     
-                    } catch (Exception ex) {
-                        Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                        MessageDialog.showException(ex);
-                    }  
+                    FileSystemUtils.recursiveRenameFiles(path, newPath);
                 
                     done = true;
                 }
