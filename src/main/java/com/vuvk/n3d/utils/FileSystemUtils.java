@@ -139,15 +139,78 @@ public final class FileSystemUtils {
         for (Path forAdd : texturesForAdd) {
             new Texture(forAdd);
         }
+        
+        texturesForAdd.clear();
     }
     
     /**
      * Рекурсивно переименовать путь. Имеется ввиду, что при переименовании папки должны измениться пути у содержащихся внутри ресурсов 
-     * @param path путь, в котором должны смениться ссылки и ресурсов
-     * @param newName Новое имя ресурса
+     * @param src  путь, в котором должны смениться ссылки и пути ресурсов
+     * @param dest новый путь (во что переименовывать)
      */
-    public static void recursiveRenameFiles(Path path, String newName) {
+    public static void recursiveRenameFiles(Path src, Path dest) {        
+        if (src  == null || !Files.exists(src) ||
+            dest == null ||  Files.exists(dest)) {
+            return;
+        }
         
+        final List<Path> texturesForRepath = new LinkedList<>();
+
+        String oldName = getProjectPath(src);
+        String newName = getProjectPath(dest);
+        // если папка, то добавить слэш, т.к. getProjectPath понятия не имеет что такое dest - папка или файл?
+        if (Files.isDirectory(src)) {
+            newName += "/";
+        }
+
+        // ищем в папке содержащиеся ресурсы и помечаем их для замены у них пути
+        if (Files.isDirectory(src)) {
+            try {
+                Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {                    
+                        // по расширению файла определяем что это
+                        switch (getFileExtension(file)) {
+                            case "txr" :
+                                texturesForRepath.add(file);
+                                break;
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            } catch (IOException ex) {
+                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
+        } else {
+            // по расширению файла определяем что это
+            switch (getFileExtension(src)) {
+                case "txr" :
+                    texturesForRepath.add(src);
+                    break;
+            }
+        }
+        
+        // переименовываем путь
+        try {
+            Files.move(src, dest);     
+        } catch (Exception ex) {
+            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+        }     
+        
+        // ну а теперь заменяем часть пути (или весь) с учетом нового имени папки или файла
+        for (Path pth : texturesForRepath) {
+            String filePath = pth.toString();
+            for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
+                Texture txr = (Texture)it.next();
+                if (txr.getPath().equals(filePath)) {
+                    String newPath = txr.getPath().replace(oldName, newName);
+                    txr.setPath(newPath);
+                }
+            }
+        }
+        texturesForRepath.clear();
     }
     
     /**
@@ -326,6 +389,8 @@ public final class FileSystemUtils {
                 }
             }
         }
+        
+        texturesForDelete.clear();
  
         // всё успешно удалено?
         return !Files.exists(path);
