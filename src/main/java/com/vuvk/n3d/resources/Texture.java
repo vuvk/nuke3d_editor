@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
+import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.image.BufferedImage;
@@ -123,7 +124,10 @@ public final class Texture extends Resource {
             
             // если текстура существует
             Path path = Paths.get(jsonPath.getAsString());
-            if (Files.exists(path)) {
+            if (Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT)
+               ) {
                 // добавляем в базу новую текстуру и задаём ей Id
                 new Texture(path)
                     .setId(jsonId.getAsInt());
