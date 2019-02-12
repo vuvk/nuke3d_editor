@@ -20,6 +20,7 @@ package com.vuvk.n3d.resources;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -68,7 +69,7 @@ public class Resource {
      * Установить путь расположения ресурса
      * @param path Новый путь
      */
-    protected void setPath(Path path) {
+    public void setPath(Path path) {
         if (path != null) {
             this.path = FileSystemUtils.getProjectPath(path);   
             setName(FilenameUtils.getBaseName(this.path));
@@ -82,11 +83,21 @@ public class Resource {
      * Установить путь расположения ресурса
      * @param path Новый путь
      */
-    protected void setPath(File path) {
+    public void setPath(File path) {
         if (path != null) {
             setPath(path.toPath());
         } else {
             setPath((Path)null);
+        }
+    }
+    
+    /**
+     * Установить путь расположения ресурса
+     * @param path Новый путь
+     */
+    public void setPath(String path) {
+        if (path != null) {
+            setPath(Paths.get(path));
         }
     }
     
