@@ -253,28 +253,35 @@ public final class FileSystemUtils {
         }*/
                 
         // существует?
-        if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {                
+        if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {         
+            // нельзя копировать себя в себя, но можно поместить рядом!
             if (src.compareTo(dest) == 0) {
-                return false;   // нельзя копировать себя в себя
-            }
-
-            // последнее предупреждение!
-            Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + dest.toString() + "\"\nуже существует! Перезаписать?");
-            // CANCEL
-            if (answer == null) {
-                return false;
-            // NO
-            } else if (!answer.booleanValue()) {
-                // решил переименовать
-                while (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
-                    String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + dest.toString() + "\":", src.getFileName());
-                    if (newName == null) {
-                        return true;    // отмена?
-                    } else {
-                        dest = Paths.get(to.toString() + "/" + newName);
-                    }
+                Path newDest = dest;                
+                while (Files.exists(newDest, LinkOption.NOFOLLOW_LINKS)) {
+                    String newName = dest.getParent().toString() + File.separator + "copy of " + newDest.getFileName().toString();
+                    newDest = Paths.get(newName);
+                }
+                dest = newDest;
+            // файл не тот же самый, но с таким именем уже существует
+            } else {
+                // последнее предупреждение!
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + dest.toString() + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return false;
+                // NO
+                } else if (!answer.booleanValue()) {
+                    // решил переименовать
+                    while (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + dest.toString() + "\":", src.getFileName());
+                        if (newName == null) {
+                            return true;    // отмена?
+                        } else {
+                            dest = Paths.get(to.toString() + "/" + newName);
+                        }
+                    }       
                 }       
-            }            
+            }
         }
                 
         File fPath = src.toFile();
