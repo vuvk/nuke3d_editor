@@ -23,15 +23,20 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * Класс хранимого материала в редакторе
@@ -124,13 +129,13 @@ public class Material extends Resource {
     private final ArrayList<Frame> frames = new ArrayList<>();
     
     /** Список всех материалов (контейнер) */
-    public static final ArrayList<Material> list = new ArrayList<>();
+    public static final ArrayList<Material> MATERIALS = new ArrayList<>();
     
     /**
      * Загрузить конфиг материалов и сами материалы
      */
     public static boolean loadAll() {
-        closeAll();
+        /*closeAll();
         
         try {
             File folder = new File(Const.MATERIAL_PATH);
@@ -188,7 +193,7 @@ public class Material extends Resource {
             Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, e);
             return false;
         }
-        
+        */
         return true;
     }
     
@@ -196,7 +201,7 @@ public class Material extends Resource {
      * Сохранить материалы и конфиг всех материалов 
      */
     public static boolean saveAll() {   
-        try {                                   
+        /*try {                                   
             // создать путь папок, если его нет
             File folder = new File(Const.MATERIAL_PATH);
             if (!folder.exists()) {
@@ -262,7 +267,7 @@ public class Material extends Resource {
             Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, e);
             return false;
         }
-        
+        */
         return true;
     }
     
@@ -270,15 +275,15 @@ public class Material extends Resource {
      * Удалить все материалы из памяти
      */
     public static boolean closeAll() {
-        list.clear();        
-        return (list.isEmpty());
+        MATERIALS.clear();        
+        return (MATERIALS.isEmpty());
     }
     
     /**
      * Конструктор текстуры по умолчанию.
      * Имя по порядку и изображение 1*1 в формате ARGB
      */
-    public Material() {
+    /*public Material() {
         name = "material_" + list.size();
         type = Type.Default;
         
@@ -294,28 +299,63 @@ public class Material extends Resource {
         frames.add(new Frame());
         
         list.add(this);
-    }    
+    }    */
+    
+    protected void init(Path path) {   
+        // ищем максимальный id и инкрементируем его
+        long newId = 0;
+        for (Iterator it = MATERIALS.iterator(); it.hasNext(); ) {
+            Material mat = (Material)it.next();
+            if (mat.getId() > newId) {
+                newId = mat.getId();
+            }
+        }
+        ++newId;
+        
+        setId(newId);
+        setPath(path);   
+        load(path);
+        MATERIALS.add(this);
+    }
+    
+    public Material(Path path) {
+        init(path);
+    }
+    public Material(File path) {
+        init(path.toPath());
+    }
+        
+    /**
+     * Загрузить материал из файла
+     * @param path Путь до файла
+     */
+    public void load(Path path) {
+        /** если файл существует и он является текстурой */
+        if (Files.exists(path) &&
+            !Files.isDirectory(path) &&  
+            FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
+           ) {
+            
+        } else {
+            
+        }
+    }
+    
+    /**
+     * Сохранить материал в файл, к которому он привязан
+     */
+    public void save() {
+        
+    }
     
     /**
      * Деструктор
      */
     public void dispose() {
         frames.clear();
-        list.remove(this);
+        MATERIALS.remove(this);
     }
-    
-    /**
-     * Деструктор для GC
-     */
-    public void finalize() {        
-        try {
-            super.finalize();
-        } catch (Throwable ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        dispose();        
-    }
-    
+        
     /**
      * Установить тип материала
      * @param materialType новый тип

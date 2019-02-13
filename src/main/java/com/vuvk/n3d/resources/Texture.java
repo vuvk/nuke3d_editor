@@ -185,28 +185,8 @@ public final class Texture extends Resource {
         TEXTURES.clear();        
         return (TEXTURES.isEmpty());
     }
-        
-    /**
-     * Конструктор текстуры по умолчанию.
-     * Имя по порядку и изображение 1*1 в формате ARGB
-     */
-    /*public Texture() {
-        name = "texture_" + list.size();
-        
-        // имя подходящее?
-        for (int i = 0; i < list.size(); ++i) {
-            // уже есть такое имя и надо подобрать новое
-            if (name.equals(list.get(i).name)) {
-                name = "texture_" + list.size() + "_" + Math.round(Math.random() * 1000);
-                i = 0;
-            }
-        }
-        image = IMAGE_EMPTY;
-        
-        list.add(this);
-    } */
-    
-    private void init(Path path) {   
+            
+    protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
         long newId = 0;
         for (Iterator it = TEXTURES.iterator(); it.hasNext(); ) {
@@ -224,30 +204,20 @@ public final class Texture extends Resource {
     }
     
     public Texture(Path path) {
-        init(path);
+        super(path);
     }
     public Texture(File path) {
-        init(path.toPath());
+        super(path.toPath());
     }
-    
-    /**
-     * Загрузить image текстуры из файла
-     * @param path Путь до файла
-     */
-    public void load(File path) {
-        if (path != null) {
-            load(path.toPath());
-        }
-    }
-    
+        
     /**
      * Загрузить image текстуры из файла
      * @param path Путь до файла
      */
     public void load(Path path) {
         /** если файл существует и он является текстурой */
-        if (!Files.isDirectory(path) && 
-            Files.exists(path) && 
+        if (Files.exists(path) &&
+            !Files.isDirectory(path) &&  
             FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
            ) {
             try {
@@ -280,19 +250,7 @@ public final class Texture extends Resource {
         image = null;
         TEXTURES.remove(this);
     }
-    
-    /**
-     * Деструктор для GC
-     */
-    public void finalize() {        
-        try {
-            super.finalize();
-        } catch (Throwable ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        dispose();        
-    }
-    
+        
     /**
      * Получить изображение
      * @return image изображение текстуры
