@@ -307,7 +307,6 @@
                         <StringItem index="28" value="Item 29"/>
                       </StringArray>
                     </Property>
-                    <Property name="selectionMode" type="int" value="1"/>
                     <Property name="autoscrolls" type="boolean" value="false"/>
                     <Property name="doubleBuffered" type="boolean" value="true"/>
                     <Property name="fixedCellHeight" type="int" value="128"/>

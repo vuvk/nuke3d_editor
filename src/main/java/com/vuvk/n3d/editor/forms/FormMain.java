@@ -718,7 +718,6 @@ public class FormMain extends javax.swing.JFrame {
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        listProjectView.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         listProjectView.setAutoscrolls(false);
         listProjectView.setDoubleBuffered(true);
         listProjectView.setFixedCellHeight(128);
