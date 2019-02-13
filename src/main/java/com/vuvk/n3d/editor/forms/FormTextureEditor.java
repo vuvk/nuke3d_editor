@@ -279,8 +279,8 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
 
         lblName.setText("Имя");
 
+        txtName.setEditable(false);
         txtName.setText("<not available>");
-        txtName.setEnabled(false);
 
         btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_done_white_24dp.png"))); // NOI18N
         btnClose.setToolTipText("Закрыть");

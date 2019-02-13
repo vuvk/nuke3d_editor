@@ -40,6 +40,31 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
     static PanelImagePreview imagePreview;
     
     /**
+     * Подготовка формы для отображения - подгружается изображение из текстуры первого кадра материала
+     */
+    public void prepareForm() {  
+        if (selectedMaterial == null) {
+            dispose();
+        }
+        
+        // получить имя редактируемой текстуры
+        txtName.setText(selectedMaterial.getName());
+        // получить в панель предпросмотра ссылку на картинку
+        Material.Frame frame = selectedMaterial.getFrame(0);
+        if (frame != null) {
+            imagePreview.image = frame.getImage();
+        } else {
+            imagePreview.image = null;
+        }
+        imagePreview.redraw();
+        
+        // установить тип материала
+        int index = selectedMaterial.getMaterialType().ordinal();
+        cmbMaterialType.setSelectedItem(index);
+        cmbMaterialType.getModel().setSelectedItem(cmbMaterialType.getItemAt(index));
+    }
+    
+    /**
      * Creates new form FormMaterialEditor
      */
     public FormMaterialEditor() {
@@ -47,7 +72,7 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         
         imagePreview = new PanelImagePreview();
         imagePreview.setSize(512, 512);
-        PanelPreview.add(imagePreview);
+        pnlPreview.add(imagePreview);
         //imagePreview.setLocation(5, 16);  
         imagePreview.setLocation(14, 26); 
     }
@@ -61,15 +86,13 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        ButtonClose = new javax.swing.JButton();
-        ButtonDelete = new javax.swing.JButton();
-        LabelName = new javax.swing.JLabel();
-        PanelPreview = new javax.swing.JPanel();
-        CheckStretched = new javax.swing.JCheckBox();
-        TextName = new javax.swing.JTextField();
-        ButtonEdit = new javax.swing.JButton();
-        ComboBoxMaterialType = new javax.swing.JComboBox<>();
-        jLabel1 = new javax.swing.JLabel();
+        lblName = new javax.swing.JLabel();
+        pnlPreview = new javax.swing.JPanel();
+        txtName = new javax.swing.JTextField();
+        cmbMaterialType = new javax.swing.JComboBox<>();
+        lblType = new javax.swing.JLabel();
+        btnClose = new javax.swing.JButton();
+        tglStretched = new javax.swing.JToggleButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -94,76 +117,54 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
             }
         });
 
-        ButtonClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/apply.png"))); // NOI18N
-        ButtonClose.setText("Закрыть");
-        ButtonClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonCloseActionPerformed(evt);
-            }
-        });
+        lblName.setText("Имя");
 
-        ButtonDelete.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/delete.png"))); // NOI18N
-        ButtonDelete.setText("Удалить");
-        ButtonDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonDeleteActionPerformed(evt);
-            }
-        });
+        pnlPreview.setBorder(javax.swing.BorderFactory.createTitledBorder("Предпросмотр"));
+        pnlPreview.setDoubleBuffered(false);
 
-        LabelName.setText("Имя");
-
-        PanelPreview.setBorder(javax.swing.BorderFactory.createTitledBorder("Предпросмотр"));
-        PanelPreview.setDoubleBuffered(false);
-
-        javax.swing.GroupLayout PanelPreviewLayout = new javax.swing.GroupLayout(PanelPreview);
-        PanelPreview.setLayout(PanelPreviewLayout);
-        PanelPreviewLayout.setHorizontalGroup(
-            PanelPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout pnlPreviewLayout = new javax.swing.GroupLayout(pnlPreview);
+        pnlPreview.setLayout(pnlPreviewLayout);
+        pnlPreviewLayout.setHorizontalGroup(
+            pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 512, Short.MAX_VALUE)
         );
-        PanelPreviewLayout.setVerticalGroup(
-            PanelPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        pnlPreviewLayout.setVerticalGroup(
+            pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 512, Short.MAX_VALUE)
         );
 
-        CheckStretched.setText("Растянуть");
-        CheckStretched.addChangeListener(new javax.swing.event.ChangeListener() {
+        txtName.setEditable(false);
+        txtName.setText("<not available>");
+
+        cmbMaterialType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "По умолчанию", "С альфа-каналом", "Полупрозрачность" }));
+        cmbMaterialType.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbMaterialTypeActionPerformed(evt);
+            }
+        });
+
+        lblType.setText("Тип");
+
+        btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_done_white_24dp.png"))); // NOI18N
+        btnClose.setToolTipText("Закрыть");
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCloseActionPerformed(evt);
+            }
+        });
+
+        tglStretched.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_photo_size_select_large_white_24dp.png"))); // NOI18N
+        tglStretched.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_photo_size_select_actual_white_24dp.png"))); // NOI18N
+        tglStretched.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
-                CheckStretchedStateChanged(evt);
+                tglStretchedStateChanged(evt);
             }
         });
-
-        TextName.setText("<not available>");
-        TextName.addActionListener(new java.awt.event.ActionListener() {
+        tglStretched.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TextNameActionPerformed(evt);
+                tglStretchedActionPerformed(evt);
             }
         });
-        TextName.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                TextNameKeyPressed(evt);
-            }
-            public void keyReleased(java.awt.event.KeyEvent evt) {
-                TextNameKeyReleased(evt);
-            }
-        });
-
-        ButtonEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/edit.png"))); // NOI18N
-        ButtonEdit.setLabel("Редактировать");
-        ButtonEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonEditActionPerformed(evt);
-            }
-        });
-
-        ComboBoxMaterialType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "По умолчанию", "С альфа-каналом", "Полупрозрачность" }));
-        ComboBoxMaterialType.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ComboBoxMaterialTypeActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("Тип");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -171,54 +172,39 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(ButtonDelete, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(ComboBoxMaterialType, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(ButtonEdit, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(558, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addGroup(layout.createSequentialGroup()
-                            .addComponent(LabelName)
+                            .addComponent(lblName)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(TextName, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(ButtonClose, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(CheckStretched)
-                        .addComponent(PanelPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addContainerGap()))
+                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(18, 18, 18)
+                            .addComponent(lblType)
+                            .addGap(33, 33, 33)
+                            .addComponent(cmbMaterialType, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(pnlPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(44, 44, 44)
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ComboBoxMaterialType, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1))
+                    .addComponent(cmbMaterialType, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblType)
+                    .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ButtonEdit)
+                .addComponent(pnlPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(ButtonDelete)
-                .addContainerGap(459, Short.MAX_VALUE))
-            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(TextName, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(LabelName))
-                        .addComponent(PanelPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(CheckStretched)
-                        .addComponent(ButtonClose))
-                    .addContainerGap(13, Short.MAX_VALUE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -227,81 +213,26 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
     private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed
         FormMain.formMaterialEditor = null;
     }//GEN-LAST:event_formInternalFrameClosed
-
-    private void ButtonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonCloseActionPerformed
-        dispose();
-    }//GEN-LAST:event_ButtonCloseActionPerformed
-
-    private void ButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonDeleteActionPerformed
-        //FormMainAlternative.treeDeleteNode(selectedTreeNode);
-    }//GEN-LAST:event_ButtonDeleteActionPerformed
-
-    private void CheckStretchedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_CheckStretchedStateChanged
-        imagePreview.isStretched = CheckStretched.isSelected();
-        imagePreview.redraw();
-    }//GEN-LAST:event_CheckStretchedStateChanged
-
-    private void TextNameChanged() {
-        String name = TextName.getText();
-        /*
-        if (selectedTreeNode != null) {
-            selectedTreeNode.setUserObject(name);
-            FormMain.treeProjectModel.nodeChanged(selectedTreeNode);
-        }
-        
-        if (selectedMaterial != null) {
-            selectedMaterial.setName(name);
-        }*/
-        
-        // подкрасим красным, чтобы выделить поле, в котором обязательно имя
-        if (name.length() == 0) {
-            TextName.setBackground(Color.red);
-        } else {
-            TextName.setBackground(Color.white);
-        }
-    }
     
-    private void TextNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TextNameActionPerformed
-        TextNameChanged();
-    }//GEN-LAST:event_TextNameActionPerformed
-
-    private void TextNameKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TextNameKeyPressed
-        TextNameChanged();
-    }//GEN-LAST:event_TextNameKeyPressed
-
-    private void TextNameKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_TextNameKeyReleased
-        TextNameChanged();
-    }//GEN-LAST:event_TextNameKeyReleased
-
-    private void ButtonEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonEditActionPerformed
-        formMaterialAnimator = new FormMaterialAnimator(FormMain.formMain, true);
-        formMaterialAnimator.selectedMaterial = selectedMaterial;
-        formMaterialAnimator.setVisible(true);
-        
-        // получить в панель предпросмотра ссылку на новую картинку
-        imagePreview.image = selectedMaterial.getFrame(0).getImage();
-        imagePreview.redraw();        
-    }//GEN-LAST:event_ButtonEditActionPerformed
-
     private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
         if (selectedMaterial == null) {
             dispose();
         }
         
         // получить имя редактируемой текстуры
-        TextName.setText(selectedMaterial.getName());
+        txtName.setText(selectedMaterial.getName());
         // получить в панель предпросмотра ссылку на картинку
         imagePreview.image = selectedMaterial.getFrame(0).getImage();
         imagePreview.redraw();
         // установить тип материала
         int index = selectedMaterial.getMaterialType().ordinal();
-        ComboBoxMaterialType.setSelectedItem(index);
-        ComboBoxMaterialType.getModel().setSelectedItem(ComboBoxMaterialType.getItemAt(index));
+        cmbMaterialType.setSelectedItem(index);
+        cmbMaterialType.getModel().setSelectedItem(cmbMaterialType.getItemAt(index));
     }//GEN-LAST:event_formInternalFrameActivated
 
-    private void ComboBoxMaterialTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxMaterialTypeActionPerformed
+    private void cmbMaterialTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMaterialTypeActionPerformed
         if (selectedMaterial != null) {
-            switch (ComboBoxMaterialType.getSelectedIndex()) {
+            switch (cmbMaterialType.getSelectedIndex()) {
                 default:
                 case 0 : 
                     selectedMaterial.setMaterialType(Material.Type.Default);
@@ -316,18 +247,29 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
                     break;
             }
         }
-    }//GEN-LAST:event_ComboBoxMaterialTypeActionPerformed
+    }//GEN-LAST:event_cmbMaterialTypeActionPerformed
+
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+        dispose();
+    }//GEN-LAST:event_btnCloseActionPerformed
+
+    private void tglStretchedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglStretchedStateChanged
+        imagePreview.isStretched = tglStretched.isSelected();
+        imagePreview.redraw();
+    }//GEN-LAST:event_tglStretchedStateChanged
+
+    private void tglStretchedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglStretchedActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tglStretchedActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ButtonClose;
-    private javax.swing.JButton ButtonDelete;
-    private javax.swing.JButton ButtonEdit;
-    private javax.swing.JCheckBox CheckStretched;
-    private javax.swing.JComboBox<String> ComboBoxMaterialType;
-    private javax.swing.JLabel LabelName;
-    private javax.swing.JPanel PanelPreview;
-    private javax.swing.JTextField TextName;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton btnClose;
+    private javax.swing.JComboBox<String> cmbMaterialType;
+    private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblType;
+    private javax.swing.JPanel pnlPreview;
+    private javax.swing.JToggleButton tglStretched;
+    private javax.swing.JTextField txtName;
     // End of variables declaration//GEN-END:variables
 }
