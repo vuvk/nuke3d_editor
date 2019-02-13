@@ -18,9 +18,12 @@
 package com.vuvk.n3d.resources;
 
 import com.vuvk.n3d.utils.FileSystemUtils;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
 
 /**
@@ -28,7 +31,7 @@ import org.apache.commons.io.FilenameUtils;
  * Путь содержит путь относительно корневой папки resources
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class Resource {
+public abstract class Resource {
     /** идентификатор */
     protected long id;
     /** имя */
@@ -36,18 +39,19 @@ public class Resource {
     /** Путь до ресурса */
     protected String path;
     
+    /** Initialization */
+    protected abstract void init(Path path);
     
-    public Resource() {
-        //setPath((Path)null);
+    protected Resource() {
+        init((Path)null);
     }
     public Resource(Path path) {
-        setId(0);
-        setPath(path);
+        init(path);
     }
-    public Resource(long id, Path path) {
+    /*public Resource(long id, Path path) {
         setId(id);
         setPath(path);
-    }
+    }*/
     
     /**
      * Присвоить id 
@@ -123,5 +127,44 @@ public class Resource {
      */
     public String getPath() {
         return path;
+    }
+    
+    /**
+     * Загрузить из файла
+     * @param path Путь до файла
+     */
+    public void load(File path) {
+        if (path != null) {
+            load(path.toPath());
+        }
+    }
+    
+    /**
+     * Загрузить из файла
+     * @param path Путь до файла
+     */
+    public abstract void load(Path path);
+
+    /**
+     * Сохранить ресурс в файл, к которому он привязан
+     */
+    public abstract void save();
+    
+    /**
+     * Деструктор
+     */
+    public abstract void dispose();
+    
+    /**
+     * Деструктор для GC
+     */
+    public void finalize() {        
+        try {
+            super.finalize();
+        } catch (Throwable ex) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+        }
+        dispose();        
     }
 }
