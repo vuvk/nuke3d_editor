@@ -31,16 +31,66 @@ import javax.swing.JPanel;
 
 /** класс поля для рисования предпросмотра */
 public class PanelImagePreview extends JPanel {
+
     /** изображение, которое рисуется в предпросмотре */
-    public BufferedImage image = null;
+    protected BufferedImage image = null;
     /** режим растяжения на всю область */
-    public boolean isStretched = false;      
+    protected boolean stretched = false;      
     /** окно для перерисовки */
-    public Container window = null;
+    protected Container window = null;
     
-    public PanelImagePreview() {
+    public PanelImagePreview(Container window) {
         super();
+        setWindow(window);
         setOpaque(true);
+    }
+    
+    /**
+     * Установить изображение для отрисовки
+     * @param image Изображение для установки
+     */
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
+    /**
+     * Установить режим растяжения
+     * @param stretched the stretched to set
+     */
+    public void setStretched(boolean stretched) {
+        this.stretched = stretched;
+    }
+    
+    /**
+     * Установить контейнер
+     * @param window the window to set
+     */
+    public void setWindow(Container window) {
+        this.window = window;
+    }
+    
+    /**
+     * Получить рисуемое изображение
+     * @return the image
+     */
+    public BufferedImage getImage() {
+        return image;
+    }
+    
+    /**
+     * Вернуть режим растяжения
+     * @return the stretched
+     */
+    public boolean isStretched() {
+        return stretched;
+    }
+
+    /**
+     * Вернуть окно-контейнер
+     * @return the window
+     */
+    public Container getWindow() {
+        return window;
     }
 
     @Override
@@ -65,7 +115,7 @@ public class PanelImagePreview extends JPanel {
             g.setColor(Color.black);
             
             // если размеры картинки большие или включен режим растяжения
-            if (imageWidth == width || imageHeight == height || isStretched) {
+            if (imageWidth == width || imageHeight == height || isStretched()) {
                 // если стороны равны, то рисовать во всю картинку
                 if (imageWidth == imageHeight) {
                     g.drawImage(image, 0, 0, width, height, null);
@@ -99,12 +149,14 @@ public class PanelImagePreview extends JPanel {
         }            
     }
 
-    /** перерисовать панель */
+    /** 
+     * перерисовать панель 
+     */
     public void redraw() {            
         paintImmediately(0, 0, getWidth(), getHeight());
         
-        if (window != null) {
-            window.repaint();
+        if (getWindow() != null) {
+            getWindow().repaint();
         }
     }
 }

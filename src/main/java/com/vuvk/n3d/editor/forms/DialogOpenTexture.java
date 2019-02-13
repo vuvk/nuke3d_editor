@@ -64,7 +64,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         FileChooser.addChoosableFileFilter(filterBmp);
         FileChooser.addChoosableFileFilter(filterGif);
         
-        panelImagePreview = new PanelImagePreview();
+        panelImagePreview = new PanelImagePreview(this);
         panelImagePreview.setSize(512, 512);
         PanelPreview.add(panelImagePreview);
         panelImagePreview.setLocation(5, 16);          
@@ -177,18 +177,18 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         switch (evt.getPropertyName()) {                
             // выбран файл
             case JFileChooser.SELECTED_FILE_CHANGED_PROPERTY :
-                panelImagePreview.image = null;
+                panelImagePreview.setImage(null);
                 
                 File file = FileChooser.getSelectedFile();
                 if (file != null && file.isFile()) {
                     // если файл является текстурой, то попробовать его загрузить в предпросмотр
                     if (Const.TEXTURE_EXTS.contains(FileSystemUtils.getFileExtension(file))) {
                         try {
-                            panelImagePreview.image = ImageUtils.prepareImage(ImageIO.read(file));
+                            panelImagePreview.setImage(ImageUtils.prepareImage(ImageIO.read(file)));
                         } catch (IOException ex) {
                             Logger.getLogger(DialogOpenTexture.class.getName()).log(Level.SEVERE, null, ex);
                             MessageDialog.showException(ex);
-                            panelImagePreview.image = null;
+                            panelImagePreview.setImage(null);
                         }
                     }                   
                 }
@@ -199,7 +199,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
     }//GEN-LAST:event_FileChooserPropertyChange
 
     private void CheckStretchedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_CheckStretchedStateChanged
-        panelImagePreview.isStretched = CheckStretched.isSelected();
+        panelImagePreview.setStretched(CheckStretched.isSelected());
         panelImagePreview.redraw();
     }//GEN-LAST:event_CheckStretchedStateChanged
 

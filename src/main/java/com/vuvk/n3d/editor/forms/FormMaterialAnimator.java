@@ -95,7 +95,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
 
                 if (imagePreview != null) {
                     if (frame != null) {
-                        imagePreview.image = frame.getImage();
+                        imagePreview.setImage(frame.getImage());
                     }
                     imagePreview.redraw();               
                 }
@@ -150,8 +150,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        imagePreview = new PanelImagePreview();
-        imagePreview.window = this;
+        imagePreview = new PanelImagePreview(this);
         imagePreview.setSize(256, 256);
         PanelPreview.add(imagePreview);
         //imagePreview.setLocation(5, 16);  
@@ -166,14 +165,14 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
                 if (TableFrames.getSelectedRowCount() > 0) {
                     selectedFrameIndex = TableFrames.getSelectedRow();
                     Material.Frame frame = selectedMaterial.getFrame(selectedFrameIndex);
-                    imagePreview.image = frame.getImage();
+                    imagePreview.setImage(frame.getImage());
                     CheckStretched.setEnabled(true);
                     ButtonChooseTexture.setEnabled(true);
                     SpinnerFrameDelay.setEnabled(true);
                     SpinnerFrameDelay.setValue(Double.valueOf(frame.getDelay()));
                 } else {
                     selectedFrameIndex = -1;
-                    imagePreview.image = null;
+                    imagePreview.setImage(null);
                     CheckStretched.setEnabled(false);
                     ButtonChooseTexture.setEnabled(false);
                     SpinnerFrameDelay.setEnabled(false);
@@ -454,7 +453,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void CheckStretchedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_CheckStretchedStateChanged
-        imagePreview.isStretched = CheckStretched.isSelected();
+        imagePreview.setStretched(CheckStretched.isSelected());
         imagePreview.redraw();
     }//GEN-LAST:event_CheckStretchedStateChanged
 
@@ -508,7 +507,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
         if (form.selectedTexture != null) {
             selectedMaterial.getFrame(selectedFrameIndex).setTexture(form.selectedTexture);
             
-            imagePreview.image = selectedMaterial.getFrame(selectedFrameIndex).getImage();
+            imagePreview.setImage(selectedMaterial.getFrame(selectedFrameIndex).getImage());
             imagePreview.redraw();
         }
         

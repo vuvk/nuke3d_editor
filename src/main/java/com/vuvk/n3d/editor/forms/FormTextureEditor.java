@@ -21,6 +21,7 @@ import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -47,8 +48,8 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
     
     class ImagePreview extends PanelImagePreview implements MouseInputListener {
         
-        public ImagePreview(){
-            super();
+        public ImagePreview(Container window){
+            super(window);
             
             addMouseListener(this);
             addMouseMotionListener(this);
@@ -69,7 +70,7 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
 
                 // если выключен режим растяжения, то надо проверить попал ли вообще курсор
                 // в область рисования картинки
-                if (!isStretched) {                                
+                if (!stretched) {                                
                     x -= (panelWidth  >> 1) - (imageWidth  >> 1);
                     y -= (panelHeight >> 1) - (imageHeight >> 1);                                
                 // при включенном режиме растяжения нужно найти координаты на картинке с учетом
@@ -124,7 +125,7 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
 
                         // если выключен режим растяжения, то надо проверить попал ли вообще курсор
                         // в область рисования картинки
-                        if (!isStretched) {                                
+                        if (!stretched) {                                
                             x -= (panelWidth  >> 1) - (imageWidth  >> 1);
                             y -= (panelHeight >> 1) - (imageHeight >> 1);                                
                         // при включенном режиме растяжения нужно найти координаты на картинке с учетом
@@ -203,7 +204,7 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
         // получить имя редактируемой текстуры
         txtName.setText(selectedTexture.getName());
         // получить в панель предпросмотра ссылку на картинку
-        imagePreview.image = selectedTexture.getImage();
+        imagePreview.setImage(selectedTexture.getImage());
         imagePreview.redraw();
         
         setLocation((getParent().getWidth() >> 1) - (getWidth() >> 1), 0);
@@ -215,7 +216,7 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
     public FormTextureEditor() {
         initComponents();                
         
-        imagePreview = new ImagePreview();
+        imagePreview = new ImagePreview(this);
         imagePreview.setSize(512, 512);
         pnlPreview.add(imagePreview);
         imagePreview.setLocation(5, 16);  
@@ -387,7 +388,7 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_formInternalFrameClosed
     
     private void tglStretchedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglStretchedStateChanged
-        imagePreview.isStretched = tglStretched.isSelected();
+        imagePreview.setStretched(tglStretched.isSelected());
         imagePreview.redraw();
     }//GEN-LAST:event_tglStretchedStateChanged
 

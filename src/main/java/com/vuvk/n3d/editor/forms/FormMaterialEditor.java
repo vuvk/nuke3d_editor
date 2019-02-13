@@ -52,9 +52,9 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         // получить в панель предпросмотра ссылку на картинку
         Material.Frame frame = selectedMaterial.getFrame(0);
         if (frame != null) {
-            imagePreview.image = frame.getImage();
+            imagePreview.setImage(frame.getImage());
         } else {
-            imagePreview.image = null;
+            imagePreview.setImage(null);
         }
         imagePreview.redraw();
         
@@ -70,7 +70,7 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
     public FormMaterialEditor() {
         initComponents();
         
-        imagePreview = new PanelImagePreview();
+        imagePreview = new PanelImagePreview(this);
         imagePreview.setSize(512, 512);
         pnlPreview.add(imagePreview);
         //imagePreview.setLocation(5, 16);  
@@ -215,19 +215,7 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_formInternalFrameClosed
     
     private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
-        if (selectedMaterial == null) {
-            dispose();
-        }
-        
-        // получить имя редактируемой текстуры
-        txtName.setText(selectedMaterial.getName());
-        // получить в панель предпросмотра ссылку на картинку
-        imagePreview.image = selectedMaterial.getFrame(0).getImage();
-        imagePreview.redraw();
-        // установить тип материала
-        int index = selectedMaterial.getMaterialType().ordinal();
-        cmbMaterialType.setSelectedItem(index);
-        cmbMaterialType.getModel().setSelectedItem(cmbMaterialType.getItemAt(index));
+        prepareForm();
     }//GEN-LAST:event_formInternalFrameActivated
 
     private void cmbMaterialTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMaterialTypeActionPerformed
@@ -254,7 +242,7 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void tglStretchedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglStretchedStateChanged
-        imagePreview.isStretched = tglStretched.isSelected();
+        imagePreview.setStretched(tglStretched.isSelected());
         imagePreview.redraw();
     }//GEN-LAST:event_tglStretchedStateChanged
 

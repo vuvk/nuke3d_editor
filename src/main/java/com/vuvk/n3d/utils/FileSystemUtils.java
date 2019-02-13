@@ -254,7 +254,7 @@ public final class FileSystemUtils {
                 
         // существует?
         if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {         
-            // нельзя копировать себя в себя, но можно поместить рядом!
+            // нельзя копировать себя в себя, но можно поместить рядом копию!
             if (src.compareTo(dest) == 0) {
                 Path newDest = dest;                
                 while (Files.exists(newDest, LinkOption.NOFOLLOW_LINKS)) {
