@@ -40,7 +40,7 @@ public final class MessageDialog {
      * Отобразить сообщение с ошибкой из исключения
      * @param ex Исключение, сообщение которого необходимо отобразить
      */
-    public static void showException(Exception ex) {
+    public static void showException(Throwable ex) {
         ByteArrayOutputStream stackTrace = new ByteArrayOutputStream();
         ex.printStackTrace(new PrintStream(stackTrace));
         showError(ex.getMessage() + "\nStackTrace:\n" + stackTrace.toString());
