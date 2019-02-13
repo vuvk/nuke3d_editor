@@ -157,7 +157,6 @@
       </Properties>
       <Events>
         <EventHandler event="stateChanged" listener="javax.swing.event.ChangeListener" parameters="javax.swing.event.ChangeEvent" handler="tglStretchedStateChanged"/>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tglStretchedActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

@@ -885,6 +885,8 @@ public class FormMain extends javax.swing.JFrame {
 
     private void popupPVMIRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRenameActionPerformed
         if (listProjectView.getSelectedIndex() != -1) {
+            int selectedIndex = listProjectView.getSelectedIndex();
+                    
             List list = listProjectView.getSelectedValuesList();
             PreviewElement element = (PreviewElement) list.get(0);
             
@@ -922,10 +924,27 @@ public class FormMain extends javax.swing.JFrame {
                 
                     done = true;
                 }
-            }
+            }            
 
             fillTreeFolders(false);
             fillListProjectView();
+                        
+            // выбрать тот же элемент
+            listProjectView.setSelectedIndex(selectedIndex);
+            list = listProjectView.getSelectedValuesList();
+            element = (PreviewElement) list.get(0);
+            
+            // перезагрузить окно, если был переименован открытый объект в редакторе
+            switch (element.getType()) {
+                case TEXTURE :
+                    if (formTextureEditor != null) {
+                        String txrPath = FormTextureEditor.selectedTexture.getPath();
+                        if (txrPath.equals(element.getPath())) {
+                            formTextureEditor.prepareForm();
+                        }
+                    }
+                    break;                
+            }
         }
     }//GEN-LAST:event_popupPVMIRenameActionPerformed
 

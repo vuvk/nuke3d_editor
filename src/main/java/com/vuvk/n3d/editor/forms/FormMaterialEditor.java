@@ -160,11 +160,6 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
                 tglStretchedStateChanged(evt);
             }
         });
-        tglStretched.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tglStretchedActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -245,10 +240,6 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         imagePreview.setStretched(tglStretched.isSelected());
         imagePreview.redraw();
     }//GEN-LAST:event_tglStretchedStateChanged
-
-    private void tglStretchedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tglStretchedActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tglStretchedActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
