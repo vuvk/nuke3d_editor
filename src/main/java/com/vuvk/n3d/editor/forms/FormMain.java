@@ -59,6 +59,7 @@ import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
@@ -574,6 +575,7 @@ public class FormMain extends javax.swing.JFrame {
         popupPVMenuAdd = new javax.swing.JMenu();
         popupPVMIFolder = new javax.swing.JMenuItem();
         popupPVMITexture = new javax.swing.JMenuItem();
+        popupPVMIMaterial = new javax.swing.JMenuItem();
         popupPVMICopy = new javax.swing.JMenuItem();
         popupPVMICut = new javax.swing.JMenuItem();
         popuvPVMIPaste = new javax.swing.JMenuItem();
@@ -613,6 +615,14 @@ public class FormMain extends javax.swing.JFrame {
             }
         });
         popupPVMenuAdd.add(popupPVMITexture);
+
+        popupPVMIMaterial.setText("Материал");
+        popupPVMIMaterial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMIMaterialActionPerformed(evt);
+            }
+        });
+        popupPVMenuAdd.add(popupPVMIMaterial);
 
         popupPV.add(popupPVMenuAdd);
 
@@ -1096,9 +1106,16 @@ public class FormMain extends javax.swing.JFrame {
                     openFormTextureEditor();
                     break;
                 }
-            }    
+            }
         }
     }//GEN-LAST:event_popupPVMITextureActionPerformed
+
+    private void popupPVMIMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIMaterialActionPerformed
+        String name = MessageDialog.showInput("Введите имя для нового материала");
+        if (name == null) {
+            return;    // отмена?
+        }
+    }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1209,6 +1226,7 @@ public class FormMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem popupPVMICopy;
     private javax.swing.JMenuItem popupPVMICut;
     private javax.swing.JMenuItem popupPVMIFolder;
+    private javax.swing.JMenuItem popupPVMIMaterial;
     private javax.swing.JMenuItem popupPVMIRemove;
     private javax.swing.JMenuItem popupPVMIRename;
     private javax.swing.JMenuItem popupPVMITexture;
