@@ -1077,7 +1077,7 @@ public class FormMain extends javax.swing.JFrame {
                         if (newName == null) {
                             return;    // отмена?
                         } else {
-                            newPath = new File(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+                            newPath = new File(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
                         }
                     }       
                 }
@@ -1114,6 +1114,32 @@ public class FormMain extends javax.swing.JFrame {
         String name = MessageDialog.showInput("Введите имя для нового материала");
         if (name == null) {
             return;    // отмена?
+        } else {               
+            File matPath = new File(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
+            
+            // файл с таким же именем существует?
+            if (matPath.exists()) {
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + name + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return;
+                // NO
+                } else if (!answer.booleanValue()) {
+                    // решил переименовать
+                    while (matPath.exists()) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + name + "\":", name);
+                        if (newName == null) {
+                            return;    // отмена?
+                        } else {
+                            matPath = new File(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
+                        }
+                    }       
+                }
+            }
+            
+            new Material(matPath);
+            
+            fillListProjectView(); 
         }
     }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
