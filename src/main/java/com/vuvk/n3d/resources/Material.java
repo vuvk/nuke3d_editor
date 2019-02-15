@@ -340,12 +340,7 @@ public class Material extends Resource {
             !Files.isDirectory(path) &&  
             FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
            ) {
-            String pathStr = FileSystemUtils.getProjectPath(path);
-            for (Material mat : MATERIALS) {
-                if (pathStr.equals(mat.getPath())) {
-                    // загрузка
-                }
-            }
+            //
         } else {
             frames.clear();
         }

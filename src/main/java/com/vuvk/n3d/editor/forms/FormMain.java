@@ -533,6 +533,38 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Открыть форму редактирования материала
+     */
+    void openFormMaterialEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.MATERIAL) {
+                
+                for (Material mat : Material.MATERIALS) {
+                    if (mat.getPath().equals(element.getPath())) {
+                        if (formMaterialEditor == null) {
+                            formMaterialEditor = new FormMaterialEditor();
+                            Desktop.add(formMaterialEditor);                            
+                        }
+
+                        formMaterialEditor.selectedMaterial = mat;
+                        formMaterialEditor.prepareForm();
+                        formMaterialEditor.setVisible(true);  
+                        
+                        return;
+                    }
+                }
+                
+                // если всё ещё не нашёл, а файл есть, значит он проект битый 
+                // или файл был "подброшен"
+                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+            }
+        }        
+    }
+    
+    /**
      * Creates new form FormMain
      */
     public FormMain() {
@@ -864,6 +896,10 @@ public class FormMain extends javax.swing.JFrame {
                         openFormTextureEditor();
                         break;
                         
+                    case MATERIAL:                        
+                        openFormMaterialEditor();
+                        break;
+                        
                     default:
                         break;
                 }
@@ -1077,6 +1113,7 @@ public class FormMain extends javax.swing.JFrame {
                         if (newName == null) {
                             return;    // отмена?
                         } else {
+                            baseName = newName;
                             newPath = new File(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
                         }
                     }       
@@ -1096,6 +1133,7 @@ public class FormMain extends javax.swing.JFrame {
             fillListProjectView();            
             new Texture(newPath);
             
+            // открываем окно редактирования текстуры
             DefaultListModel model = (DefaultListModel) listProjectView.getModel();
             for (Object obj : model.toArray()) {
                 PreviewElement element = (PreviewElement)obj;
@@ -1131,6 +1169,7 @@ public class FormMain extends javax.swing.JFrame {
                         if (newName == null) {
                             return;    // отмена?
                         } else {
+                            name = newName;
                             matPath = new File(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
                         }
                     }       
@@ -1140,6 +1179,19 @@ public class FormMain extends javax.swing.JFrame {
             new Material(matPath);
             
             fillListProjectView(); 
+            
+            // открываем окно редактирования материала
+            DefaultListModel model = (DefaultListModel) listProjectView.getModel();
+            for (Object obj : model.toArray()) {
+                PreviewElement element = (PreviewElement)obj;
+                if (element.getType() == PreviewElement.Type.MATERIAL && 
+                    element.getName().equals(name)
+                   ) {                    
+                    listProjectView.setSelectedValue(element, true);
+                    openFormMaterialEditor();
+                    break;
+                }
+            }
         }
     }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
