@@ -71,7 +71,7 @@ public class PreviewElement {
             try {
                 icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_arrow_upward_white_48dp.png")));        // Level Up
                 icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_folder_open_white_48dp.png")));         // Folder
-                icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_palette_black_48dp.png")));             // Material
+                icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_color_lens_white_48dp.png")));          // Material
                 icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));          // Audio
                 icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));   // Unknown
                 
