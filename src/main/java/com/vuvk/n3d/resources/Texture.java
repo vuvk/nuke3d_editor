@@ -214,7 +214,7 @@ public final class Texture extends Resource {
      * Загрузить image текстуры из файла
      * @param path Путь до файла
      */
-    public void load(Path path) {
+    protected void load(Path path) {
         /** если файл существует и он является текстурой */
         if (Files.exists(path) &&
             !Files.isDirectory(path) &&  
