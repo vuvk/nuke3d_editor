@@ -15,7 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.vuvk.n3d.editor.forms;
+package com.vuvk.n3d.forms;
 
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.utils.FileSystemUtils;
@@ -93,7 +93,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
             }
         });
 
-        FileChooser.setCurrentDirectory(new java.io.File("/home/tai-prg3/netbeans-8.2/bin/~"));
+        FileChooser.setCurrentDirectory(new java.io.File("/home/vuvk/~"));
         FileChooser.setDialogTitle("");
         FileChooser.setFileFilter(null);
         FileChooser.setAutoscrolls(true);
