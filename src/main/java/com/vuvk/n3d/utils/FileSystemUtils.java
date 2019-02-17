@@ -19,7 +19,7 @@ package com.vuvk.n3d.utils;
 
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
-import com.vuvk.n3d.editor.forms.FormMain;
+import com.vuvk.n3d.forms.FormMain;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
 import java.io.IOException;

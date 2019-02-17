@@ -71,7 +71,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.vuvk.n3d.editor.forms.FormMain</mainClass>
+                            <mainClass>com.vuvk.n3d.forms.FormMain</mainClass>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                     </archive>
