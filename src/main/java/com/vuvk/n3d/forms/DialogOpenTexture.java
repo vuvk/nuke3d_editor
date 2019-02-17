@@ -93,7 +93,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
             }
         });
 
-        FileChooser.setCurrentDirectory(new java.io.File("/home/vuvk/~"));
+        FileChooser.setCurrentDirectory(null);
         FileChooser.setDialogTitle("");
         FileChooser.setFileFilter(null);
         FileChooser.setAutoscrolls(true);
