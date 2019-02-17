@@ -30,6 +30,14 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMITextureActionPerformed"/>
               </Events>
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="popupPVMIMaterial">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="&#x41c;&#x430;&#x442;&#x435;&#x440;&#x438;&#x430;&#x43b;"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMIMaterialActionPerformed"/>
+              </Events>
+            </MenuItem>
           </SubComponents>
         </Menu>
         <MenuItem class="javax.swing.JMenuItem" name="popupPVMICopy">

@@ -143,12 +143,12 @@ public abstract class Resource {
      * Загрузить из файла
      * @param path Путь до файла
      */
-    public abstract void load(Path path);
+    protected abstract void load(Path path);
 
     /**
      * Сохранить ресурс в файл, к которому он привязан
      */
-    public abstract void save();
+    protected abstract void save();
     
     /**
      * Деструктор

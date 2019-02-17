@@ -35,6 +35,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -59,6 +60,7 @@ import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
@@ -241,6 +243,96 @@ public class FormMain extends javax.swing.JFrame {
 
         MessageDialog.showInformation("Проект закрыт");
         return true;
+    }
+
+    /**
+     * Открыть форму редактирования текстуры
+     */
+    void openFormTextureEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.TEXTURE) {
+                
+                for (Texture txr : Texture.TEXTURES) {
+                    if (txr.getPath().equals(element.getPath())) {
+                        boolean firstRun = false;
+                        if (formTextureEditor == null) {
+                            formTextureEditor = new FormTextureEditor();
+                            Desktop.add(formTextureEditor);  
+                            firstRun = true;
+                        }
+
+                        formTextureEditor.selectedTexture = txr;
+                        // свернуто?
+                        if (formTextureEditor.isIcon()) {
+                            try {
+                                formTextureEditor.setIcon(false);
+                            } catch (PropertyVetoException ex) {
+                                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        // невидимое?
+                        } else {
+                            formTextureEditor.setVisible(true); 
+                            formTextureEditor.prepareForm(firstRun);
+                        }
+                        Desktop.moveToFront(formTextureEditor);
+                        
+                        return;
+                    }
+                }
+                
+                // если всё ещё не нашёл, а файл есть, значит он проект битый 
+                // или файл был "подброшен"
+                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+            }
+        }
+    }
+    
+    /**
+     * Открыть форму редактирования материала
+     */
+    void openFormMaterialEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.MATERIAL) {
+                
+                for (Material mat : Material.MATERIALS) {
+                    if (mat.getPath().equals(element.getPath())) {
+                        boolean firstRun = false;
+                        if (formMaterialEditor == null) {
+                            formMaterialEditor = new FormMaterialEditor();
+                            Desktop.add(formMaterialEditor);
+                            firstRun = true;
+                        }
+
+                        formMaterialEditor.selectedMaterial = mat;
+                        // свернуто?
+                        if (formMaterialEditor.isIcon()) {
+                            try {
+                                formMaterialEditor.setIcon(false);
+                            } catch (PropertyVetoException ex) {
+                                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        // невидимое?
+                        } else {
+                            formMaterialEditor.setVisible(true); 
+                            formMaterialEditor.prepareForm(firstRun);
+                        }
+                        Desktop.moveToFront(formMaterialEditor);
+                        
+                        return;
+                    }
+                }
+                
+                // если всё ещё не нашёл, а файл есть, значит он проект битый 
+                // или файл был "подброшен"
+                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+            }
+        }        
     }
     
     /**
@@ -498,39 +590,7 @@ public class FormMain extends javax.swing.JFrame {
             }
         }
     }
-    
-    /**
-     * Открыть форму редактирования текстуры
-     */
-    void openFormTextureEditor() {
-        List list = listProjectView.getSelectedValuesList();
-        if (list.size() > 0) {
-            PreviewElement element = (PreviewElement)list.get(0);
-            if (element.getType() == PreviewElement.Type.TEXTURE) {
-                
-                for (Texture txr : Texture.TEXTURES) {
-                    if (txr.getPath().equals(element.getPath())) {
-                        if (formTextureEditor == null) {
-                            formTextureEditor = new FormTextureEditor();
-                            Desktop.add(formTextureEditor);                            
-                        }
-
-                        formTextureEditor.selectedTexture = txr;
-                        formTextureEditor.prepareForm();
-                        formTextureEditor.setVisible(true);  
-                        
-                        return;
-                    }
-                }
-                
-                // если всё ещё не нашёл, а файл есть, значит он проект битый 
-                // или файл был "подброшен"
-                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
-                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
-            }
-        }
-    }
-    
+        
     /**
      * Creates new form FormMain
      */
@@ -574,6 +634,7 @@ public class FormMain extends javax.swing.JFrame {
         popupPVMenuAdd = new javax.swing.JMenu();
         popupPVMIFolder = new javax.swing.JMenuItem();
         popupPVMITexture = new javax.swing.JMenuItem();
+        popupPVMIMaterial = new javax.swing.JMenuItem();
         popupPVMICopy = new javax.swing.JMenuItem();
         popupPVMICut = new javax.swing.JMenuItem();
         popuvPVMIPaste = new javax.swing.JMenuItem();
@@ -613,6 +674,14 @@ public class FormMain extends javax.swing.JFrame {
             }
         });
         popupPVMenuAdd.add(popupPVMITexture);
+
+        popupPVMIMaterial.setText("Материал");
+        popupPVMIMaterial.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMIMaterialActionPerformed(evt);
+            }
+        });
+        popupPVMenuAdd.add(popupPVMIMaterial);
 
         popupPV.add(popupPVMenuAdd);
 
@@ -854,6 +923,10 @@ public class FormMain extends javax.swing.JFrame {
                         openFormTextureEditor();
                         break;
                         
+                    case MATERIAL:                        
+                        openFormMaterialEditor();
+                        break;
+                        
                     default:
                         break;
                 }
@@ -940,7 +1013,7 @@ public class FormMain extends javax.swing.JFrame {
                     if (formTextureEditor != null) {
                         String txrPath = FormTextureEditor.selectedTexture.getPath();
                         if (txrPath.equals(element.getPath())) {
-                            formTextureEditor.prepareForm();
+                            formTextureEditor.prepareForm(false);
                         }
                     }
                     break;                
@@ -1067,7 +1140,8 @@ public class FormMain extends javax.swing.JFrame {
                         if (newName == null) {
                             return;    // отмена?
                         } else {
-                            newPath = new File(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+                            baseName = newName;
+                            newPath = new File(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
                         }
                     }       
                 }
@@ -1086,6 +1160,7 @@ public class FormMain extends javax.swing.JFrame {
             fillListProjectView();            
             new Texture(newPath);
             
+            // открываем окно редактирования текстуры
             DefaultListModel model = (DefaultListModel) listProjectView.getModel();
             for (Object obj : model.toArray()) {
                 PreviewElement element = (PreviewElement)obj;
@@ -1096,9 +1171,56 @@ public class FormMain extends javax.swing.JFrame {
                     openFormTextureEditor();
                     break;
                 }
-            }    
+            }
         }
     }//GEN-LAST:event_popupPVMITextureActionPerformed
+
+    private void popupPVMIMaterialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIMaterialActionPerformed
+        String name = MessageDialog.showInput("Введите имя для нового материала");
+        if (name == null) {
+            return;    // отмена?
+        } else {               
+            File matPath = new File(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
+            
+            // файл с таким же именем существует?
+            if (matPath.exists()) {
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + name + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return;
+                // NO
+                } else if (!answer.booleanValue()) {
+                    // решил переименовать
+                    while (matPath.exists()) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + name + "\":", name);
+                        if (newName == null) {
+                            return;    // отмена?
+                        } else {
+                            name = newName;
+                            matPath = new File(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
+                        }
+                    }       
+                }
+            }
+            
+            new Material(matPath);
+            
+            fillListProjectView(); 
+            
+            // открываем окно редактирования материала
+            DefaultListModel model = (DefaultListModel) listProjectView.getModel();
+            for (Object obj : model.toArray()) {
+                PreviewElement element = (PreviewElement)obj;
+                if (element.getType() == PreviewElement.Type.MATERIAL && 
+                    element.getName().equals(name)
+                   ) {                    
+                    listProjectView.setSelectedValue(element, true);
+                    openFormMaterialEditor();
+                    break;
+                }
+            }
+        }
+    }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1209,6 +1331,7 @@ public class FormMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem popupPVMICopy;
     private javax.swing.JMenuItem popupPVMICut;
     private javax.swing.JMenuItem popupPVMIFolder;
+    private javax.swing.JMenuItem popupPVMIMaterial;
     private javax.swing.JMenuItem popupPVMIRemove;
     private javax.swing.JMenuItem popupPVMIRename;
     private javax.swing.JMenuItem popupPVMITexture;

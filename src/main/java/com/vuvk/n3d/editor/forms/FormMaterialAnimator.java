@@ -31,7 +31,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class FormMaterialAnimator extends javax.swing.JDialog {
     /** выбранный материал для редактирования */
-    public static Material selectedMaterial = null;
+    public Material selectedMaterial = null;
     /** поле для рисования предпросмотра */
     static PanelImagePreview imagePreview;
     /** номер выбранного кадра */
@@ -153,8 +153,8 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
         imagePreview = new PanelImagePreview(this);
         imagePreview.setSize(256, 256);
         PanelPreview.add(imagePreview);
-        //imagePreview.setLocation(5, 16);  
-        imagePreview.setLocation(14, 26); 
+        imagePreview.setLocation(5, 16);  
+        //imagePreview.setLocation(14, 26); 
         
         ListSelectionModel model = TableFrames.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -365,9 +365,6 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
         PanelPropertiesLayout.setHorizontalGroup(
             PanelPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(PanelPropertiesLayout.createSequentialGroup()
-                .addComponent(PanelPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(PanelPropertiesLayout.createSequentialGroup()
                 .addGroup(PanelPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(PanelPropertiesLayout.createSequentialGroup()
                         .addContainerGap()
@@ -379,7 +376,10 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
                             .addGroup(PanelPropertiesLayout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addGap(18, 18, 18)
-                                .addComponent(SpinnerFrameDelay, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(SpinnerFrameDelay, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(PanelPropertiesLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(PanelPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         PanelPropertiesLayout.setVerticalGroup(

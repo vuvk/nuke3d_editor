@@ -32,14 +32,6 @@ public final class Const {
     public static final String CONFIG_STRING = "config/";
     
     
-    /** Путь до сохранённых параметров текстур */
-    public static final String TEXTURE_CONFIG_STRING = CONFIG_STRING + "textures.sav";
-    /** идентификатор конфига текстур */
-    public static final String TEXTURE_CONFIG_IDENTIFICATOR = "N3D_TEXTURES";
-    /** версия конфига текстур */
-    static final int TEXTURE_CONFIG_MAJOR = 0;
-    static final int TEXTURE_CONFIG_MINOR = 1;
-    public static final String TEXTURE_CONFIG_VERSION = TEXTURE_CONFIG_MAJOR + "." + TEXTURE_CONFIG_MINOR;
     /** максимальная ширина текстуры */
     public static final int TEXTURE_MAX_WIDTH  = 512;
     /** максимальная высота текстуры */
@@ -48,13 +40,38 @@ public final class Const {
     public static final String TEXTURE_FORMAT_EXT = "txr";
     /** доступные расширения текстур для загрузки */
     public static final List<String> TEXTURE_EXTS = Arrays.asList("jpg", "jpeg", "png", "bmp", "gif");
+    /** Путь до сохранённых параметров текстур */
+    public static final String TEXTURE_CONFIG_STRING = CONFIG_STRING + "textures.sav";
+    /** идентификатор конфига текстур */
+    public static final String TEXTURE_CONFIG_IDENTIFICATOR = "N3D_TEXTURES";
+    /** версия конфига текстур */
+    static final int TEXTURE_CONFIG_MAJOR = 0;
+    static final int TEXTURE_CONFIG_MINOR = 1;
+    public static final String TEXTURE_CONFIG_VERSION = TEXTURE_CONFIG_MAJOR + "." + TEXTURE_CONFIG_MINOR;
     
-    /** Путь до материалов в паке */
-    public static final String MATERIAL_PATH = "resources/materials/";
+    
+    /** идентификатор материала */
+    public static final String MATERIAL_IDENTIFICATOR = "N3D_MATERIAL";
+    /** версия материала */
+    static final int MATERIAL_MAJOR = 0;
+    static final int MATERIAL_MINOR = 1;
+    public static final String MATERIAL_VERSION = MATERIAL_MAJOR + "." + MATERIAL_MINOR;
+    /** расширение файла импортированного материала */
+    public static final String MATERIAL_FORMAT_EXT = "mat";
+    /** Путь до сохранённых параметров материалов */
+    public static final String MATERIAL_CONFIG_STRING = CONFIG_STRING + "materials.sav";
+    /** идентификатор конфига материалов */
+    public static final String MATERIAL_CONFIG_IDENTIFICATOR = "N3D_MATERIALS";
+    /** версия конфига материалов */
+    static final int MATERIAL_CONFIG_MAJOR = 0;
+    static final int MATERIAL_CONFIG_MINOR = 1;
+    public static final String MATERIAL_CONFIG_VERSION = MATERIAL_CONFIG_MAJOR + "." + MATERIAL_CONFIG_MINOR;
+    
     
     /** Размер иконок превью */
     public static final int ICON_PREVIEW_WIDTH  = 64;
     public static final int ICON_PREVIEW_HEIGHT = 64;
+    
     
     private Const() {}
 }

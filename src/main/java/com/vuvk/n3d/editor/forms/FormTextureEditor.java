@@ -194,8 +194,9 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
     
     /**
      * Подготовка формы для отображения - подгружается изображение из текстуры
+     * @param firstRun - первый запуск окна
      */
-    public void prepareForm() {        
+    public void prepareForm(boolean firstRun) {        
         if (selectedTexture == null) {
             dispose();
             return;
@@ -207,7 +208,9 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
         imagePreview.setImage(selectedTexture.getImage());
         imagePreview.redraw();
         
-        setLocation((getParent().getWidth() >> 1) - (getWidth() >> 1), 0);
+        if (firstRun) {
+            setLocation((getParent().getWidth() >> 1) - (getWidth() >> 1), 0);
+        }
     }
 
     /**
@@ -258,8 +261,12 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
         tglDeleteColor = new javax.swing.JToggleButton();
 
         setClosable(true);
+        setIconifiable(true);
         setTitle("Редактор текстуры");
         setToolTipText("");
+        setMaximumSize(new java.awt.Dimension(544, 660));
+        setMinimumSize(new java.awt.Dimension(544, 660));
+        setNormalBounds(new java.awt.Rectangle(0, 0, 544, 660));
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -282,9 +289,15 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
 
         txtName.setEditable(false);
         txtName.setText("<not available>");
+        txtName.setMaximumSize(new java.awt.Dimension(432, 27));
+        txtName.setMinimumSize(new java.awt.Dimension(432, 27));
+        txtName.setPreferredSize(new java.awt.Dimension(432, 27));
 
         btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_done_white_24dp.png"))); // NOI18N
         btnClose.setToolTipText("Закрыть");
+        btnClose.setMaximumSize(new java.awt.Dimension(64, 64));
+        btnClose.setMinimumSize(new java.awt.Dimension(64, 64));
+        btnClose.setPreferredSize(new java.awt.Dimension(64, 64));
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
@@ -292,18 +305,23 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
         });
 
         pnlPreview.setBorder(javax.swing.BorderFactory.createTitledBorder("Предпросмотр"));
-        pnlPreview.setDoubleBuffered(false);
+        pnlPreview.setMaximumSize(new java.awt.Dimension(524, 535));
+        pnlPreview.setMinimumSize(new java.awt.Dimension(524, 535));
+        pnlPreview.setPreferredSize(new java.awt.Dimension(524, 535));
 
         javax.swing.GroupLayout pnlPreviewLayout = new javax.swing.GroupLayout(pnlPreview);
         pnlPreview.setLayout(pnlPreviewLayout);
         pnlPreviewLayout.setHorizontalGroup(
             pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 512, Short.MAX_VALUE)
+            .addGap(0, 514, Short.MAX_VALUE)
         );
         pnlPreviewLayout.setVerticalGroup(
             pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 512, Short.MAX_VALUE)
+            .addGap(0, 513, Short.MAX_VALUE)
         );
+
+        pnlColorChoosed.setMaximumSize(new java.awt.Dimension(64, 64));
+        pnlColorChoosed.setMinimumSize(new java.awt.Dimension(64, 64));
 
         javax.swing.GroupLayout pnlColorChoosedLayout = new javax.swing.GroupLayout(pnlColorChoosed);
         pnlColorChoosed.setLayout(pnlColorChoosedLayout);
@@ -313,10 +331,14 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
         );
         pnlColorChoosedLayout.setVerticalGroup(
             pnlColorChoosedLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 64, Short.MAX_VALUE)
         );
 
         tglStretched.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_photo_size_select_large_white_24dp.png"))); // NOI18N
+        tglStretched.setToolTipText("Растянуть");
+        tglStretched.setMaximumSize(new java.awt.Dimension(64, 64));
+        tglStretched.setMinimumSize(new java.awt.Dimension(64, 64));
+        tglStretched.setPreferredSize(new java.awt.Dimension(64, 64));
         tglStretched.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_photo_size_select_actual_white_24dp.png"))); // NOI18N
         tglStretched.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
@@ -326,6 +348,9 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
 
         tglDeleteColor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_colorize_white_24dp.png"))); // NOI18N
         tglDeleteColor.setToolTipText("Удалить цвет");
+        tglDeleteColor.setMaximumSize(new java.awt.Dimension(64, 64));
+        tglDeleteColor.setMinimumSize(new java.awt.Dimension(64, 64));
+        tglDeleteColor.setPreferredSize(new java.awt.Dimension(64, 64));
         tglDeleteColor.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_center_focus_weak_white_24dp.png"))); // NOI18N
         tglDeleteColor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -340,40 +365,38 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(244, 244, 244)
                         .addComponent(pnlColorChoosed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(tglDeleteColor, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblName)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(pnlPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblName)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(pnlPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblName))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
-                    .addComponent(pnlColorChoosed, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tglStretched, javax.swing.GroupLayout.DEFAULT_SIZE, 64, Short.MAX_VALUE)
-                    .addComponent(tglDeleteColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlColorChoosed, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglDeleteColor, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         pack();

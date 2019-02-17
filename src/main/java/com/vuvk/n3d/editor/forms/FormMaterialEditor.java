@@ -17,21 +17,23 @@
 */
 package com.vuvk.n3d.editor.forms;
 
+import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.resources.Material;
-import com.vuvk.n3d.resources.Texture;
+import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Color;
-import java.io.File;
-import javax.swing.tree.DefaultMutableTreeNode;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.image.BufferedImage;
 
 /**
  *
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class FormMaterialEditor extends javax.swing.JInternalFrame {
+public final class FormMaterialEditor extends javax.swing.JInternalFrame {
 
     /** редактируемая в данный момент нода в списке */
-    public static DefaultMutableTreeNode selectedTreeNode = null;
+//    public static DefaultMutableTreeNode selectedTreeNode = null;
     /** выбранный материал для редактирования */
     public static Material selectedMaterial = null;
     /** окно редактирования материала */
@@ -40,9 +42,10 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
     static PanelImagePreview imagePreview;
     
     /**
-     * Подготовка формы для отображения - подгружается изображение из текстуры первого кадра материала
+     * Подготовка формы для отображения - подгружается изображение из текстуры первого кадра
+     * @param firstRun - первый запуск окна материала
      */
-    public void prepareForm() {  
+    public void prepareForm(boolean firstRun) {  
         if (selectedMaterial == null) {
             dispose();
         }
@@ -62,6 +65,10 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         int index = selectedMaterial.getMaterialType().ordinal();
         cmbMaterialType.setSelectedItem(index);
         cmbMaterialType.getModel().setSelectedItem(cmbMaterialType.getItemAt(index));
+        
+        if (firstRun) {
+            setLocation((getParent().getWidth() >> 1) - (getWidth() >> 1), 0);
+        }
     }
     
     /**
@@ -73,8 +80,8 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         imagePreview = new PanelImagePreview(this);
         imagePreview.setSize(512, 512);
         pnlPreview.add(imagePreview);
-        //imagePreview.setLocation(5, 16);  
-        imagePreview.setLocation(14, 26); 
+        imagePreview.setLocation(5, 16);  
+        //imagePreview.setLocation(14, 26); 
     }
 
     /**
@@ -93,11 +100,15 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         lblType = new javax.swing.JLabel();
         btnClose = new javax.swing.JButton();
         tglStretched = new javax.swing.JToggleButton();
+        btnEdit = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
         setTitle("Редактор материала");
-        setPreferredSize(new java.awt.Dimension(775, 629));
+        setToolTipText("");
+        setMaximumSize(new java.awt.Dimension(544, 660));
+        setMinimumSize(new java.awt.Dimension(544, 660));
+        setNormalBounds(new java.awt.Rectangle(0, 0, 544, 660));
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -111,7 +122,6 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
             public void internalFrameDeiconified(javax.swing.event.InternalFrameEvent evt) {
             }
             public void internalFrameActivated(javax.swing.event.InternalFrameEvent evt) {
-                formInternalFrameActivated(evt);
             }
             public void internalFrameDeactivated(javax.swing.event.InternalFrameEvent evt) {
             }
@@ -120,17 +130,18 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         lblName.setText("Имя");
 
         pnlPreview.setBorder(javax.swing.BorderFactory.createTitledBorder("Предпросмотр"));
-        pnlPreview.setDoubleBuffered(false);
+        pnlPreview.setMaximumSize(new java.awt.Dimension(524, 535));
+        pnlPreview.setMinimumSize(new java.awt.Dimension(524, 535));
 
         javax.swing.GroupLayout pnlPreviewLayout = new javax.swing.GroupLayout(pnlPreview);
         pnlPreview.setLayout(pnlPreviewLayout);
         pnlPreviewLayout.setHorizontalGroup(
             pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 512, Short.MAX_VALUE)
+            .addGap(0, 514, Short.MAX_VALUE)
         );
         pnlPreviewLayout.setVerticalGroup(
             pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 512, Short.MAX_VALUE)
+            .addGap(0, 513, Short.MAX_VALUE)
         );
 
         txtName.setEditable(false);
@@ -147,6 +158,9 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
 
         btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_done_white_24dp.png"))); // NOI18N
         btnClose.setToolTipText("Закрыть");
+        btnClose.setMaximumSize(new java.awt.Dimension(64, 64));
+        btnClose.setMinimumSize(new java.awt.Dimension(64, 64));
+        btnClose.setPreferredSize(new java.awt.Dimension(64, 64));
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
@@ -154,10 +168,25 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         });
 
         tglStretched.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_photo_size_select_large_white_24dp.png"))); // NOI18N
+        tglStretched.setToolTipText("Растянуть");
+        tglStretched.setMaximumSize(new java.awt.Dimension(64, 64));
+        tglStretched.setMinimumSize(new java.awt.Dimension(64, 64));
+        tglStretched.setPreferredSize(new java.awt.Dimension(64, 64));
         tglStretched.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_photo_size_select_actual_white_24dp.png"))); // NOI18N
         tglStretched.addChangeListener(new javax.swing.event.ChangeListener() {
             public void stateChanged(javax.swing.event.ChangeEvent evt) {
                 tglStretchedStateChanged(evt);
+            }
+        });
+
+        btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_camera_roll_white_24dp.png"))); // NOI18N
+        btnEdit.setToolTipText("Редактировать кадры");
+        btnEdit.setMaximumSize(new java.awt.Dimension(64, 64));
+        btnEdit.setMinimumSize(new java.awt.Dimension(64, 64));
+        btnEdit.setPreferredSize(new java.awt.Dimension(64, 64));
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditActionPerformed(evt);
             }
         });
 
@@ -167,26 +196,27 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(lblName)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGap(18, 18, 18)
-                            .addComponent(lblType)
-                            .addGap(33, 33, 33)
-                            .addComponent(cmbMaterialType, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(pnlPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lblName)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 194, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblType)
+                        .addGap(33, 33, 33)
+                        .addComponent(cmbMaterialType, javax.swing.GroupLayout.PREFERRED_SIZE, 208, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnlPreview, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbMaterialType, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -196,38 +226,35 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlPreview, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnClose, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglStretched, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnEdit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+        
     private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed
         FormMain.formMaterialEditor = null;
     }//GEN-LAST:event_formInternalFrameClosed
-    
-    private void formInternalFrameActivated(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameActivated
-        prepareForm();
-    }//GEN-LAST:event_formInternalFrameActivated
 
     private void cmbMaterialTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbMaterialTypeActionPerformed
         if (selectedMaterial != null) {
             switch (cmbMaterialType.getSelectedIndex()) {
                 default:
-                case 0 : 
-                    selectedMaterial.setMaterialType(Material.Type.Default);
-                    break;     
-                    
-                case 1 : 
-                    selectedMaterial.setMaterialType(Material.Type.AlphaChannel);
-                    break;
-                    
-                case 2 : 
-                    selectedMaterial.setMaterialType(Material.Type.Transparent);
-                    break;
+                case 0 :
+                selectedMaterial.setMaterialType(Material.Type.Default);
+                break;
+
+                case 1 :
+                selectedMaterial.setMaterialType(Material.Type.AlphaChannel);
+                break;
+
+                case 2 :
+                selectedMaterial.setMaterialType(Material.Type.Transparent);
+                break;
             }
         }
     }//GEN-LAST:event_cmbMaterialTypeActionPerformed
@@ -241,9 +268,16 @@ public class FormMaterialEditor extends javax.swing.JInternalFrame {
         imagePreview.redraw();
     }//GEN-LAST:event_tglStretchedStateChanged
 
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        formMaterialAnimator = new FormMaterialAnimator(FormMain.formMain, true);
+        formMaterialAnimator.selectedMaterial = selectedMaterial;
+        formMaterialAnimator.setVisible(true);
+    }//GEN-LAST:event_btnEditActionPerformed
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnEdit;
     private javax.swing.JComboBox<String> cmbMaterialType;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblType;

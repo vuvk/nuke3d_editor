@@ -23,11 +23,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
@@ -124,9 +126,9 @@ public class Material extends Resource {
     }
     
     /** тип материала */
-    private Type type = Type.Default;    
+    private Type type;    
     /** Список кадров материала */
-    private final ArrayList<Frame> frames = new ArrayList<>();
+    private ArrayList<Frame> frames;
     
     /** Список всех материалов (контейнер) */
     public static final ArrayList<Material> MATERIALS = new ArrayList<>();
@@ -312,40 +314,72 @@ public class Material extends Resource {
         }
         ++newId;
         
+        type = Type.Default; 
+        frames = new ArrayList<>();
+        
         setId(newId);
-        setPath(path);   
-        load(path);
+        setPath(path);  
+        save(); 
         MATERIALS.add(this);
     }
     
     public Material(Path path) {
-        init(path);
+        super(path);
     }
     public Material(File path) {
-        init(path.toPath());
+        super(path.toPath());
     }
         
     /**
      * Загрузить материал из файла
      * @param path Путь до файла
      */
-    public void load(Path path) {
+    protected void load(Path path) {
         /** если файл существует и он является текстурой */
         if (Files.exists(path) &&
             !Files.isDirectory(path) &&  
             FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
            ) {
-            
+            //
         } else {
-            
+            frames.clear();
         }
     }
     
     /**
      * Сохранить материал в файл, к которому он привязан
      */
-    public void save() {
+    public void save() { 
+        // информация о кадрах
+        JsonArray jsonFrames = new JsonArray();
+        for (Frame frm : frames) {
+            JsonObject jsonFrame = new JsonObject();
+            Texture txr = frm.getTexture();
+            if (txr != null) {
+                jsonFrame.addProperty("texture_id", txr.getId());
+            } else {
+                jsonFrame.addProperty("texture_id", -1);                
+            }
+            jsonFrame.addProperty("delay", frm.getDelay());
+            
+            jsonFrames.add(jsonFrame);
+        }
         
+        // общая информация об объекте
+        JsonObject object = new JsonObject();
+        object.addProperty("identificator", Const.MATERIAL_IDENTIFICATOR);
+        object.addProperty("version", Const.MATERIAL_VERSION);
+        object.addProperty("id", getId());
+        object.add("frames", jsonFrames);
+        
+        // сохраняем в привязанный файл
+        try (Writer writer = new FileWriter(getPath())) { 
+            Gson gson = new GsonBuilder().create();   
+            gson.toJson(object, writer);             
+        } catch (IOException ex) {
+            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+        }        
     }
     
     /**
