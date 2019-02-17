@@ -35,6 +35,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -242,6 +243,96 @@ public class FormMain extends javax.swing.JFrame {
 
         MessageDialog.showInformation("Проект закрыт");
         return true;
+    }
+
+    /**
+     * Открыть форму редактирования текстуры
+     */
+    void openFormTextureEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.TEXTURE) {
+                
+                for (Texture txr : Texture.TEXTURES) {
+                    if (txr.getPath().equals(element.getPath())) {
+                        boolean firstRun = false;
+                        if (formTextureEditor == null) {
+                            formTextureEditor = new FormTextureEditor();
+                            Desktop.add(formTextureEditor);  
+                            firstRun = true;
+                        }
+
+                        formTextureEditor.selectedTexture = txr;
+                        // свернуто?
+                        if (formTextureEditor.isIcon()) {
+                            try {
+                                formTextureEditor.setIcon(false);
+                            } catch (PropertyVetoException ex) {
+                                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        // невидимое?
+                        } else {
+                            formTextureEditor.setVisible(true); 
+                            formTextureEditor.prepareForm(firstRun);
+                        }
+                        Desktop.moveToFront(formTextureEditor);
+                        
+                        return;
+                    }
+                }
+                
+                // если всё ещё не нашёл, а файл есть, значит он проект битый 
+                // или файл был "подброшен"
+                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+            }
+        }
+    }
+    
+    /**
+     * Открыть форму редактирования материала
+     */
+    void openFormMaterialEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.MATERIAL) {
+                
+                for (Material mat : Material.MATERIALS) {
+                    if (mat.getPath().equals(element.getPath())) {
+                        boolean firstRun = false;
+                        if (formMaterialEditor == null) {
+                            formMaterialEditor = new FormMaterialEditor();
+                            Desktop.add(formMaterialEditor);
+                            firstRun = true;
+                        }
+
+                        formMaterialEditor.selectedMaterial = mat;
+                        // свернуто?
+                        if (formMaterialEditor.isIcon()) {
+                            try {
+                                formMaterialEditor.setIcon(false);
+                            } catch (PropertyVetoException ex) {
+                                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        // невидимое?
+                        } else {
+                            formMaterialEditor.setVisible(true); 
+                            formMaterialEditor.prepareForm(firstRun);
+                        }
+                        Desktop.moveToFront(formMaterialEditor);
+                        
+                        return;
+                    }
+                }
+                
+                // если всё ещё не нашёл, а файл есть, значит он проект битый 
+                // или файл был "подброшен"
+                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+            }
+        }        
     }
     
     /**
@@ -499,71 +590,7 @@ public class FormMain extends javax.swing.JFrame {
             }
         }
     }
-    
-    /**
-     * Открыть форму редактирования текстуры
-     */
-    void openFormTextureEditor() {
-        List list = listProjectView.getSelectedValuesList();
-        if (list.size() > 0) {
-            PreviewElement element = (PreviewElement)list.get(0);
-            if (element.getType() == PreviewElement.Type.TEXTURE) {
-                
-                for (Texture txr : Texture.TEXTURES) {
-                    if (txr.getPath().equals(element.getPath())) {
-                        if (formTextureEditor == null) {
-                            formTextureEditor = new FormTextureEditor();
-                            Desktop.add(formTextureEditor);                            
-                        }
-
-                        formTextureEditor.selectedTexture = txr;
-                        formTextureEditor.prepareForm();
-                        formTextureEditor.setVisible(true);  
-                        
-                        return;
-                    }
-                }
-                
-                // если всё ещё не нашёл, а файл есть, значит он проект битый 
-                // или файл был "подброшен"
-                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
-                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
-            }
-        }
-    }
-    
-    /**
-     * Открыть форму редактирования материала
-     */
-    void openFormMaterialEditor() {
-        List list = listProjectView.getSelectedValuesList();
-        if (list.size() > 0) {
-            PreviewElement element = (PreviewElement)list.get(0);
-            if (element.getType() == PreviewElement.Type.MATERIAL) {
-                
-                for (Material mat : Material.MATERIALS) {
-                    if (mat.getPath().equals(element.getPath())) {
-                        if (formMaterialEditor == null) {
-                            formMaterialEditor = new FormMaterialEditor();
-                            Desktop.add(formMaterialEditor);                            
-                        }
-
-                        formMaterialEditor.selectedMaterial = mat;
-                        formMaterialEditor.prepareForm();
-                        formMaterialEditor.setVisible(true);  
-                        
-                        return;
-                    }
-                }
-                
-                // если всё ещё не нашёл, а файл есть, значит он проект битый 
-                // или файл был "подброшен"
-                MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
-                                        "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
-            }
-        }        
-    }
-    
+        
     /**
      * Creates new form FormMain
      */
@@ -986,7 +1013,7 @@ public class FormMain extends javax.swing.JFrame {
                     if (formTextureEditor != null) {
                         String txrPath = FormTextureEditor.selectedTexture.getPath();
                         if (txrPath.equals(element.getPath())) {
-                            formTextureEditor.prepareForm();
+                            formTextureEditor.prepareForm(false);
                         }
                     }
                     break;                
