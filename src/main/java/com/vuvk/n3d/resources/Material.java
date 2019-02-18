@@ -282,6 +282,17 @@ public class Material extends Resource {
     }
     
     /**
+     * Проверка всех кадров всех материалов на наличие текстуры в базе.
+     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
+     * @return true, если все кадры валидные
+     */
+    public static void checkAll() {
+        for (Material mat : MATERIALS) {
+            mat.check();
+        }
+    }
+    
+    /**
      * Конструктор текстуры по умолчанию.
      * Имя по порядку и изображение 1*1 в формате ARGB
      */
@@ -494,13 +505,13 @@ public class Material extends Resource {
     
     /**
      * Проверка всех кадров на наличие текстуры в базе.
-     * Если текстуры нет, то будет ОБНУЛЕНА.
+     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
      * @return true, если все кадры валидные
      */
     public boolean check() {
         int counter = 0;
-        for (int i = 0; i < frames.size(); ++i) {
-            if (frames.get(i).check()) {
+        for (Frame frm : frames) {
+            if (frm.check()) {
                 ++counter;
             }
         }
