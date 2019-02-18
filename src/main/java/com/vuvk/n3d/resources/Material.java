@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -501,6 +502,14 @@ public class Material extends Resource {
         if (index >= 0 && index < frames.size()) {
             frames.set(index, frame);
         }
+    }    
+    /**
+     * Получить ссылку на материал по пути до файла
+     * @param path Путь до файла
+     * @return Материал, если есть такой в базе, иначе null
+     */
+    public static Material getByPath(String path) {
+        return getByPath(Paths.get(path));
     }
     /**
      * Получить ссылку на материал по пути до файла

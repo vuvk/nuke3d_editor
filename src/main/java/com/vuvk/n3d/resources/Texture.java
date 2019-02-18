@@ -279,6 +279,14 @@ public final class Texture extends Resource {
      * @param path Путь до файла
      * @return Текстура, если есть такая в базе, иначе null
      */
+    public static Texture getByPath(String path) {
+        return getByPath(Paths.get(path));
+    }
+    /**
+     * Получить ссылку на текстуру по пути до файла
+     * @param path Путь до файла
+     * @return Текстура, если есть такая в базе, иначе null
+     */
     public static Texture getByPath(Path path) {
         if (Files.exists(path) && 
             !Files.isDirectory(path) && 
