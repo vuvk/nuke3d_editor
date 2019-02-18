@@ -216,10 +216,7 @@ public final class Texture extends Resource {
      */
     protected void load(Path path) {
         /** если файл существует и он является текстурой */
-        if (Files.exists(path) &&
-            !Files.isDirectory(path) &&  
-            FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
-           ) {
+        if (pathIsTexture(path)) {
             try {
                 image = ImageUtils.prepareImage(ImageIO.read(path.toFile()));
             } catch (IOException ex) {
@@ -288,10 +285,7 @@ public final class Texture extends Resource {
      * @return Текстура, если есть такая в базе, иначе null
      */
     public static Texture getByPath(Path path) {
-        if (Files.exists(path) && 
-            !Files.isDirectory(path) && 
-            FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT)
-           ) {
+        if (pathIsTexture(path)) {
             String checkPath = FileSystemUtils.getProjectPath(path);
             for (Texture txr : TEXTURES) {
                 if (txr.getPath().equals(checkPath)) {
@@ -301,5 +295,16 @@ public final class Texture extends Resource {
         }
         
         return null;
+    }
+    /**
+     * Проверка является ли указанный путь текстурой
+     * @param path путь для проверки
+     * @return true, если по указанному пути текстура
+     */
+    public static boolean pathIsTexture(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT));
     }
 }

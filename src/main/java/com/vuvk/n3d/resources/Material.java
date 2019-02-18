@@ -293,28 +293,6 @@ public class Material extends Resource {
         }
     }
     
-    /**
-     * Конструктор текстуры по умолчанию.
-     * Имя по порядку и изображение 1*1 в формате ARGB
-     */
-    /*public Material() {
-        name = "material_" + list.size();
-        type = Type.Default;
-        
-        // имя подходящее?
-        for (int i = 0; i < list.size(); ++i) {
-            // уже есть такое имя и надо подобрать новое
-            if (name.equals(list.get(i).name)) {
-                name = "material_" + list.size() + "_" + Math.round(Math.random() * 1000);
-                i = 0;
-            }
-        }
-        
-        frames.add(new Frame());
-        
-        list.add(this);
-    }    */
-    
     protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
         long newId = 0;
@@ -348,10 +326,7 @@ public class Material extends Resource {
      */
     protected void load(Path path) {
         /** если файл существует и он является текстурой */
-        if (Files.exists(path) &&
-            !Files.isDirectory(path) &&  
-            FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
-           ) {
+        if (pathIsMaterial(path)) {
             //
         } else {
             frames.clear();
@@ -416,11 +391,11 @@ public class Material extends Resource {
      * @param count количество кадров
      */
     public void setFramesCount(int count) {
-        if (count > 1) {
+        if (count > 0) {
             // сокращаем количество
             if (count < frames.size()) {
                 while (frames.size() > count) {
-                    frames.remove(frames.size() - 1);
+                    popFrame();
                 }
             // наращиваем
             } else if (count > frames.size()) {                
@@ -523,10 +498,7 @@ public class Material extends Resource {
      * @return Материал, если есть такой в базе, иначе null
      */
     public static Material getByPath(Path path) {
-        if (Files.exists(path) && 
-            !Files.isDirectory(path) && 
-            FileSystemUtils.getFileExtension(path).equals(Const.MATERIAL_FORMAT_EXT)
-           ) {
+        if (pathIsMaterial(path)) {
             String checkPath = FileSystemUtils.getProjectPath(path);
             for (Material mat : MATERIALS) {
                 if (mat.getPath().equals(checkPath)) {
@@ -536,6 +508,17 @@ public class Material extends Resource {
         }
         
         return null;
+    }
+    /**
+     * Проверка является ли указанный путь материалом
+     * @param path путь для проверки
+     * @return true, если по указанному пути материал
+     */
+    public static boolean pathIsMaterial(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(Const.MATERIAL_FORMAT_EXT));
     }
     
     /**
