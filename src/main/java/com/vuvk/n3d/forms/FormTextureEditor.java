@@ -313,11 +313,11 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
         pnlPreview.setLayout(pnlPreviewLayout);
         pnlPreviewLayout.setHorizontalGroup(
             pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 514, Short.MAX_VALUE)
+            .addGap(0, 512, Short.MAX_VALUE)
         );
         pnlPreviewLayout.setVerticalGroup(
             pnlPreviewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 513, Short.MAX_VALUE)
+            .addGap(0, 512, Short.MAX_VALUE)
         );
 
         pnlColorChoosed.setMaximumSize(new java.awt.Dimension(64, 64));
@@ -336,6 +336,7 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
 
         tglStretched.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_photo_size_select_large_white_24dp.png"))); // NOI18N
         tglStretched.setToolTipText("Растянуть");
+        tglStretched.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         tglStretched.setMaximumSize(new java.awt.Dimension(64, 64));
         tglStretched.setMinimumSize(new java.awt.Dimension(64, 64));
         tglStretched.setPreferredSize(new java.awt.Dimension(64, 64));

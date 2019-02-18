@@ -146,12 +146,12 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="514" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="512" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="513" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="512" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -185,6 +185,9 @@
           <Image iconType="3" name="/com/vuvk/n3d/ico/ic_photo_size_select_large_white_24dp.png"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" value="&#x420;&#x430;&#x441;&#x442;&#x44f;&#x43d;&#x443;&#x442;&#x44c;"/>
+        <Property name="cursor" type="java.awt.Cursor" editor="org.netbeans.modules.form.editors2.CursorEditor">
+          <Color id="Default Cursor"/>
+        </Property>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[64, 64]"/>
         </Property>
