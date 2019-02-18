@@ -20,6 +20,7 @@ package com.vuvk.n3d.utils;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.forms.FormMain;
+import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
 import java.io.IOException;
@@ -154,7 +155,7 @@ public final class FileSystemUtils {
             return;
         }
         
-        final List<Path> texturesForRepath = new LinkedList<>();
+        final List<String> texturesForRepath = new LinkedList<>();
 
         String oldName = getProjectPath(src);
         String newName = getProjectPath(dest);
@@ -172,7 +173,7 @@ public final class FileSystemUtils {
                         // по расширению файла определяем что это
                         switch (getFileExtension(file)) {
                             case "txr" :
-                                texturesForRepath.add(file);
+                                texturesForRepath.add(getProjectPath(file));
                                 break;
                         }
                         return FileVisitResult.CONTINUE;
@@ -186,7 +187,7 @@ public final class FileSystemUtils {
             // по расширению файла определяем что это
             switch (getFileExtension(src)) {
                 case "txr" :
-                    texturesForRepath.add(src);
+                    texturesForRepath.add(getProjectPath(src));
                     break;
             }
         }
@@ -200,8 +201,7 @@ public final class FileSystemUtils {
         }     
         
         // ну а теперь заменяем часть пути (или весь) с учетом нового имени папки или файла
-        for (Path pth : texturesForRepath) {
-            String filePath = pth.toString();
+        for (String filePath : texturesForRepath) {
             for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
                 Texture txr = (Texture)it.next();
                 if (txr.getPath().equals(filePath)) {
@@ -334,7 +334,7 @@ public final class FileSystemUtils {
      * @return true, если удалены, false - возникла ошибка
      */
     public static boolean recursiveRemoveFiles(Path path) {   
-        final List<Path> texturesForDelete = new LinkedList<>();
+        final List<String> texturesForDelete = new LinkedList<>();
         
         // это директория
         if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
@@ -352,7 +352,7 @@ public final class FileSystemUtils {
                         // для того, чтобы удалить файл из настроек проекта
                         switch (getFileExtension(file)) {
                             case "txr" :
-                                texturesForDelete.add(file);
+                                texturesForDelete.add(getProjectPath(file));
                                 break;
                         }
                         Files.deleteIfExists(file);
@@ -372,7 +372,7 @@ public final class FileSystemUtils {
             // для того, чтобы удалить файл из настроек проекта
             switch (getFileExtension(path)) {
                 case "txr" :
-                    texturesForDelete.add(path);
+                    texturesForDelete.add(getProjectPath(path));
                     break;
             }
             
@@ -388,16 +388,18 @@ public final class FileSystemUtils {
         if (!texturesForDelete.isEmpty()) {
             FormMain.closeFormTextureEditor();            
         }
-        for (Path txr : texturesForDelete) {
-            String filePath = getProjectPath(txr);
+        for (String filePath : texturesForDelete) {
             for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
-                if (((Texture)it.next()).getPath().equals(filePath)) {
+                Texture txr = (Texture)it.next();
+                if (txr.getPath().equals(filePath)) {
                     it.remove();
                 }
             }
         }
         
         texturesForDelete.clear();
+        
+        Material.checkAll();
  
         // всё успешно удалено?
         return !Files.exists(path);
