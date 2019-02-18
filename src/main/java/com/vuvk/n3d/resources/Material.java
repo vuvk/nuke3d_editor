@@ -475,6 +475,12 @@ public class Material extends Resource {
         }
     }
     /**
+     * Удалить все кадры
+     */
+    public void clearFrames() {
+        frames.clear();
+    }
+    /**
      * Получить кадр из анимации
      * @param index номер кадра
      * @return кадр в классе MaterialFrame или null, если такого нет

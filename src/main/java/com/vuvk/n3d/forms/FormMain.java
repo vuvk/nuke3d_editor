@@ -1196,11 +1196,17 @@ public class FormMain extends javax.swing.JFrame {
                             name = newName;
                             matPath = new File(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
                         }
-                    }       
+                    }
+                // YES
+                } else {
+                    Material oldMat = Material.getByPath(matPath.toPath());
+                    if (oldMat != null) {
+                        oldMat.clearFrames();
+                    }
                 }
+            } else {            
+                new Material(matPath);
             }
-            
-            new Material(matPath);
             
             fillListProjectView(); 
             
