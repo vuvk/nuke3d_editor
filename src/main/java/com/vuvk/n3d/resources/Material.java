@@ -34,6 +34,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -282,26 +283,15 @@ public class Material extends Resource {
     }
     
     /**
-     * Конструктор текстуры по умолчанию.
-     * Имя по порядку и изображение 1*1 в формате ARGB
+     * Проверка всех кадров всех материалов на наличие текстуры в базе.
+     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
+     * @return true, если все кадры валидные
      */
-    /*public Material() {
-        name = "material_" + list.size();
-        type = Type.Default;
-        
-        // имя подходящее?
-        for (int i = 0; i < list.size(); ++i) {
-            // уже есть такое имя и надо подобрать новое
-            if (name.equals(list.get(i).name)) {
-                name = "material_" + list.size() + "_" + Math.round(Math.random() * 1000);
-                i = 0;
-            }
+    public static void checkAll() {
+        for (Material mat : MATERIALS) {
+            mat.check();
         }
-        
-        frames.add(new Frame());
-        
-        list.add(this);
-    }    */
+    }
     
     protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
@@ -336,10 +326,7 @@ public class Material extends Resource {
      */
     protected void load(Path path) {
         /** если файл существует и он является текстурой */
-        if (Files.exists(path) &&
-            !Files.isDirectory(path) &&  
-            FilenameUtils.isExtension(path.getFileName().toString(), Const.TEXTURE_FORMAT_EXT)
-           ) {
+        if (pathIsMaterial(path)) {
             //
         } else {
             frames.clear();
@@ -404,11 +391,11 @@ public class Material extends Resource {
      * @param count количество кадров
      */
     public void setFramesCount(int count) {
-        if (count > 1) {
+        if (count > 0) {
             // сокращаем количество
             if (count < frames.size()) {
                 while (frames.size() > count) {
-                    frames.remove(frames.size() - 1);
+                    popFrame();
                 }
             // наращиваем
             } else if (count > frames.size()) {                
@@ -463,6 +450,12 @@ public class Material extends Resource {
         }
     }
     /**
+     * Удалить все кадры
+     */
+    public void clearFrames() {
+        frames.clear();
+    }
+    /**
      * Получить кадр из анимации
      * @param index номер кадра
      * @return кадр в классе MaterialFrame или null, если такого нет
@@ -490,17 +483,53 @@ public class Material extends Resource {
         if (index >= 0 && index < frames.size()) {
             frames.set(index, frame);
         }
+    }    
+    /**
+     * Получить ссылку на материал по пути до файла
+     * @param path Путь до файла
+     * @return Материал, если есть такой в базе, иначе null
+     */
+    public static Material getByPath(String path) {
+        return getByPath(Paths.get(path));
+    }
+    /**
+     * Получить ссылку на материал по пути до файла
+     * @param path Путь до файла
+     * @return Материал, если есть такой в базе, иначе null
+     */
+    public static Material getByPath(Path path) {
+        if (pathIsMaterial(path)) {
+            String checkPath = FileSystemUtils.getProjectPath(path);
+            for (Material mat : MATERIALS) {
+                if (mat.getPath().equals(checkPath)) {
+                    return mat;
+                }
+            }
+        }
+        
+        return null;
+    }
+    /**
+     * Проверка является ли указанный путь материалом
+     * @param path путь для проверки
+     * @return true, если по указанному пути материал
+     */
+    public static boolean pathIsMaterial(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(Const.MATERIAL_FORMAT_EXT));
     }
     
     /**
      * Проверка всех кадров на наличие текстуры в базе.
-     * Если текстуры нет, то будет ОБНУЛЕНА.
+     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
      * @return true, если все кадры валидные
      */
     public boolean check() {
         int counter = 0;
-        for (int i = 0; i < frames.size(); ++i) {
-            if (frames.get(i).check()) {
+        for (Frame frm : frames) {
+            if (frm.check()) {
                 ++counter;
             }
         }

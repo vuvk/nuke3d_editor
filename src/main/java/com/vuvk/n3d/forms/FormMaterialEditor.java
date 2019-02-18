@@ -272,6 +272,9 @@ public final class FormMaterialEditor extends javax.swing.JInternalFrame {
         formMaterialAnimator = new FormMaterialAnimator(FormMain.formMain, true);
         formMaterialAnimator.selectedMaterial = selectedMaterial;
         formMaterialAnimator.setVisible(true);
+        
+        // обновляем предпросмотр
+        prepareForm(false);
     }//GEN-LAST:event_btnEditActionPerformed
     
 
