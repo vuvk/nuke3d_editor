@@ -273,4 +273,25 @@ public final class Texture extends Resource {
     public void clearImage() {
         image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
     }
+    
+    /**
+     * Получить ссылку на текстуру по пути до файла
+     * @param path Путь до файла
+     * @return Текстура, если есть такая в базе, иначе null
+     */
+    public static Texture getByPath(Path path) {
+        if (Files.exists(path) && 
+            !Files.isDirectory(path) && 
+            FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT)
+           ) {
+            String checkPath = FileSystemUtils.getProjectPath(path);
+            for (Texture txr : TEXTURES) {
+                if (txr.getPath().equals(checkPath)) {
+                    return txr;
+                }
+            }
+        }
+        
+        return null;
+    }
 }

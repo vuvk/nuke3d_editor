@@ -502,6 +502,26 @@ public class Material extends Resource {
             frames.set(index, frame);
         }
     }
+    /**
+     * Получить ссылку на материал по пути до файла
+     * @param path Путь до файла
+     * @return Материал, если есть такой в базе, иначе null
+     */
+    public static Material getByPath(Path path) {
+        if (Files.exists(path) && 
+            !Files.isDirectory(path) && 
+            FileSystemUtils.getFileExtension(path).equals(Const.MATERIAL_FORMAT_EXT)
+           ) {
+            String checkPath = FileSystemUtils.getProjectPath(path);
+            for (Material mat : MATERIALS) {
+                if (mat.getPath().equals(checkPath)) {
+                    return mat;
+                }
+            }
+        }
+        
+        return null;
+    }
     
     /**
      * Проверка всех кадров на наличие текстуры в базе.
