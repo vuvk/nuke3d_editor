@@ -728,6 +728,7 @@ public class FormMain extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Nuke3D Editor");
         setName("mainForm"); // NOI18N
+        setPreferredSize(new java.awt.Dimension(1024, 768));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
@@ -740,6 +741,7 @@ public class FormMain extends javax.swing.JFrame {
             }
         });
 
+        jSplitPane3.setDividerLocation(600);
         jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         Desktop.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.focus"));
@@ -749,7 +751,7 @@ public class FormMain extends javax.swing.JFrame {
         Desktop.setLayout(DesktopLayout);
         DesktopLayout.setHorizontalGroup(
             DesktopLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 1053, Short.MAX_VALUE)
+            .add(0, 1095, Short.MAX_VALUE)
         );
         DesktopLayout.setVerticalGroup(
             DesktopLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -795,6 +797,7 @@ public class FormMain extends javax.swing.JFrame {
         listProjectView.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
         listProjectView.setMaximumSize(new java.awt.Dimension(32767, 32767));
         listProjectView.setMinimumSize(new java.awt.Dimension(128, 128));
+        listProjectView.setPreferredSize(new java.awt.Dimension(128, 300));
         listProjectView.setVisibleRowCount(-1);
         listProjectView.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -861,7 +864,7 @@ public class FormMain extends javax.swing.JFrame {
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jSplitPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 694, Short.MAX_VALUE))
+                .add(jSplitPane3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 731, Short.MAX_VALUE))
         );
 
         pack();
