@@ -62,7 +62,7 @@ public final class FormMaterialEditor extends javax.swing.JInternalFrame {
         imagePreview.redraw();
         
         // установить тип материала
-        int index = selectedMaterial.getMaterialType().ordinal();
+        int index = selectedMaterial.getType().ordinal();
         cmbMaterialType.setSelectedItem(index);
         cmbMaterialType.getModel().setSelectedItem(cmbMaterialType.getItemAt(index));
         
@@ -245,15 +245,15 @@ public final class FormMaterialEditor extends javax.swing.JInternalFrame {
             switch (cmbMaterialType.getSelectedIndex()) {
                 default:
                 case 0 :
-                selectedMaterial.setMaterialType(Material.Type.Default);
+                selectedMaterial.setType(Material.Type.Default);
                 break;
 
                 case 1 :
-                selectedMaterial.setMaterialType(Material.Type.AlphaChannel);
+                selectedMaterial.setType(Material.Type.AlphaChannel);
                 break;
 
                 case 2 :
-                selectedMaterial.setMaterialType(Material.Type.Transparent);
+                selectedMaterial.setType(Material.Type.Transparent);
                 break;
             }
         }

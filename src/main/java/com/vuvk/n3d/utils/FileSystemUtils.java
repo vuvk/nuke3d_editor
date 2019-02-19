@@ -20,6 +20,8 @@ package com.vuvk.n3d.utils;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.forms.FormMain;
+import com.vuvk.n3d.forms.FormMaterialEditor;
+import com.vuvk.n3d.forms.FormTextureEditor;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
@@ -43,9 +45,7 @@ import org.apache.commons.io.FilenameUtils;
  *
  * @author Anton "Vuvk" Shcherbatykh
  */
-public final class FileSystemUtils {
-    private FileSystemUtils(){}
-    
+public final class FileSystemUtils {  
     
     /** получить расширение файла
      * @param file Файл, расширение которого нужно узнать
@@ -103,7 +103,9 @@ public final class FileSystemUtils {
      * @param path Путь, в котором нужно произвести поиск
      */
     static void addResourcesFromPath(Path path) {
+        // списки путей для добавления
         final List<Path> texturesForAdd = new LinkedList<>();
+        final List<Path> materialsForAdd = new LinkedList<>();
         
         if (path != null) {
             // это директория
@@ -114,8 +116,12 @@ public final class FileSystemUtils {
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {                    
                             // по расширению файла определяем что это
                             switch (getFileExtension(file)) {
-                                case "txr" :
+                                case Const.TEXTURE_FORMAT_EXT :
                                     texturesForAdd.add(file);
+                                    break;
+                                    
+                                case Const.MATERIAL_FORMAT_EXT :
+                                    materialsForAdd.add(file);
                                     break;
                             }
                             return FileVisitResult.CONTINUE;
@@ -129,8 +135,12 @@ public final class FileSystemUtils {
             } else {
                 // по расширению файла определяем что это
                 switch (getFileExtension(path)) {
-                    case "txr" :
+                    case Const.TEXTURE_FORMAT_EXT :
                         texturesForAdd.add(path);
+                        break;
+                                    
+                    case Const.MATERIAL_FORMAT_EXT :
+                        materialsForAdd.add(path);
                         break;
                 }
             }        
@@ -140,8 +150,12 @@ public final class FileSystemUtils {
         for (Path forAdd : texturesForAdd) {
             new Texture(forAdd);
         }
+        for (Path forAdd : materialsForAdd) {
+            new Material(forAdd);
+        }
         
         texturesForAdd.clear();
+        materialsForAdd.clear();
     }
     
     /**
@@ -155,7 +169,12 @@ public final class FileSystemUtils {
             return;
         }
         
+        // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+        Material.saveAll();
+        
+        // списки путей для изменения
         final List<String> texturesForRepath = new LinkedList<>();
+        final List<String> materialsForRepath = new LinkedList<>();
 
         String oldName = getProjectPath(src);
         String newName = getProjectPath(dest);
@@ -172,8 +191,12 @@ public final class FileSystemUtils {
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {                    
                         // по расширению файла определяем что это
                         switch (getFileExtension(file)) {
-                            case "txr" :
+                            case Const.TEXTURE_FORMAT_EXT :
                                 texturesForRepath.add(getProjectPath(file));
+                                break;
+                                
+                            case Const.MATERIAL_FORMAT_EXT :
+                                materialsForRepath.add(getProjectPath(file));
                                 break;
                         }
                         return FileVisitResult.CONTINUE;
@@ -186,9 +209,29 @@ public final class FileSystemUtils {
         } else {
             // по расширению файла определяем что это
             switch (getFileExtension(src)) {
-                case "txr" :
+                case Const.TEXTURE_FORMAT_EXT :
                     texturesForRepath.add(getProjectPath(src));
                     break;
+                    
+                case Const.MATERIAL_FORMAT_EXT :
+                    materialsForRepath.add(getProjectPath(src));
+                    break;
+            }
+        }
+        
+        // заменяем часть пути (или весь) с учетом нового имени папки или файла
+        for (String filePath : texturesForRepath) {
+            Texture txr = Texture.getByPath(filePath);
+            if (txr != null) {
+                String newPath = txr.getPath().replace(oldName, newName);
+                txr.setPath(newPath);
+            }
+        }
+        for (String filePath : materialsForRepath) {
+            Material mat = Material.getByPath(filePath);
+            if (mat != null) {
+                String newPath = mat.getPath().replace(oldName, newName);
+                mat.setPath(newPath);
             }
         }
         
@@ -200,17 +243,8 @@ public final class FileSystemUtils {
             MessageDialog.showException(ex);
         }     
         
-        // ну а теперь заменяем часть пути (или весь) с учетом нового имени папки или файла
-        for (String filePath : texturesForRepath) {
-            for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
-                Texture txr = (Texture)it.next();
-                if (txr.getPath().equals(filePath)) {
-                    String newPath = txr.getPath().replace(oldName, newName);
-                    txr.setPath(newPath);
-                }
-            }
-        }
         texturesForRepath.clear();
+        materialsForRepath.clear();
     }
     
     /**
@@ -223,6 +257,9 @@ public final class FileSystemUtils {
         if (src == null || to == null) {
             return false;
         }
+        
+        // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+        Material.saveAll();
         
         // конечное имя
         Path dest = Paths.get(to.toString() + "/" + src.getFileName()); 
@@ -334,7 +371,9 @@ public final class FileSystemUtils {
      * @return true, если удалены, false - возникла ошибка
      */
     public static boolean recursiveRemoveFiles(Path path) {   
+        // списки путей для изменения
         final List<String> texturesForDelete = new LinkedList<>();
+        final List<String> materialsForDelete = new LinkedList<>();
         
         // это директория
         if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
@@ -351,8 +390,12 @@ public final class FileSystemUtils {
                         // по расширению файла определяем что это
                         // для того, чтобы удалить файл из настроек проекта
                         switch (getFileExtension(file)) {
-                            case "txr" :
+                            case Const.TEXTURE_FORMAT_EXT :
                                 texturesForDelete.add(getProjectPath(file));
+                                break;
+                                
+                            case Const.MATERIAL_FORMAT_EXT :
+                                materialsForDelete.add(getProjectPath(file));
                                 break;
                         }
                         Files.deleteIfExists(file);
@@ -371,8 +414,12 @@ public final class FileSystemUtils {
             // по расширению файла определяем что это
             // для того, чтобы удалить файл из настроек проекта
             switch (getFileExtension(path)) {
-                case "txr" :
+                case Const.TEXTURE_FORMAT_EXT :
                     texturesForDelete.add(getProjectPath(path));
+                    break;
+                                
+                case Const.MATERIAL_FORMAT_EXT :
+                    materialsForDelete.add(getProjectPath(path));
                     break;
             }
             
@@ -385,23 +432,52 @@ public final class FileSystemUtils {
         }       
         
         // удаляем из проекта то, что нашли
-        if (!texturesForDelete.isEmpty()) {
-            FormMain.closeFormTextureEditor();            
-        }
+        // текстуры
         for (String filePath : texturesForDelete) {
             for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
                 Texture txr = (Texture)it.next();
                 if (txr.getPath().equals(filePath)) {
-                    it.remove();
+                    // закрыть окно с открытой удаляемой текстурой
+                    if (FormMain.formTextureEditor != null && 
+                        FormTextureEditor.selectedTexture != null &&
+                        FormTextureEditor.selectedTexture.equals(txr)
+                       ) {
+                        FormMain.closeFormTextureEditor();
+                    }
+                    
+                    it.remove();                    
+                }
+            }
+        }
+        // материалы
+        for (String filePath : materialsForDelete) {
+            for (Iterator it = Material.MATERIALS.iterator(); it.hasNext(); ) {
+                Material mat = (Material)it.next();
+                if (mat.getPath().equals(filePath)) {
+                    // закрыть окно с открытой удаляемым материалом
+                    if (FormMain.formMaterialEditor != null && 
+                        FormMaterialEditor.selectedMaterial != null &&
+                        FormMaterialEditor.selectedMaterial.equals(mat)
+                       ) {
+                        FormMain.closeFormMaterialEditor();
+                    }
+                    
+                    it.remove();                    
                 }
             }
         }
         
         texturesForDelete.clear();
+        materialsForDelete.clear();
         
+        // проверяем валидность материалов
         Material.checkAll();
  
         // всё успешно удалено?
         return !Files.exists(path);
     }
+    
+    
+    
+    private FileSystemUtils(){}
 }

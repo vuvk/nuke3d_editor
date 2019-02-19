@@ -67,6 +67,7 @@ public final class Texture extends Resource {
     
     /**
      * Загрузить конфиг текстур и сами текстуры
+     * @return true в случае успеха
      */
     public static boolean loadAll() {
         closeAll();
@@ -88,25 +89,15 @@ public final class Texture extends Resource {
             MessageDialog.showException(ex);
             return false;
         }
-        
+              
         // проверяем правильность конфига
-        // идентификатор
-        JsonElement jsonIdentificator = config.get("identificator");
-        if (jsonIdentificator == null || 
-            !jsonIdentificator.getAsString().equals(Const.TEXTURE_CONFIG_IDENTIFICATOR)
+        if (!Resource.checkConfig(config, 
+                                  Const.TEXTURE_CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(Const.TEXTURE_CONFIG_VERSION))
            ) {
             return false;
         }
-        // версия
-        JsonElement jsonVersion = config.get("version");
-        if (jsonVersion == null) {
-            return false;
-        }
-        double configVersion = jsonVersion.getAsDouble();
-        double editorVersion = Double.parseDouble(Const.TEXTURE_CONFIG_VERSION);
-        if (editorVersion < configVersion) {
-            return false;
-        }
+        
         // данные
         JsonElement jsonData = config.get("data");
         if (jsonData == null) {
@@ -124,10 +115,7 @@ public final class Texture extends Resource {
             
             // если текстура существует
             Path path = Paths.get(jsonPath.getAsString());
-            if (Files.exists(path) && 
-                !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT)
-               ) {
+            if (pathIsTexture(path)) {
                 // добавляем в базу новую текстуру и задаём ей Id
                 new Texture(path)
                     .setId(jsonId.getAsInt());
@@ -139,6 +127,7 @@ public final class Texture extends Resource {
     
     /** 
      * Сохранить конфиг всех текстур 
+     * @return true в случае успеха
      */
     public static boolean saveConfig() {        
         // создадим папку с конфигами, если нужно
@@ -180,17 +169,18 @@ public final class Texture extends Resource {
     
     /**
      * Удалить все текстуры из памяти
+     * @return true в случае успеха
      */
     public static boolean closeAll() {
         TEXTURES.clear();        
         return (TEXTURES.isEmpty());
     }
             
+    /** Initialization */
     protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
         long newId = 0;
-        for (Iterator it = TEXTURES.iterator(); it.hasNext(); ) {
-            Texture txr = (Texture)it.next();
+        for (Texture txr : TEXTURES) {
             if (txr.getId() > newId) {
                 newId = txr.getId();
             }
@@ -213,8 +203,9 @@ public final class Texture extends Resource {
     /**
      * Загрузить image текстуры из файла
      * @param path Путь до файла
+     * @return true в случае успеха
      */
-    protected void load(Path path) {
+    protected boolean load(Path path) {
         /** если файл существует и он является текстурой */
         if (pathIsTexture(path)) {
             try {
@@ -222,22 +213,27 @@ public final class Texture extends Resource {
             } catch (IOException ex) {
                 Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
                 image = IMAGE_EMPTY;
+                return false;
             }
         } else {
             image = IMAGE_EMPTY;
         }
+        return true;
     }
     
     /**
      * Сохранить текстуру в файл, к которому она привязана
+     * @return true в случае успеха
      */
-    public void save() {
+    public boolean save() {
         try {
             ImageIO.write(image, "png", new File(path));
         } catch (IOException ex) {
             Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
+            return false;
         }
+        return true;
     }
     
     /**
@@ -294,6 +290,19 @@ public final class Texture extends Resource {
             }
         }
         
+        return null;
+    }
+    /**
+     * Получить ссылку на текстуру по id
+     * @param id Идентификатор текстуры
+     * @return Текстура, если есть такая в базе, иначе null
+     */
+    public static Texture getById(long id) {
+        for (Texture txr : TEXTURES) {
+            if (txr.getId() == id) {
+                return txr;
+            }
+        }
         return null;
     }
     /**
