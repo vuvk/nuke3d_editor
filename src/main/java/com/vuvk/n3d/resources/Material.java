@@ -23,6 +23,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.Global;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.image.BufferedImage;
@@ -230,7 +231,7 @@ public class Material extends Resource {
      */
     public static boolean saveConfig() {        
         // создадим папку с конфигами, если нужно
-        /*if (!Files.exists(Global.CONFIG_PATH)) {
+        if (!Files.exists(Global.CONFIG_PATH)) {
             try {
                 Files.createDirectory(Global.CONFIG_PATH);
             } catch (IOException ex) {
@@ -240,28 +241,28 @@ public class Material extends Resource {
             }
         }
         
-        // формируем конфиг с описанием текстур проекта
-        JsonArray array = new JsonArray(TEXTURES.size());
-        for (Texture txr : TEXTURES) {
+        // формируем конфиг с описанием
+        JsonArray array = new JsonArray(MATERIALS.size());
+        for (Material mat : MATERIALS) {
             JsonObject object = new JsonObject();
-            object.addProperty("id", txr.getId());
-            object.addProperty("path", txr.getPath());
+            object.addProperty("id",   mat.getId());
+            object.addProperty("path", mat.getPath());
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.TEXTURE_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.TEXTURE_CONFIG_VERSION);
+        config.addProperty("identificator", Const.MATERIAL_CONFIG_IDENTIFICATOR);
+        config.addProperty("version", Const.MATERIAL_CONFIG_VERSION);
         config.add("data", array);
         
-        // сохраняем конфиг текстур
-        try (Writer writer = new FileWriter(Const.TEXTURE_CONFIG_STRING)) { 
+        // сохраняем конфиг
+        try (Writer writer = new FileWriter(Const.MATERIAL_CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
             Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
-        }*/
+        }
         
         return true;
     }
@@ -303,7 +304,11 @@ public class Material extends Resource {
         
         setId(newId);
         setPath(path);  
-        save(); 
+        if (Files.exists(path)) {
+            load(path);
+        } else {
+            save(); 
+        }
         MATERIALS.add(this);
     }
     
@@ -354,23 +359,33 @@ public class Material extends Resource {
                 return false;
             }
             
+            // id
+            JsonElement jsonId = config.get("id");
+            if (jsonId != null) {
+                setId(jsonId.getAsLong());
+            }
+            // тип
+            JsonElement jsonType = config.get("type");
+            if (jsonType != null) {
+                setType(Type.valueOf(jsonType.getAsString()));
+            }            
+            
             // кадры
-            JsonElement jsonFrames = config.get("data");
+            JsonElement jsonFrames = config.get("frames");
             if (jsonFrames == null) {
                 return false;
-            }
-        
+            }        
             // получаем текстуры по данным из конфига
             for (JsonElement element : jsonFrames.getAsJsonArray()) {
-                JsonElement jsonId    = ((JsonObject)element).get("texture_id");
+                JsonElement jsonTxrId = ((JsonObject)element).get("texture_id");
                 JsonElement jsonDelay = ((JsonObject)element).get("delay");
 
-                if (jsonId == null || jsonDelay == null) {
+                if (jsonTxrId == null || jsonDelay == null) {
                     continue;
                 }
 
                 // добавить кадр
-                pushFrame(new Frame(Texture.getById(jsonId.getAsLong()), jsonDelay.getAsDouble()));
+                pushFrame(new Frame(Texture.getById(jsonTxrId.getAsLong()), jsonDelay.getAsDouble()));
             }
             
             return true;
@@ -404,6 +419,7 @@ public class Material extends Resource {
         object.addProperty("identificator", Const.MATERIAL_IDENTIFICATOR);
         object.addProperty("version", Const.MATERIAL_VERSION);
         object.addProperty("id", getId());
+        object.addProperty("type",  type.toString());
         object.add("frames", jsonFrames);
         
         // сохраняем в привязанный файл
@@ -429,10 +445,10 @@ public class Material extends Resource {
         
     /**
      * Установить тип материала
-     * @param materialType новый тип
+     * @param type новый тип
      */
-    public void setMaterialType(Type materialType) {
-        this.type = materialType;
+    public void setType(Type type) {
+        this.type = type;
     }
     /**
      * Установить количество кадров (не менее 1).
@@ -459,7 +475,7 @@ public class Material extends Resource {
      * Получить тип материала
      * @return тип Type
      */
-    public Type getMaterialType() {
+    public Type getType() {
         return type;
     }
     /**
