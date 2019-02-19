@@ -219,9 +219,6 @@ public class Material extends Resource {
                 allOk = false;
             }
         }
-        if (!saveConfig()) {
-            allOk = false;
-        }
         
         return allOk;
     }
@@ -414,6 +411,8 @@ public class Material extends Resource {
      * @return true в случае успеха
      */
     public boolean save() { 
+        check();
+        
         // информация о кадрах
         JsonArray jsonFrames = new JsonArray();
         for (Frame frm : frames) {
