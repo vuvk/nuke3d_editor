@@ -145,65 +145,65 @@ public class Material extends Resource {
      * @return true в случае успеха
      */
     public static boolean loadAll() {
-        /*closeAll();
+        closeAll();
         
-        try {
-            File folder = new File(Const.MATERIAL_PATH);
-            if (!folder.exists()) {
-                return true;
-            }
-
-            // читаем конфиг в массив
-            Reader reader = new FileReader(Const.MATERIAL_PATH + "config.json");
-            Gson gson = new GsonBuilder().create();  
-            JsonArray jsonMaterials = gson.fromJson(reader, JsonArray.class);
-            reader.close();                
-
-            
-            for (int i = 0; i < jsonMaterials.size(); ++i) {
-                Material mat = new Material();
-                
-                JsonObject jsonMaterial = jsonMaterials.get(i).getAsJsonObject();
-                
-                // дергаем имя и тип
-                String name = jsonMaterial.get("name").getAsString();
-                Type type = Type.Default;
-                switch (jsonMaterial.get("type").getAsString()) {
-                    case "AlphaChannel" : 
-                        type = Type.AlphaChannel;
-                        break;
-                        
-                    case "Transparent" : 
-                        type = Type.Transparent;
-                        break;  
-                }
-                
-                mat.setName(name);
-                mat.setMaterialType(type);
-                
-                // теперь дергаем кадры
-                JsonArray jsonFrames = jsonMaterial.getAsJsonArray("frames");
-                mat.setFramesCount(jsonFrames.size());
-                for (int f = 0; f < jsonFrames.size(); ++f) {
-                    Frame frame = new Frame();
-                    
-                    JsonObject jsonFrame = jsonFrames.get(f).getAsJsonObject();
-                    int index = jsonFrame.get("texture").getAsInt();
-                    if (index > -1 && index < Texture.TEXTURES.size()) {
-                        frame.setTexture(Texture.TEXTURES.get(index));
-                    }
-                    
-                    frame.setDelay(jsonFrame.get("delay").getAsDouble());
-                        
-                    mat.setFrame(f, frame);
-                }
-            }   
-            
-        } catch (Exception e) {
-            Logger.getLogger(Material.class.getName()).log(Level.SEVERE, null, e);
+        File materialConfig = new File(Const.MATERIAL_CONFIG_STRING);
+        
+        if (!Files.exists(Global.CONFIG_PATH) || 
+            !materialConfig.exists()) {
             return false;
         }
-        */
+        
+        // читаем конфиг
+        JsonObject config = new JsonObject();        
+        try (Reader reader = new FileReader(materialConfig)){
+            Gson gson = new GsonBuilder().create();  
+            config = gson.fromJson(reader, JsonObject.class);
+        } catch (Exception ex) {
+            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }
+        
+        // проверяем правильность конфига
+        // идентификатор
+        JsonElement jsonIdentificator = config.get("identificator");
+        if (jsonIdentificator == null || 
+            !jsonIdentificator.getAsString().equals(Const.MATERIAL_CONFIG_IDENTIFICATOR)
+           ) {
+            return false;
+        }
+        // версия
+        JsonElement jsonVersion = config.get("version");
+        if (jsonVersion == null) {
+            return false;
+        }
+        double configVersion = jsonVersion.getAsDouble();
+        double editorVersion = Double.parseDouble(Const.MATERIAL_CONFIG_VERSION);
+        if (editorVersion < configVersion) {
+            return false;
+        }
+        // данные
+        JsonElement jsonData = config.get("data");
+        if (jsonData == null) {
+            return false;
+        }
+        
+        // создаем материалы по данным из конфига
+        for (JsonElement element : jsonData.getAsJsonArray()) {
+            JsonElement jsonPath = ((JsonObject)element).get("path");
+            
+            // если материал существует
+            Path path = Paths.get(jsonPath.getAsString());
+            if (pathIsMaterial(path)) {
+                // добавляем в базу новый материал
+                new Material(path);
+            }
+        }
+        
+        // на всякий случай проверим валидность всех материалов
+        checkAll();
+        
         return true;
     }
     
@@ -242,7 +242,6 @@ public class Material extends Resource {
         JsonArray array = new JsonArray(MATERIALS.size());
         for (Material mat : MATERIALS) {
             JsonObject object = new JsonObject();
-            object.addProperty("id",   mat.getId());
             object.addProperty("path", mat.getPath());
             array.add(object);
         }
