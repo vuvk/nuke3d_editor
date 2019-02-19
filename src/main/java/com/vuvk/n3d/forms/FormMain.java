@@ -1082,10 +1082,9 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMICopyActionPerformed
 
     private void popuvPVMIPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popuvPVMIPasteActionPerformed
-        if (copyPaths != null && copyPaths.size() > 0) {            
+        if (copyPaths != null && copyPaths.size() > 0) {              
             
-            for (Iterator it = copyPaths.iterator(); it.hasNext();) {                
-                Path path = (Path) it.next();
+            for (Path path : copyPaths) {    
                 Path dest = currentPath;
                 
                 // вырезаем?

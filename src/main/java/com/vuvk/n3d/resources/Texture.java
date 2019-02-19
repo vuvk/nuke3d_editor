@@ -190,8 +190,7 @@ public final class Texture extends Resource {
     protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
         long newId = 0;
-        for (Iterator it = TEXTURES.iterator(); it.hasNext(); ) {
-            Texture txr = (Texture)it.next();
+        for (Texture txr : TEXTURES) {
             if (txr.getId() > newId) {
                 newId = txr.getId();
             }

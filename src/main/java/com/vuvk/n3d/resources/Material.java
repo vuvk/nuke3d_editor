@@ -291,8 +291,7 @@ public class Material extends Resource {
     protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
         long newId = 0;
-        for (Iterator it = MATERIALS.iterator(); it.hasNext(); ) {
-            Material mat = (Material)it.next();
+        for (Material mat : MATERIALS) {
             if (mat.getId() > newId) {
                 newId = mat.getId();
             }
@@ -304,6 +303,7 @@ public class Material extends Resource {
         
         setId(newId);
         setPath(path);  
+        
         if (Files.exists(path)) {
             load(path);
         } else {
@@ -362,7 +362,22 @@ public class Material extends Resource {
             // id
             JsonElement jsonId = config.get("id");
             if (jsonId != null) {
-                setId(jsonId.getAsLong());
+                // считаем новый id из json
+                long newId = jsonId.getAsLong();
+                // если уже такой id есть и он не принадлежит данному объекту, 
+                // то назначить новый id
+                Material clone = Material.getById(newId);
+                if (clone != null && 
+                    !this.equals(clone)
+                   ) {
+                    for (Material mat : MATERIALS) {
+                        if (mat.getId() > newId) {
+                            newId = mat.getId();
+                        }
+                    }
+                    ++newId;
+                }
+                setId(newId);
             }
             // тип
             JsonElement jsonType = config.get("type");
