@@ -1140,7 +1140,10 @@ public class FormMain extends javax.swing.JFrame {
                             baseName = newName;
                             newPath = new File(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
                         }
-                    }       
+                    }   
+                // YES
+                } else {
+                    FileSystemUtils.recursiveRemoveFiles(newPath.toPath());
                 }
             }
             
@@ -1176,7 +1179,7 @@ public class FormMain extends javax.swing.JFrame {
         String name = MessageDialog.showInput("Введите имя для нового материала");
         if (name == null) {
             return;    // отмена?
-        } else {               
+        } else {
             File matPath = new File(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
             
             // файл с таким же именем существует?
@@ -1195,19 +1198,15 @@ public class FormMain extends javax.swing.JFrame {
                         } else {
                             name = newName;
                             matPath = new File(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
-                            new Material(matPath);
                         }
                     }
                 // YES
                 } else {
-                    Material oldMat = Material.getByPath(matPath.toPath());
-                    if (oldMat != null) {
-                        oldMat.clearFrames();
-                    }
+                    FileSystemUtils.recursiveRemoveFiles(matPath.toPath());
                 }
-            } else {            
-                new Material(matPath);
             }
+            
+            new Material(matPath);
             
             fillListProjectView(); 
             
