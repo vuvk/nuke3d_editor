@@ -67,6 +67,7 @@ public final class Texture extends Resource {
     
     /**
      * Загрузить конфиг текстур и сами текстуры
+     * @return true в случае успеха
      */
     public static boolean loadAll() {
         closeAll();
@@ -136,6 +137,7 @@ public final class Texture extends Resource {
     
     /** 
      * Сохранить конфиг всех текстур 
+     * @return true в случае успеха
      */
     public static boolean saveConfig() {        
         // создадим папку с конфигами, если нужно
@@ -177,12 +179,14 @@ public final class Texture extends Resource {
     
     /**
      * Удалить все текстуры из памяти
+     * @return true в случае успеха
      */
     public static boolean closeAll() {
         TEXTURES.clear();        
         return (TEXTURES.isEmpty());
     }
             
+    /** Initialization */
     protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
         long newId = 0;
@@ -210,8 +214,9 @@ public final class Texture extends Resource {
     /**
      * Загрузить image текстуры из файла
      * @param path Путь до файла
+     * @return true в случае успеха
      */
-    protected void load(Path path) {
+    protected boolean load(Path path) {
         /** если файл существует и он является текстурой */
         if (pathIsTexture(path)) {
             try {
@@ -219,22 +224,27 @@ public final class Texture extends Resource {
             } catch (IOException ex) {
                 Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
                 image = IMAGE_EMPTY;
+                return false;
             }
         } else {
             image = IMAGE_EMPTY;
         }
+        return true;
     }
     
     /**
      * Сохранить текстуру в файл, к которому она привязана
+     * @return true в случае успеха
      */
-    public void save() {
+    public boolean save() {
         try {
             ImageIO.write(image, "png", new File(path));
         } catch (IOException ex) {
             Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
+            return false;
         }
+        return true;
     }
     
     /**

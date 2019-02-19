@@ -132,23 +132,28 @@ public abstract class Resource {
     /**
      * Загрузить из файла
      * @param path Путь до файла
+     * @return true в случае успеха
      */
-    public void load(File path) {
+    public boolean load(File path) {
         if (path != null) {
-            load(path.toPath());
-        }
+            return load(path.toPath());
+        } else {
+            return false;
+        }        
     }
     
     /**
      * Загрузить из файла
      * @param path Путь до файла
+     * @return true в случае успеха
      */
-    protected abstract void load(Path path);
+    protected abstract boolean load(Path path);
 
     /**
      * Сохранить ресурс в файл, к которому он привязан
+     * @return true в случае успеха
      */
-    protected abstract void save();
+    protected abstract boolean save();
     
     /**
      * Деструктор

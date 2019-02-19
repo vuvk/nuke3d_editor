@@ -141,6 +141,7 @@ public class Material extends Resource {
     
     /**
      * Загрузить конфиг материалов и сами материалы
+     * @return true в случае успеха
      */
     public static boolean loadAll() {
         /*closeAll();
@@ -206,16 +207,68 @@ public class Material extends Resource {
     }
     
     /** 
-     * Сохранить все материалы
+     * Сохранить все материалы и конфиг
+     * @return true в случае успеха
      */
-    public static void saveAll() {   
+    public static boolean saveAll() {
+        boolean allOk = true;
+        
         for (Material mat : MATERIALS) {
-            mat.save();
+            if (!mat.save()) {
+                allOk = false;
+            }
         }
+        if (!saveConfig()) {
+            allOk = false;
+        }
+        
+        return allOk;
+    }
+    /** 
+     * Сохранить конфиг всех материалов 
+     * @return true в случае успеха
+     */
+    public static boolean saveConfig() {        
+        // создадим папку с конфигами, если нужно
+        /*if (!Files.exists(Global.CONFIG_PATH)) {
+            try {
+                Files.createDirectory(Global.CONFIG_PATH);
+            } catch (IOException ex) {
+                Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return false;
+            }
+        }
+        
+        // формируем конфиг с описанием текстур проекта
+        JsonArray array = new JsonArray(TEXTURES.size());
+        for (Texture txr : TEXTURES) {
+            JsonObject object = new JsonObject();
+            object.addProperty("id", txr.getId());
+            object.addProperty("path", txr.getPath());
+            array.add(object);
+        }
+        JsonObject config = new JsonObject();
+        config.addProperty("identificator", Const.TEXTURE_CONFIG_IDENTIFICATOR);
+        config.addProperty("version", Const.TEXTURE_CONFIG_VERSION);
+        config.add("data", array);
+        
+        // сохраняем конфиг текстур
+        try (Writer writer = new FileWriter(Const.TEXTURE_CONFIG_STRING)) { 
+            Gson gson = new GsonBuilder().create();   
+            gson.toJson(config, writer);             
+        } catch (IOException ex) {
+            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }*/
+        
+        return true;
     }
     
     /**
      * Удалить все материалы из памяти
+     * @return true в случае успеха
      */
     public static boolean closeAll() {
         MATERIALS.clear();        
@@ -233,6 +286,7 @@ public class Material extends Resource {
         }
     }
     
+    /** Initialization */
     protected void init(Path path) {   
         // ищем максимальный id и инкрементируем его
         long newId = 0;
@@ -263,8 +317,9 @@ public class Material extends Resource {
     /**
      * Загрузить материал из файла
      * @param path Путь до файла
+     * @return true в случае успеха
      */
-    protected void load(Path path) {
+    protected boolean load(Path path) {
         frames.clear();
         
         /** если файл существует и он является текстурой */
@@ -277,7 +332,7 @@ public class Material extends Resource {
             } catch (Exception ex) {
                 Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
-                return;
+                return false;
             }
 
             // проверяем правильность конфига
@@ -286,23 +341,23 @@ public class Material extends Resource {
             if (jsonIdentificator == null || 
                 !jsonIdentificator.getAsString().equals(Const.MATERIAL_IDENTIFICATOR)
                ) {
-                return;
+                return false;
             }
             // версия
             JsonElement jsonVersion = config.get("version");
             if (jsonVersion == null) {
-                return;
+                return false;
             }
             double configVersion = jsonVersion.getAsDouble();
             double editorVersion = Double.parseDouble(Const.MATERIAL_VERSION);
             if (editorVersion < configVersion) {
-                return;
+                return false;
             }
             
             // кадры
             JsonElement jsonFrames = config.get("data");
             if (jsonFrames == null) {
-                return;
+                return false;
             }
         
             // получаем текстуры по данным из конфига
@@ -317,13 +372,18 @@ public class Material extends Resource {
                 // добавить кадр
                 pushFrame(new Frame(Texture.getById(jsonId.getAsLong()), jsonDelay.getAsDouble()));
             }
+            
+            return true;
         }
+        
+        return false;
     }
     
     /**
      * Сохранить материал в файл, к которому он привязан
+     * @return true в случае успеха
      */
-    public void save() { 
+    public boolean save() { 
         // информация о кадрах
         JsonArray jsonFrames = new JsonArray();
         for (Frame frm : frames) {
@@ -353,7 +413,10 @@ public class Material extends Resource {
         } catch (IOException ex) {
             Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
-        }        
+            return false;
+        }
+        
+        return true;
     }
     
     /**
