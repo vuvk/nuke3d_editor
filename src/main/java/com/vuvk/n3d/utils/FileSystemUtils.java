@@ -103,6 +103,7 @@ public final class FileSystemUtils {
      * @param path Путь, в котором нужно произвести поиск
      */
     static void addResourcesFromPath(Path path) {
+        // списки путей для добавления
         final List<Path> texturesForAdd = new LinkedList<>();
         final List<Path> materialsForAdd = new LinkedList<>();
         
@@ -168,6 +169,10 @@ public final class FileSystemUtils {
             return;
         }
         
+        // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+        Material.saveAll();
+        
+        // списки путей для изменения
         final List<String> texturesForRepath = new LinkedList<>();
         final List<String> materialsForRepath = new LinkedList<>();
 
@@ -214,15 +219,7 @@ public final class FileSystemUtils {
             }
         }
         
-        // переименовываем путь
-        try {
-            Files.move(src, dest);     
-        } catch (Exception ex) {
-            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-            MessageDialog.showException(ex);
-        }     
-        
-        // ну а теперь заменяем часть пути (или весь) с учетом нового имени папки или файла
+        // заменяем часть пути (или весь) с учетом нового имени папки или файла
         for (String filePath : texturesForRepath) {
             Texture txr = Texture.getByPath(filePath);
             if (txr != null) {
@@ -238,6 +235,14 @@ public final class FileSystemUtils {
             }
         }
         
+        // переименовываем путь
+        try {
+            Files.move(src, dest);     
+        } catch (Exception ex) {
+            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+        }     
+        
         texturesForRepath.clear();
         materialsForRepath.clear();
     }
@@ -252,6 +257,9 @@ public final class FileSystemUtils {
         if (src == null || to == null) {
             return false;
         }
+        
+        // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+        Material.saveAll();
         
         // конечное имя
         Path dest = Paths.get(to.toString() + "/" + src.getFileName()); 
@@ -363,6 +371,7 @@ public final class FileSystemUtils {
      * @return true, если удалены, false - возникла ошибка
      */
     public static boolean recursiveRemoveFiles(Path path) {   
+        // списки путей для изменения
         final List<String> texturesForDelete = new LinkedList<>();
         final List<String> materialsForDelete = new LinkedList<>();
         
