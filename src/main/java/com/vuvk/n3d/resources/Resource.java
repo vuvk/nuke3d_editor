@@ -17,6 +17,8 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.io.File;
@@ -154,6 +156,39 @@ public abstract class Resource {
      * @return true в случае успеха
      */
     protected abstract boolean save();
+    
+    /**
+     * Проверить конфиг ресурса на валидность
+     * @param config Ссылка на json-объект конфига
+     * @param identificator Нужный идентификатор
+     * @param version Версия формата
+     * @return true, если конфиг валидный
+     */
+    protected static boolean checkConfig(JsonObject config, String identificator, double version) {
+        if (config == null || identificator == null) {
+            return false;
+        }
+        
+        // идентификатор
+        JsonElement jsonIdentificator = config.get("identificator");
+        if (jsonIdentificator == null || 
+            !jsonIdentificator.getAsString().equals(identificator)
+           ) {
+            return false;
+        }
+        
+        // версия
+        JsonElement jsonVersion = config.get("version");
+        if (jsonVersion == null) {
+            return false;
+        }
+        double configVersion = jsonVersion.getAsDouble();
+        if (version < configVersion) {
+            return false;
+        }
+        
+        return true;
+    }
     
     /**
      * Деструктор

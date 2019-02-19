@@ -166,23 +166,13 @@ public class Material extends Resource {
         }
         
         // проверяем правильность конфига
-        // идентификатор
-        JsonElement jsonIdentificator = config.get("identificator");
-        if (jsonIdentificator == null || 
-            !jsonIdentificator.getAsString().equals(Const.MATERIAL_CONFIG_IDENTIFICATOR)
+        if (!Resource.checkConfig(config, 
+                                  Const.MATERIAL_CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(Const.MATERIAL_CONFIG_VERSION))
            ) {
             return false;
         }
-        // версия
-        JsonElement jsonVersion = config.get("version");
-        if (jsonVersion == null) {
-            return false;
-        }
-        double configVersion = jsonVersion.getAsDouble();
-        double editorVersion = Double.parseDouble(Const.MATERIAL_CONFIG_VERSION);
-        if (editorVersion < configVersion) {
-            return false;
-        }
+        
         // данные
         JsonElement jsonData = config.get("data");
         if (jsonData == null) {
