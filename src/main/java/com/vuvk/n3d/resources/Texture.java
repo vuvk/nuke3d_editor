@@ -124,10 +124,7 @@ public final class Texture extends Resource {
             
             // если текстура существует
             Path path = Paths.get(jsonPath.getAsString());
-            if (Files.exists(path) && 
-                !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT)
-               ) {
+            if (pathIsTexture(path)) {
                 // добавляем в базу новую текстуру и задаём ей Id
                 new Texture(path)
                     .setId(jsonId.getAsInt());
@@ -294,6 +291,19 @@ public final class Texture extends Resource {
             }
         }
         
+        return null;
+    }
+    /**
+     * Получить ссылку на текстуру по id
+     * @param id Идентификатор текстуры
+     * @return Текстура, если есть такая в базе, иначе null
+     */
+    public static Texture getById(long id) {
+        for (Texture txr : TEXTURES) {
+            if (txr.getId() == id) {
+                return txr;
+            }
+        }
         return null;
     }
     /**
