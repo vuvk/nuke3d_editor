@@ -64,6 +64,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import static javax.swing.SwingConstants.BOTTOM;
 import static javax.swing.SwingConstants.CENTER;
@@ -198,7 +199,7 @@ public class FormMain extends javax.swing.JFrame {
             MessageDialog.showError("Не удалось сохранить текстуры проекта! Повторите попытку.");
         }
         
-        if (!Material.saveAll()) {
+        if (!Material.saveAll() || !Material.saveConfig()) {
             MessageDialog.showError("Не удалось сохранить материалы проекта! Повторите попытку.");
         }
         
@@ -349,6 +350,17 @@ public class FormMain extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * Перезагрузить открытые окна
+     */
+    public static void reloadChildWindows() {
+        if (formTextureEditor != null) {
+            formTextureEditor.prepareForm(false);
+        }
+        if (formMaterialEditor != null) {
+            formMaterialEditor.prepareForm(false);
+        }
+    }
     /** 
      * Закрыть все вызванные ранее дочерние окна
      */
@@ -955,15 +967,18 @@ public class FormMain extends javax.swing.JFrame {
 
     private void popupPVMIRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRenameActionPerformed
         if (listProjectView.getSelectedIndex() != -1) {
-            int selectedIndex = listProjectView.getSelectedIndex();
-                    
+            
             List list = listProjectView.getSelectedValuesList();
-            PreviewElement element = (PreviewElement) list.get(0);
+            
+            PreviewElement element = (PreviewElement) list.get(0);            
+            PreviewElement.Type elementType = element.getType();
+            
+            String oldName = element.getName(); 
+            String newName = null;
             
             boolean done = false;
-            while (!done) {
-                String name = element.getName();            
-                String newName = (String) MessageDialog.showInput("Введите новое имя объекта", name);
+            while (!done) {          
+                newName = (String) MessageDialog.showInput("Введите новое имя объекта", oldName);
                 
                 // пользователь отказался от ввода
                 if (newName == null) {
@@ -971,7 +986,7 @@ public class FormMain extends javax.swing.JFrame {
                 }
 
                 // имена идентичны - повторить ввод
-                if (newName.equals(name)) {
+                if (newName.equals(oldName)) {
                     continue;
                 } else {
                     Path path = Paths.get(element.getPath());
@@ -998,23 +1013,18 @@ public class FormMain extends javax.swing.JFrame {
 
             fillTreeFolders(false);
             fillListProjectView();
-                        
-            // выбрать тот же элемент
-            listProjectView.setSelectedIndex(selectedIndex);
-            list = listProjectView.getSelectedValuesList();
-            element = (PreviewElement) list.get(0);
             
-            // перезагрузить окно, если был переименован открытый объект в редакторе
-            switch (element.getType()) {
-                case TEXTURE :
-                    if (formTextureEditor != null) {
-                        String txrPath = FormTextureEditor.selectedTexture.getPath();
-                        if (txrPath.equals(element.getPath())) {
-                            formTextureEditor.prepareForm(false);
-                        }
-                    }
-                    break;                
-            }
+            // выбираем "тот же" объект
+            ListModel model = listProjectView.getModel();
+            for (int i = 0; i < model.getSize(); ++i) {
+                element = (PreviewElement) model.getElementAt(i);
+                if (element.getType() == elementType && element.getName().equals(newName)) {
+                    listProjectView.setSelectedIndex(i);
+                }
+            }            
+                        
+            // перезагрузить окна на случай, если был переименован открытый объект в редакторе
+            reloadChildWindows();
         }
     }//GEN-LAST:event_popupPVMIRenameActionPerformed
 
@@ -1066,7 +1076,9 @@ public class FormMain extends javax.swing.JFrame {
                             MessageDialog.showError("Возникли ошибки во время удаления \"" + name + "\"");
                         }
                         fillTreeFolders(false);
-                        fillListProjectView();
+                        fillListProjectView();           
+        
+                        reloadChildWindows();
                         break;
 
                     case LEVELUP:
@@ -1103,7 +1115,9 @@ public class FormMain extends javax.swing.JFrame {
             }
             
             fillTreeFolders(false);
-            fillListProjectView();
+            fillListProjectView();            
+        
+            reloadChildWindows();
         }
     }//GEN-LAST:event_popuvPVMIPasteActionPerformed
 
