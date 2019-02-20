@@ -124,8 +124,7 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             }
         }
     }
-    
-    
+        
     /**
      * Заполнение таблицы данными о кадрах материала
      */
@@ -143,6 +142,30 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
         }
     }
 
+    /**
+     * вызвать окно выбора текстуры и назначить выбранную в кадр
+     */
+    void chooseTexture() {
+        setAnimationPlaying(false);
+            
+        //int prevRow = TableFrames.getSelectedRow();
+        
+        FormTextureSelector form = new FormTextureSelector(FormMain.formMain, true);
+        form.setVisible(true);
+        
+        if (form.selectedTexture != null) {
+            selectedMaterial.getFrame(selectedFrameIndex).setTexture(form.selectedTexture);
+            
+            imagePreview.setImage(selectedMaterial.getFrame(selectedFrameIndex).getImage());
+            imagePreview.redraw();
+        }
+        
+        form.dispose();
+        
+        // выбрать кадр, ранее выбранный
+        TableFrames.changeSelection(selectedFrameIndex, 0, false, false);
+    }
+    
     /**
      * Creates new form FormMaterialAnimator
      */
@@ -498,29 +521,14 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             frame.setDelay(prevDelay);
             
             fillTableFrames();
-            TableFrames.changeSelection(index, 0, false, false);            
+            TableFrames.changeSelection(index, 0, false, false);    
+            
+            chooseTexture();
         }
     }//GEN-LAST:event_btnAddFrameActionPerformed
 
     private void btnChooseTextureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChooseTextureActionPerformed
-        setAnimationPlaying(false);
-            
-        //int prevRow = TableFrames.getSelectedRow();
-        
-        FormTextureSelector form = new FormTextureSelector(FormMain.formMain, true);
-        form.setVisible(true);
-        
-        if (form.selectedTexture != null) {
-            selectedMaterial.getFrame(selectedFrameIndex).setTexture(form.selectedTexture);
-            
-            imagePreview.setImage(selectedMaterial.getFrame(selectedFrameIndex).getImage());
-            imagePreview.redraw();
-        }
-        
-        form.dispose();
-        
-        // выбрать кадр, ранее выбранный
-        TableFrames.changeSelection(selectedFrameIndex, 0, false, false);
+        chooseTexture();
     }//GEN-LAST:event_btnChooseTextureActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
