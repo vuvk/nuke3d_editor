@@ -159,14 +159,16 @@ public final class FileSystemUtils {
     }
     
     /**
-     * Рекурсивно переименовать путь. Имеется ввиду, что при переименовании папки должны измениться пути у содержащихся внутри ресурсов 
+     * Рекурсивно переименовать или перенести путь. Должны измениться пути у содержащихся внутри ресурсов 
      * @param src  путь, в котором должны смениться ссылки и пути ресурсов
      * @param dest новый путь (во что переименовывать)
+     * @return true в случае успеха, false - возникла ошибка
      */
-    public static void recursiveRenameFiles(Path src, Path dest) {        
+    public static boolean recursiveMoveFiles(Path src, Path dest) {        
         if (src  == null || !Files.exists(src) ||
-            dest == null ||  Files.exists(dest)) {
-            return;
+            dest == null ||  Files.exists(dest)
+           ) {
+            return false;
         }
         
         // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
@@ -219,6 +221,15 @@ public final class FileSystemUtils {
             }
         }
         
+        // переименовываем путь
+        try {
+            Files.move(src, dest);     
+        } catch (Exception ex) {
+            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }    
+        
         // заменяем часть пути (или весь) с учетом нового имени папки или файла
         for (String filePath : texturesForRepath) {
             Texture txr = Texture.getByPath(filePath);
@@ -233,18 +244,12 @@ public final class FileSystemUtils {
                 String newPath = mat.getPath().replace(oldName, newName);
                 mat.setPath(newPath);
             }
-        }
-        
-        // переименовываем путь
-        try {
-            Files.move(src, dest);     
-        } catch (Exception ex) {
-            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-            MessageDialog.showException(ex);
-        }     
+        } 
         
         texturesForRepath.clear();
         materialsForRepath.clear();
+            
+        return true;
     }
     
     /**
@@ -274,20 +279,6 @@ public final class FileSystemUtils {
                 return false;
             }
         }
-
-        // нельзя вставить папку во вложенную в неё же папку
-        /*if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS) && 
-            Files.isDirectory(dest, LinkOption.NOFOLLOW_LINKS)) {
-            try {
-                if (FileUtils.directoryContains(fPath, fDest)) {
-                    Utils.showMessageError("Невозможно вставить папку в дочернюю!");
-                    continue;
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                continue;
-            }
-        }*/
                 
         // существует?
         if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {         
@@ -350,21 +341,7 @@ public final class FileSystemUtils {
 
         return true;
     }
-    
-    /**
-     * Рекурсивное копирование всех файлов и папок (включая вложенные подпапки и файлы) в новый путь с последующим удалением исходных файлов
-     * @param src Путь, из которого нужно копировать, включая сам путь. Путь src будет удален
-     * @param to  Путь, в который нужно копировать src (ПАПКА, куда переносить файлы/папки из src)
-     * @return true при успехе, false - возникла ошибка
-     */
-    public static boolean recursiveMoveFiles(Path src, Path to) {
-        if (recursiveCopyFiles(src, to)) {
-            return recursiveRemoveFiles(src);
-        } else {
-            return false;
-        }
-    }
-        
+            
     /**
      * Рекурсивное удаление всех файлов и папок (включая вложенные подпапки и файлы) в пути
      * @param path Путь, в котором будет удалено всё, включая сам путь

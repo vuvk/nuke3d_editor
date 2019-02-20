@@ -559,7 +559,12 @@ public class Material extends Resource {
      * @return Материал, если есть такой в базе, иначе null
      */
     public static Material getByPath(String path) {
-        return getByPath(Paths.get(path));
+        for (Material mat : MATERIALS) {
+            if (mat.getPath().equals(path)) {
+                return mat;
+            }
+        }        
+        return null;
     }
     /**
      * Получить ссылку на материал по пути до файла
@@ -567,16 +572,7 @@ public class Material extends Resource {
      * @return Материал, если есть такой в базе, иначе null
      */
     public static Material getByPath(Path path) {
-        if (pathIsMaterial(path)) {
-            String checkPath = FileSystemUtils.getProjectPath(path);
-            for (Material mat : MATERIALS) {
-                if (mat.getPath().equals(checkPath)) {
-                    return mat;
-                }
-            }
-        }
-        
-        return null;
+        return getByPath(path.toString());
     }
     /**
      * Получить ссылку на материал по id

@@ -1005,7 +1005,7 @@ public class FormMain extends javax.swing.JFrame {
                         continue;
                     }
 
-                    FileSystemUtils.recursiveRenameFiles(path, newPath);
+                    FileSystemUtils.recursiveMoveFiles(path, newPath);
                 
                     done = true;
                 }
@@ -1096,15 +1096,15 @@ public class FormMain extends javax.swing.JFrame {
     private void popuvPVMIPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popuvPVMIPasteActionPerformed
         if (copyPaths != null && copyPaths.size() > 0) {              
             
-            for (Path path : copyPaths) {    
-                Path dest = currentPath;
-                
+            String currentPathString = FileSystemUtils.getProjectPath(currentPath);
+            for (Path path : copyPaths) {                   
                 // вырезаем?
                 if (!isCutMode) {
-                    if (!FileSystemUtils.recursiveCopyFiles(path, dest)) {
+                    if (!FileSystemUtils.recursiveCopyFiles(path, currentPath)) {
                         MessageDialog.showError("Возникли ошибки при копировании файлов.");
                     } 
                 } else {
+                    Path dest = Paths.get(currentPathString + path.getFileName());
                     if (!FileSystemUtils.recursiveMoveFiles(path, dest)) {
                         MessageDialog.showError("Возникли ошибки при переносе файлов.");
                     }                     
@@ -1114,7 +1114,7 @@ public class FormMain extends javax.swing.JFrame {
                 }
             }
             
-            fillTreeFolders(false);
+            fillTreeFolders(true);
             fillListProjectView();            
         
             reloadChildWindows();
