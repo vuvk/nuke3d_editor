@@ -1009,7 +1009,7 @@ public class FormMain extends javax.swing.JFrame {
                 
                     done = true;
                 }
-            }            
+            }
 
             fillTreeFolders(false);
             fillListProjectView();

@@ -26,12 +26,14 @@ import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,6 +42,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  *
@@ -166,7 +170,7 @@ public final class FileSystemUtils {
      */
     public static boolean recursiveMoveFiles(Path src, Path dest) {        
         if (src  == null || !Files.exists(src) ||
-            dest == null ||  Files.exists(dest)
+            dest == null/* ||  Files.exists(dest)*/
            ) {
             return false;
         }
@@ -174,31 +178,66 @@ public final class FileSystemUtils {
         // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
         Material.saveAll();
         
-        // списки путей для изменения
-        final List<String> texturesForRepath = new LinkedList<>();
-        final List<String> materialsForRepath = new LinkedList<>();
-
-        String oldName = getProjectPath(src);
-        String newName = getProjectPath(dest);
-        // если папка, то добавить слэш, т.к. getProjectPath понятия не имеет что такое dest - папка или файл?
-        if (Files.isDirectory(src)) {
-            newName += "/";
+        // списки путей для изменения (пара "старый путь" - "новый путь")
+        final List<Pair<String, String>> texturesForRepath  = new LinkedList<>();
+        final List<Pair<String, String>> materialsForRepath = new LinkedList<>(); 
+        // список файлов на удаление перед заменой
+        final List<Path> filesForRemove = new LinkedList();
+        
+        // существует?
+        if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {         
+            // нельзя вырезать себя в себя!
+            if (src.compareTo(dest) == 0) {
+                return false;
+            // файл не тот же самый, но с таким именем уже существует
+            } else {
+                // последнее предупреждение!
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + dest.toString() + "\"\nуже существует! Перезаписать?");
+                // CANCEL or NO
+                if (answer == null || !answer.booleanValue()) {
+                    return false;
+                }
+                
+                // если это файл, то сразу отметим его для предварительного удаления
+                if (!Files.isDirectory(dest)) {
+                    filesForRemove.add(dest);
+                }
+            }
         }
+
+        // собираем старое и новое имя в строковом представлении
+        final String oldName = getProjectPath(src);
+        StringBuilder nameBuilder = new StringBuilder(getProjectPath(dest));
+        // если папка, то добавить слэш, т.к. getProjectPath понятия не имеет 
+        // что такое dest - папка или файл, если их не существует
+        if (Files.isDirectory(src) && !Files.exists(dest)) {
+            nameBuilder.append("/");
+        }
+        final String newName = nameBuilder.toString();
 
         // ищем в папке содержащиеся ресурсы и помечаем их для замены у них пути
         if (Files.isDirectory(src)) {
             try {
                 Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
                     @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {                    
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {  
+                        String oldPathString = getProjectPath(file);
+                        String newPathString = oldPathString.replace(oldName, newName);
+                        
+                        // если файл уже существует, то сразу отметим его для предварительного удаления
+                        Path newPath = Paths.get(newPathString);
+                        if (Files.exists(newPath) && !Files.isDirectory(newPath)) {
+                            filesForRemove.add(newPath);
+                        }
+                        
                         // по расширению файла определяем что это
                         switch (getFileExtension(file)) {
-                            case Const.TEXTURE_FORMAT_EXT :
-                                texturesForRepath.add(getProjectPath(file));
+                            case Const.TEXTURE_FORMAT_EXT :                                
+                                texturesForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
                                 break;
                                 
                             case Const.MATERIAL_FORMAT_EXT :
-                                materialsForRepath.add(getProjectPath(file));
+                                texturesForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
                                 break;
                         }
                         return FileVisitResult.CONTINUE;
@@ -212,18 +251,28 @@ public final class FileSystemUtils {
             // по расширению файла определяем что это
             switch (getFileExtension(src)) {
                 case Const.TEXTURE_FORMAT_EXT :
-                    texturesForRepath.add(getProjectPath(src));
+                    texturesForRepath.add(new ImmutablePair<String, String>(oldName, newName));
                     break;
                     
                 case Const.MATERIAL_FORMAT_EXT :
-                    materialsForRepath.add(getProjectPath(src));
+                    materialsForRepath.add(new ImmutablePair<String, String>(oldName, newName));;
                     break;
             }
         }
         
-        // переименовываем путь
+        // если конечный путь существует, то заменяемые файлы необходимо предварительно удалить из проекта
+        for (Path path : filesForRemove) {
+            recursiveRemoveFiles(path);
+        }
+        
+        // переносим путь
         try {
-            Files.move(src, dest);     
+            Files.move(src, dest, StandardCopyOption.REPLACE_EXISTING);   
+            /*if (Files.isDirectory(src)) {
+                FileUtils.moveDirectory(src.toFile(), dest.toFile());
+            } else {
+                FileUtils.moveFile(src.toFile(), dest.toFile());
+            } */           
         } catch (Exception ex) {
             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
@@ -231,23 +280,22 @@ public final class FileSystemUtils {
         }    
         
         // заменяем часть пути (или весь) с учетом нового имени папки или файла
-        for (String filePath : texturesForRepath) {
-            Texture txr = Texture.getByPath(filePath);
+        for (Pair<String, String> paths : texturesForRepath) {
+            Texture txr = Texture.getByPath(paths.getLeft());            
             if (txr != null) {
-                String newPath = txr.getPath().replace(oldName, newName);
-                txr.setPath(newPath);
+                txr.setPath(paths.getRight());
             }
         }
-        for (String filePath : materialsForRepath) {
-            Material mat = Material.getByPath(filePath);
+        for (Pair<String, String> paths : materialsForRepath) {
+            Material mat = Material.getByPath(paths.getLeft());
             if (mat != null) {
-                String newPath = mat.getPath().replace(oldName, newName);
-                mat.setPath(newPath);
+                mat.setPath(paths.getRight());
             }
         } 
         
         texturesForRepath.clear();
         materialsForRepath.clear();
+        filesForRemove.clear();
             
         return true;
     }
