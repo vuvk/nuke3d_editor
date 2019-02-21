@@ -1118,6 +1118,8 @@ public class FormMain extends javax.swing.JFrame {
             fillListProjectView();            
         
             reloadChildWindows();
+        
+            System.gc();
         }
     }//GEN-LAST:event_popuvPVMIPasteActionPerformed
 

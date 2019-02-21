@@ -181,8 +181,8 @@ public final class FileSystemUtils {
         // списки путей для изменения (пара "старый путь" - "новый путь")
         final List<Pair<String, String>> texturesForRepath  = new LinkedList<>();
         final List<Pair<String, String>> materialsForRepath = new LinkedList<>(); 
-        // список файлов на удаление перед заменой
-        final List<Path> filesForRemove = new LinkedList();
+        // список переносимых путей (откуда - куда)
+        final List<Pair<Path, Path>> pathsForMove = new LinkedList();
         
         // существует?
         if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {         
@@ -197,11 +197,6 @@ public final class FileSystemUtils {
                 if (answer == null || !answer.booleanValue()) {
                     return false;
                 }
-                
-                // если это файл, то сразу отметим его для предварительного удаления
-                if (!Files.isDirectory(dest)) {
-                    filesForRemove.add(dest);
-                }
             }
         }
 
@@ -214,6 +209,48 @@ public final class FileSystemUtils {
             nameBuilder.append("/");
         }
         final String newName = nameBuilder.toString();
+        
+        /**
+         * класс для обработки обнаруженных файлов и папок    
+         */
+        class PathProcessor {
+            /**
+             * Обработать путь - добавить его в список на перенос и в список обновления пути, если это известный ресурс
+             * @param path Путь для проверки
+             */
+            public void process(Path path) {
+                String oldPathString = getProjectPath(path);
+                String newPathString = oldPathString.replace(oldName, newName);
+
+                // если файл уже существует, то сразу отметим его для предварительного удаления
+                Path oldPath = Paths.get(oldPathString);
+                Path newPath = Paths.get(newPathString);
+                
+                if (!Files.isDirectory(oldPath)) {
+                    // целевой файл существует? Переписать?
+                    if (Files.exists(newPath)) {
+                        if (!MessageDialog.showConfirmationYesNo("\"" + newPath.toString() + "\"\nуже существует! Перезаписать?")) {
+                            return;
+                        }
+                    }
+                    
+                    // по расширению файла определяем что это
+                    switch (getFileExtension(path)) {
+                        case Const.TEXTURE_FORMAT_EXT :                                
+                            texturesForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
+                            break;
+
+                        case Const.MATERIAL_FORMAT_EXT :
+                            materialsForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
+                            break;
+                    }
+                }
+                
+                // если не существует или дано добро на перезапись, то отмечаем путь
+                pathsForMove.add(new ImmutablePair<>(oldPath, newPath));
+            }
+        }
+        PathProcessor pathProcessor = new PathProcessor();
 
         // ищем в папке содержащиеся ресурсы и помечаем их для замены у них пути
         if (Files.isDirectory(src)) {
@@ -221,64 +258,64 @@ public final class FileSystemUtils {
                 Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {  
-                        String oldPathString = getProjectPath(file);
-                        String newPathString = oldPathString.replace(oldName, newName);
-                        
-                        // если файл уже существует, то сразу отметим его для предварительного удаления
-                        Path newPath = Paths.get(newPathString);
-                        if (Files.exists(newPath) && !Files.isDirectory(newPath)) {
-                            filesForRemove.add(newPath);
-                        }
-                        
-                        // по расширению файла определяем что это
-                        switch (getFileExtension(file)) {
-                            case Const.TEXTURE_FORMAT_EXT :                                
-                                texturesForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
-                                break;
-                                
-                            case Const.MATERIAL_FORMAT_EXT :
-                                texturesForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
-                                break;
-                        }
+                        pathProcessor.process(file);
                         return FileVisitResult.CONTINUE;
+                    }
+                    
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                        pathProcessor.process(dir);                        
+                        return FileVisitResult.CONTINUE;                        
                     }
                 });
             } catch (IOException ex) {
                 Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
+                return false;
             }
-        } else {
-            // по расширению файла определяем что это
-            switch (getFileExtension(src)) {
-                case Const.TEXTURE_FORMAT_EXT :
-                    texturesForRepath.add(new ImmutablePair<String, String>(oldName, newName));
-                    break;
-                    
-                case Const.MATERIAL_FORMAT_EXT :
-                    materialsForRepath.add(new ImmutablePair<String, String>(oldName, newName));;
-                    break;
-            }
-        }
-        
-        // если конечный путь существует, то заменяемые файлы необходимо предварительно удалить из проекта
-        for (Path path : filesForRemove) {
-            recursiveRemoveFiles(path);
+        } else {            
+            pathProcessor.process(src);
         }
         
         // переносим путь
-        try {
-            Files.move(src, dest, StandardCopyOption.REPLACE_EXISTING);   
-            /*if (Files.isDirectory(src)) {
-                FileUtils.moveDirectory(src.toFile(), dest.toFile());
+        // если конечный путь существует, то заменяемые файлы необходимо предварительно удалить из проекта
+        for (Pair<Path, Path> paths : pathsForMove) {
+            Path from = paths.getLeft();
+            Path to   = paths.getRight();
+            
+            // если конечный путь существует
+            if (Files.exists(to)) {
+                // и это не директория, то удалить из проекта
+                if (!Files.isDirectory(to)) {
+                    if (!recursiveRemoveFiles(to)) {
+                        return false;
+                    }
+                }   
+            // не существует
             } else {
-                FileUtils.moveFile(src.toFile(), dest.toFile());
-            } */           
-        } catch (Exception ex) {
-            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-            MessageDialog.showException(ex);
-            return false;
-        }    
-        
+                // переносим файл?
+                if (!Files.isDirectory(from)) {
+                    try {
+                        Files.createDirectories(to.getParent());
+                        Files.move(from, to);
+                    } catch (IOException ex) {
+                        Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+                        MessageDialog.showException(ex);
+                        return false;
+                    }    
+                // папку
+                } else {
+                    try {
+                        Files.createDirectories(to);
+                    } catch (IOException ex) {
+                        Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+                        MessageDialog.showException(ex);
+                        return false;
+                    }                        
+                }
+            }
+        }
+                
         // заменяем часть пути (или весь) с учетом нового имени папки или файла
         for (Pair<String, String> paths : texturesForRepath) {
             Texture txr = Texture.getByPath(paths.getLeft());            
@@ -295,8 +332,19 @@ public final class FileSystemUtils {
         
         texturesForRepath.clear();
         materialsForRepath.clear();
-        filesForRemove.clear();
-            
+        pathsForMove.clear();
+        
+        // если исходный путь был папкой, то смело удалить её
+        if (Files.exists(src) && Files.isDirectory(src)) {
+            try {
+                FileUtils.deleteDirectory(src.toFile());
+            } catch (IOException ex) {
+                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return false;
+            }
+        }
+        
         return true;
     }
     
