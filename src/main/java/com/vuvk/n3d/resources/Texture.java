@@ -197,7 +197,7 @@ public final class Texture extends Resource {
         super(path);
     }
     public Texture(File path) {
-        super(path.toPath());
+        super(path);
     }
         
     /**
@@ -273,24 +273,20 @@ public final class Texture extends Resource {
      * @return Текстура, если есть такая в базе, иначе null
      */
     public static Texture getByPath(String path) {
-        return getByPath(Paths.get(path));
+        for (Texture txr : TEXTURES) {
+            if (txr.getPath().equals(path)) {
+                return txr;
+            }
+        }        
+        return null;
     }
     /**
      * Получить ссылку на текстуру по пути до файла
      * @param path Путь до файла
      * @return Текстура, если есть такая в базе, иначе null
      */
-    public static Texture getByPath(Path path) {
-        if (pathIsTexture(path)) {
-            String checkPath = FileSystemUtils.getProjectPath(path);
-            for (Texture txr : TEXTURES) {
-                if (txr.getPath().equals(checkPath)) {
-                    return txr;
-                }
-            }
-        }
-        
-        return null;
+    public static Texture getByPath(Path path) {        
+        return getByPath(path.toString());
     }
     /**
      * Получить ссылку на текстуру по id

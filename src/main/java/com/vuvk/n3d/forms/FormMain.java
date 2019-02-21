@@ -967,6 +967,9 @@ public class FormMain extends javax.swing.JFrame {
 
     private void popupPVMIRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRenameActionPerformed
         if (listProjectView.getSelectedIndex() != -1) {
+        
+            // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+            Material.saveAll();
             
             List list = listProjectView.getSelectedValuesList();
             
@@ -1005,11 +1008,11 @@ public class FormMain extends javax.swing.JFrame {
                         continue;
                     }
 
-                    FileSystemUtils.recursiveRenameFiles(path, newPath);
+                    FileSystemUtils.move(path, newPath);
                 
                     done = true;
                 }
-            }            
+            }
 
             fillTreeFolders(false);
             fillListProjectView();
@@ -1021,7 +1024,10 @@ public class FormMain extends javax.swing.JFrame {
                 if (element.getType() == elementType && element.getName().equals(newName)) {
                     listProjectView.setSelectedIndex(i);
                 }
-            }            
+            }      
+            
+            // проверяем валидность материалов
+            Material.checkAll();        
                         
             // перезагрузить окна на случай, если был переименован открытый объект в редакторе
             reloadChildWindows();
@@ -1071,20 +1077,23 @@ public class FormMain extends javax.swing.JFrame {
                     case MATERIAL:
                     case SOUND:
                     default:
-                        if (!FileSystemUtils.recursiveRemoveFiles(Paths.get(element.getPath()))) {
-                        //if (!FileSystemUtils.removeFiles(Paths.get(element.getPath()))) {
+                        if (!FileSystemUtils.remove(Paths.get(element.getPath()))) {
                             MessageDialog.showError("Возникли ошибки во время удаления \"" + name + "\"");
-                        }
-                        fillTreeFolders(false);
-                        fillListProjectView();           
-        
-                        reloadChildWindows();
+                        }        
                         break;
 
                     case LEVELUP:
                         continue;
                 }                
-            }            
+            }  
+            
+            // проверяем валидность материалов
+            Material.checkAll();  
+
+            fillTreeFolders(false);
+            fillListProjectView();         
+
+            reloadChildWindows();          
         }
     }//GEN-LAST:event_popupPVMIRemoveActionPerformed
     
@@ -1094,30 +1103,39 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMICopyActionPerformed
 
     private void popuvPVMIPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popuvPVMIPasteActionPerformed
-        if (copyPaths != null && copyPaths.size() > 0) {              
+        if (copyPaths != null && copyPaths.size() > 0) {          
+        
+            // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+            Material.saveAll();    
             
+            String currentPathString = FileSystemUtils.getProjectPath(currentPath);
             for (Path path : copyPaths) {    
-                Path dest = currentPath;
-                
-                // вырезаем?
-                if (!isCutMode) {
-                    if (!FileSystemUtils.recursiveCopyFiles(path, dest)) {
-                        MessageDialog.showError("Возникли ошибки при копировании файлов.");
-                    } 
-                } else {
-                    if (!FileSystemUtils.recursiveMoveFiles(path, dest)) {
-                        MessageDialog.showError("Возникли ошибки при переносе файлов.");
-                    }                     
-                    isCutMode = false;
-                    copyPaths.clear();
-                    copyPaths = null;                    
-                }
+                Path dest = Paths.get(currentPathString + path.getFileName());
+                if (!FileSystemUtils.repath(path, dest, isCutMode)) {
+                    if (!isCutMode) {
+                        MessageDialog.showError("Возникли ошибки при копировании \"" + path.toString() + "\".");
+                    } else {
+                        MessageDialog.showError("Возникли ошибки при переносе \"" + path.toString() + "\".");
+                    }
+                }              
+            }
+        
+            // проверяем валидность материалов
+            Material.checkAll();
+                   
+            // несколько раз вырезать нельзя
+            if (isCutMode) {
+                isCutMode = false;
+                copyPaths.clear();
+                copyPaths = null; 
             }
             
-            fillTreeFolders(false);
+            fillTreeFolders(true);
             fillListProjectView();            
         
             reloadChildWindows();
+        
+            System.gc();
         }
     }//GEN-LAST:event_popuvPVMIPasteActionPerformed
 
@@ -1134,10 +1152,10 @@ public class FormMain extends javax.swing.JFrame {
         if (txrFile != null) {
             // копируем текстуру к себе в папку ресурсов
             String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-            File newPath = new File(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
             
             // файл с таким же именем существует?
-            if (newPath.exists()) {
+            if (Files.exists(newPath)) {
                 Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
                 // CANCEL
                 if (answer == null) {
@@ -1145,25 +1163,25 @@ public class FormMain extends javax.swing.JFrame {
                 // NO
                 } else if (!answer.booleanValue()) {
                     // решил переименовать
-                    while (newPath.exists()) {
+                    while (Files.exists(newPath)) {
                         String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
                         if (newName == null) {
                             return;    // отмена?
                         } else {
                             baseName = newName;
-                            newPath = new File(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
+                            newPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
                         }
                     }   
                 // YES
                 } else {
-                    FileSystemUtils.recursiveRemoveFiles(newPath.toPath());
+                    FileSystemUtils.remove(newPath);
                 }
             }
             
             // создаем файл у себя
             try {
                 BufferedImage img = ImageUtils.prepareImage(ImageIO.read(txrFile));
-                ImageIO.write(img, "png", newPath);
+                ImageIO.write(img, "png", newPath.toFile());
             } catch (Exception ex) {
                 Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
@@ -1193,10 +1211,10 @@ public class FormMain extends javax.swing.JFrame {
         if (name == null) {
             return;    // отмена?
         } else {
-            File matPath = new File(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
+            Path matPath = Paths.get(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
             
             // файл с таким же именем существует?
-            if (matPath.exists()) {
+            if (Files.exists(matPath)) {
                 Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + name + "\"\nуже существует! Перезаписать?");
                 // CANCEL
                 if (answer == null) {
@@ -1204,18 +1222,18 @@ public class FormMain extends javax.swing.JFrame {
                 // NO
                 } else if (!answer.booleanValue()) {
                     // решил переименовать
-                    while (matPath.exists()) {
+                    while (Files.exists(matPath)) {
                         String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + name + "\":", name);
                         if (newName == null) {
                             return;    // отмена?
                         } else {
                             name = newName;
-                            matPath = new File(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
+                            matPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
                         }
                     }
                 // YES
                 } else {
-                    FileSystemUtils.recursiveRemoveFiles(matPath.toPath());
+                    FileSystemUtils.remove(matPath);
                 }
             }
             
