@@ -111,6 +111,30 @@ public final class FileSystemUtils {
         final List<Path> texturesForAdd  = new LinkedList<>();
         final List<Path> materialsForAdd = new LinkedList<>();
         
+        /**
+         * класс для обработки обнаруженных файлов и папок    
+         */
+        class PathProcessor {
+            /**
+             * Обработать путь - добавить его в список добавления пути, если это известный ресурс
+             * @param path Путь для проверки
+             */
+            public void process(Path path) {
+                // по расширению файла определяем что это
+                switch (getFileExtension(path)) {
+                    case Const.TEXTURE_FORMAT_EXT :
+                        texturesForAdd.add(path);
+                        break;
+
+                    case Const.MATERIAL_FORMAT_EXT :
+                        materialsForAdd.add(path);
+                        break;
+                }
+            }
+        }
+        PathProcessor pathProcessor = new PathProcessor();
+        
+        
         if (path != null) {
             // это директория
             if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
@@ -118,16 +142,7 @@ public final class FileSystemUtils {
                     Files.walkFileTree(path, new SimpleFileVisitor<Path>() {   
                         @Override
                         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {                    
-                            // по расширению файла определяем что это
-                            switch (getFileExtension(file)) {
-                                case Const.TEXTURE_FORMAT_EXT :
-                                    texturesForAdd.add(file);
-                                    break;
-                                    
-                                case Const.MATERIAL_FORMAT_EXT :
-                                    materialsForAdd.add(file);
-                                    break;
-                            }
+                            pathProcessor.process(file);
                             return FileVisitResult.CONTINUE;
                         }
                     });
@@ -137,17 +152,8 @@ public final class FileSystemUtils {
                 }
             // это файл
             } else {
-                // по расширению файла определяем что это
-                switch (getFileExtension(path)) {
-                    case Const.TEXTURE_FORMAT_EXT :
-                        texturesForAdd.add(path);
-                        break;
-                                    
-                    case Const.MATERIAL_FORMAT_EXT :
-                        materialsForAdd.add(path);
-                        break;
-                }
-            }        
+                pathProcessor.process(path);
+            }
         }
         
         // добавляем всё, что нашли
@@ -172,28 +178,29 @@ public final class FileSystemUtils {
      * @param dest Путь, в который нужно копировать src (ПАПКА, куда переносить файлы/папки из src)
      * @return true, если всё копировано, false - возникла ошибка
      */
-    public static boolean recursiveCopyFiles(Path src, Path dest) {
-        return recursiveMoveFiles(src, dest, false);
+    public static boolean copy(Path src, Path dest) {
+        return repath(src, dest, false);
     }
     
     /**
-     * Рекурсивно переименовать или перенести путь. Должны измениться пути у содержащихся внутри ресурсов 
+     * Рекурсивно переименовать или перенести путь
      * @param src  путь, в котором должны смениться ссылки и пути ресурсов
      * @param dest новый путь (во что переименовывать)
      * @return true в случае успеха, false - возникла ошибка
      */
-    public static boolean recursiveMoveFiles(Path src, Path dest) {  
-        return recursiveMoveFiles(src, dest, true);
+    public static boolean move(Path src, Path dest) {  
+        return repath(src, dest, true);
     }
     
     /**
-     * Рекурсивно переименовать или перенести путь. Должны измениться пути у содержащихся внутри ресурсов 
+     * При выключенном флаге isCutMode - рекурсивное копирование всех файлов и папок (включая вложенные подпапки и файлы) в новый путь.
+     * При включенном флаге isCutMode  - рекурсивно переименовать или перенести путь. Должны измениться пути у содержащихся внутри ресурсов. 
      * @param src  путь, в котором должны смениться ссылки и пути ресурсов
      * @param dest новый путь (во что переименовывать)
      * @param isCutMode Режим вырезания. Если true, то исходные файлы будут удалены, если false, то объекты просто будут скопированы
      * @return true в случае успеха, false - возникла ошибка
      */
-    private static boolean recursiveMoveFiles(Path src, Path dest, boolean isCutMode) {        
+    public static boolean repath(Path src, Path dest, boolean isCutMode) {        
         if (src  == null || !Files.exists(src) ||
             dest == null/* ||  Files.exists(dest)*/
            ) {
@@ -338,7 +345,7 @@ public final class FileSystemUtils {
             if (Files.exists(to)) {
                 // и это не директория, то удалить из проекта
                 if (!Files.isDirectory(to)) {
-                    if (!recursiveRemoveFiles(to)) {
+                    if (!remove(to)) {
                         return false;
                     }
                 }                   
@@ -391,7 +398,7 @@ public final class FileSystemUtils {
                 Files.isDirectory(src) && 
                 pathsForSkip.isEmpty()
                ) {
-                if (!recursiveRemoveFiles(src)) {
+                if (!remove(src)) {
                     return false;
                 }
             }
@@ -406,106 +413,46 @@ public final class FileSystemUtils {
                 
         return true;
     }
-    
-    /**
-     * Рекурсивное копирование всех файлов и папок (включая вложенные подпапки и файлы) в новый путь
-     * @param src Путь, из которого нужно копировать, включая сам путь
-     * @param to  Путь, в который нужно копировать src (ПАПКА, куда переносить файлы/папки из src)
-     * @return true, если всё копировано, false - возникла ошибка
-     */
-    /*public static boolean recursiveCopyFiles(Path src, Path to) {
-        if (src == null || to == null) {
-            return false;
-        }
-        
-        // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
-        Material.saveAll();
-        
-        // конечное имя
-        Path dest = Paths.get(to.toString() + "/" + src.getFileName()); 
-        
-        // создаем целевую папку
-        if (!Files.exists(to)) {
-            try {
-                Files.createDirectories(dest);
-            } catch (IOException ex) {
-                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                return false;
-            }
-        }
                 
-        // существует?
-        if (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {         
-            // нельзя копировать себя в себя, но можно поместить рядом копию!
-            if (src.compareTo(dest) == 0) {
-                Path newDest = dest;                
-                while (Files.exists(newDest, LinkOption.NOFOLLOW_LINKS)) {
-                    String newName = dest.getParent().toString() + File.separator + "copy of " + newDest.getFileName().toString();
-                    newDest = Paths.get(newName);
-                }
-                dest = newDest;
-            // файл не тот же самый, но с таким именем уже существует
-            } else {
-                // последнее предупреждение!
-                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + dest.toString() + "\"\nуже существует! Перезаписать?");
-                // CANCEL
-                if (answer == null) {
-                    return false;
-                // NO
-                } else if (!answer.booleanValue()) {
-                    // решил переименовать
-                    while (Files.exists(dest, LinkOption.NOFOLLOW_LINKS)) {
-                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + dest.toString() + "\":", src.getFileName());
-                        if (newName == null) {
-                            return true;    // отмена?
-                        } else {
-                            dest = Paths.get(to.toString() + "/" + newName);
-                        }
-                    }
-                }
-            }
-        }
-                
-        File fPath = src.toFile();
-        File fDest = dest.toFile();
-
-        // пишем!
-        // директория?
-        if (Files.isDirectory(src, LinkOption.NOFOLLOW_LINKS)) {
-            try {
-                FileUtils.copyDirectory(fPath, fDest);
-            } catch (IOException ex) {
-                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                return false;
-            }
-        // файл
-        } else {
-            try {
-                FileUtils.copyFile(fPath, fDest);
-            } catch (IOException ex) {
-                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                return false;
-            }
-        }
-
-        // добавляем ссылки на вновь созданные объекты
-        addResourcesFromPath(dest);
-
-        return true;
-    }*/
-            
     /**
      * Рекурсивное удаление всех файлов и папок (включая вложенные подпапки и файлы) в пути
      * @param path Путь, в котором будет удалено всё, включая сам путь
      * @return true, если удалены, false - возникла ошибка
      */
-    public static boolean recursiveRemoveFiles(Path path) {   
+    public static boolean remove(Path path) {   
         // списки путей для изменения
         final List<String> texturesForDelete = new LinkedList<>();
         final List<String> materialsForDelete = new LinkedList<>();
+        
+        /**
+         * класс для обработки обнаруженных файлов и папок    
+         */
+        class PathProcessor {
+            /**
+             * Обработать путь - добавить его в список удаления пути, если это известный ресурс
+             * @param path Путь для проверки
+             */
+            public void process(Path path) {
+                // по расширению файла определяем что это
+                switch (getFileExtension(path)) {
+                    case Const.TEXTURE_FORMAT_EXT :
+                        texturesForDelete.add(getProjectPath(path));
+                        break;
+
+                    case Const.MATERIAL_FORMAT_EXT :
+                        materialsForDelete.add(getProjectPath(path));
+                        break;
+                }
+                
+                try {
+                    Files.delete(path);
+                } catch (IOException ex) {
+                    Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageDialog.showException(ex);
+                }
+            }
+        }
+        PathProcessor pathProcessor = new PathProcessor();
         
         // это директория
         if (Files.isDirectory(path, LinkOption.NOFOLLOW_LINKS)) {
@@ -519,91 +466,55 @@ public final class FileSystemUtils {
 
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {                    
-                        // по расширению файла определяем что это
-                        // для того, чтобы удалить файл из настроек проекта
-                        switch (getFileExtension(file)) {
-                            case Const.TEXTURE_FORMAT_EXT :
-                                texturesForDelete.add(getProjectPath(file));
-                                break;
-                                
-                            case Const.MATERIAL_FORMAT_EXT :
-                                materialsForDelete.add(getProjectPath(file));
-                                break;
-                        }
-                        Files.deleteIfExists(file);
+                        pathProcessor.process(file);
                         return FileVisitResult.CONTINUE;
                     }
                 });
                 
-                // Удаляем сам путь
                 Files.deleteIfExists(path);
             } catch (IOException ex) {
                 Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
             }
         // это файл
-        } else {
-            // по расширению файла определяем что это
-            // для того, чтобы удалить файл из настроек проекта
-            switch (getFileExtension(path)) {
-                case Const.TEXTURE_FORMAT_EXT :
-                    texturesForDelete.add(getProjectPath(path));
-                    break;
-                                
-                case Const.MATERIAL_FORMAT_EXT :
-                    materialsForDelete.add(getProjectPath(path));
-                    break;
-            }
-            
-            try {
-                Files.deleteIfExists(path);
-            } catch (IOException ex) {
-                Logger.getLogger(FileSystemUtils.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-            }
+        } else {   
+            pathProcessor.process(path);
         }       
         
         // удаляем из проекта то, что нашли
         // текстуры
         for (String filePath : texturesForDelete) {
-            for (Iterator it = Texture.TEXTURES.iterator(); it.hasNext(); ) {
-                Texture txr = (Texture)it.next();
-                if (txr.getPath().equals(filePath)) {
-                    // закрыть окно с открытой удаляемой текстурой
-                    if (FormMain.formTextureEditor != null && 
-                        FormTextureEditor.selectedTexture != null &&
-                        FormTextureEditor.selectedTexture.equals(txr)
-                       ) {
-                        FormMain.closeFormTextureEditor();
-                    }
-                    
-                    it.remove();                    
+            Texture txr = Texture.getByPath(filePath);
+            if (txr != null) {
+                // закрыть окно с открытой удаляемой текстурой
+                if (FormMain.formTextureEditor != null && 
+                    FormTextureEditor.selectedTexture != null &&
+                    FormTextureEditor.selectedTexture.equals(txr)
+                   ) {
+                    FormMain.closeFormTextureEditor();
                 }
+                
+                Texture.TEXTURES.remove(txr);
             }
         }
         // материалы
         for (String filePath : materialsForDelete) {
-            for (Iterator it = Material.MATERIALS.iterator(); it.hasNext(); ) {
-                Material mat = (Material)it.next();
-                if (mat.getPath().equals(filePath)) {
-                    // закрыть окно с открытой удаляемым материалом
-                    if (FormMain.formMaterialEditor != null && 
-                        FormMaterialEditor.selectedMaterial != null &&
-                        FormMaterialEditor.selectedMaterial.equals(mat)
-                       ) {
-                        FormMain.closeFormMaterialEditor();
-                    }
-                    
-                    it.remove();                    
+            Material mat = Material.getByPath(filePath);
+            if (mat != null) {
+                // закрыть окно с открытой удаляемым материалом
+                if (FormMain.formMaterialEditor != null && 
+                    FormMaterialEditor.selectedMaterial != null &&
+                    FormMaterialEditor.selectedMaterial.equals(mat)
+                   ) {
+                    FormMain.closeFormMaterialEditor();
                 }
+                
+                Material.MATERIALS.remove(mat);
             }
         }
         
         texturesForDelete.clear();
         materialsForDelete.clear();
-        
-        // проверяем валидность материалов
-        Material.checkAll();
  
         // всё успешно удалено?
         return !Files.exists(path);

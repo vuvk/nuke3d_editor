@@ -1008,7 +1008,7 @@ public class FormMain extends javax.swing.JFrame {
                         continue;
                     }
 
-                    FileSystemUtils.recursiveMoveFiles(path, newPath);
+                    FileSystemUtils.move(path, newPath);
                 
                     done = true;
                 }
@@ -1024,7 +1024,10 @@ public class FormMain extends javax.swing.JFrame {
                 if (element.getType() == elementType && element.getName().equals(newName)) {
                     listProjectView.setSelectedIndex(i);
                 }
-            }            
+            }      
+            
+            // проверяем валидность материалов
+            Material.checkAll();        
                         
             // перезагрузить окна на случай, если был переименован открытый объект в редакторе
             reloadChildWindows();
@@ -1074,20 +1077,23 @@ public class FormMain extends javax.swing.JFrame {
                     case MATERIAL:
                     case SOUND:
                     default:
-                        if (!FileSystemUtils.recursiveRemoveFiles(Paths.get(element.getPath()))) {
-                        //if (!FileSystemUtils.removeFiles(Paths.get(element.getPath()))) {
+                        if (!FileSystemUtils.remove(Paths.get(element.getPath()))) {
                             MessageDialog.showError("Возникли ошибки во время удаления \"" + name + "\"");
-                        }
-                        fillTreeFolders(false);
-                        fillListProjectView();           
-        
-                        reloadChildWindows();
+                        }        
                         break;
 
                     case LEVELUP:
                         continue;
                 }                
-            }            
+            }  
+            
+            // проверяем валидность материалов
+            Material.checkAll();  
+
+            fillTreeFolders(false);
+            fillListProjectView();         
+
+            reloadChildWindows();          
         }
     }//GEN-LAST:event_popupPVMIRemoveActionPerformed
     
@@ -1103,36 +1109,26 @@ public class FormMain extends javax.swing.JFrame {
             Material.saveAll();    
             
             String currentPathString = FileSystemUtils.getProjectPath(currentPath);
-            for (Path path : copyPaths) {                   
-                // вырезаем?
-                /*if (!isCutMode) {
-                    if (!FileSystemUtils.recursiveCopyFiles(path, currentPath)) {
-                        MessageDialog.showError("Возникли ошибки при копировании файлов.");
-                    } 
-                } else {
-                    Path dest = Paths.get(currentPathString + path.getFileName());
-                    if (!FileSystemUtils.recursiveMoveFiles(path, dest)) {
-                        MessageDialog.showError("Возникли ошибки при переносе файлов.");
-                    }                     
-                    isCutMode = false;
-                    copyPaths.clear();
-                    copyPaths = null;                    
-                }*/
+            for (Path path : copyPaths) {    
                 Path dest = Paths.get(currentPathString + path.getFileName());
-                if (!isCutMode) {
-                    if (!FileSystemUtils.recursiveCopyFiles(path, dest)) {
-                        MessageDialog.showError("Возникли ошибки при копировании файлов.");
-                    } 
-                } else {
-                    if (!FileSystemUtils.recursiveMoveFiles(path, dest)) {
-                        MessageDialog.showError("Возникли ошибки при переносе файлов.");
+                if (!FileSystemUtils.repath(path, dest, isCutMode)) {
+                    if (!isCutMode) {
+                        MessageDialog.showError("Возникли ошибки при копировании \"" + path.toString() + "\".");
+                    } else {
+                        MessageDialog.showError("Возникли ошибки при переносе \"" + path.toString() + "\".");
                     }
                 }              
             }
+        
+            // проверяем валидность материалов
+            Material.checkAll();
                    
-            isCutMode = false;
-            copyPaths.clear();
-            copyPaths = null;   
+            // несколько раз вырезать нельзя
+            if (isCutMode) {
+                isCutMode = false;
+                copyPaths.clear();
+                copyPaths = null; 
+            }
             
             fillTreeFolders(true);
             fillListProjectView();            
@@ -1178,7 +1174,7 @@ public class FormMain extends javax.swing.JFrame {
                     }   
                 // YES
                 } else {
-                    FileSystemUtils.recursiveRemoveFiles(newPath);
+                    FileSystemUtils.remove(newPath);
                 }
             }
             
@@ -1237,7 +1233,7 @@ public class FormMain extends javax.swing.JFrame {
                     }
                 // YES
                 } else {
-                    FileSystemUtils.recursiveRemoveFiles(matPath);
+                    FileSystemUtils.remove(matPath);
                 }
             }
             
