@@ -302,7 +302,7 @@ public class Material extends Resource {
         super(path);
     }
     public Material(File path) {
-        super(path.toPath());
+        super(path);
     }
         
     /**

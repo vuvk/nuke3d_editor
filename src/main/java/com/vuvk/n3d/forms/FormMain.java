@@ -1134,10 +1134,10 @@ public class FormMain extends javax.swing.JFrame {
         if (txrFile != null) {
             // копируем текстуру к себе в папку ресурсов
             String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-            File newPath = new File(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
             
             // файл с таким же именем существует?
-            if (newPath.exists()) {
+            if (Files.exists(newPath)) {
                 Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
                 // CANCEL
                 if (answer == null) {
@@ -1145,25 +1145,25 @@ public class FormMain extends javax.swing.JFrame {
                 // NO
                 } else if (!answer.booleanValue()) {
                     // решил переименовать
-                    while (newPath.exists()) {
+                    while (Files.exists(newPath)) {
                         String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
                         if (newName == null) {
                             return;    // отмена?
                         } else {
                             baseName = newName;
-                            newPath = new File(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
+                            newPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
                         }
                     }   
                 // YES
                 } else {
-                    FileSystemUtils.recursiveRemoveFiles(newPath.toPath());
+                    FileSystemUtils.recursiveRemoveFiles(newPath);
                 }
             }
             
             // создаем файл у себя
             try {
                 BufferedImage img = ImageUtils.prepareImage(ImageIO.read(txrFile));
-                ImageIO.write(img, "png", newPath);
+                ImageIO.write(img, "png", newPath.toFile());
             } catch (Exception ex) {
                 Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
@@ -1193,10 +1193,10 @@ public class FormMain extends javax.swing.JFrame {
         if (name == null) {
             return;    // отмена?
         } else {
-            File matPath = new File(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
+            Path matPath = Paths.get(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
             
             // файл с таким же именем существует?
-            if (matPath.exists()) {
+            if (Files.exists(matPath)) {
                 Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + name + "\"\nуже существует! Перезаписать?");
                 // CANCEL
                 if (answer == null) {
@@ -1204,18 +1204,18 @@ public class FormMain extends javax.swing.JFrame {
                 // NO
                 } else if (!answer.booleanValue()) {
                     // решил переименовать
-                    while (matPath.exists()) {
+                    while (Files.exists(matPath)) {
                         String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + name + "\":", name);
                         if (newName == null) {
                             return;    // отмена?
                         } else {
                             name = newName;
-                            matPath = new File(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
+                            matPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
                         }
                     }
                 // YES
                 } else {
-                    FileSystemUtils.recursiveRemoveFiles(matPath.toPath());
+                    FileSystemUtils.recursiveRemoveFiles(matPath);
                 }
             }
             

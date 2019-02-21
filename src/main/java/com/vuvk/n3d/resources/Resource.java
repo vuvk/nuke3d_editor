@@ -45,15 +45,14 @@ public abstract class Resource {
     protected abstract void init(Path path);
     
     protected Resource() {
-        init((Path)null);
+        this((Path)null);
+    }
+    public Resource(File path) {
+        this(path.toPath());
     }
     public Resource(Path path) {
         init(path);
     }
-    /*public Resource(long id, Path path) {
-        setId(id);
-        setPath(path);
-    }*/
     
     /**
      * Присвоить id 

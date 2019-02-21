@@ -197,7 +197,7 @@ public final class Texture extends Resource {
         super(path);
     }
     public Texture(File path) {
-        super(path.toPath());
+        super(path);
     }
         
     /**
