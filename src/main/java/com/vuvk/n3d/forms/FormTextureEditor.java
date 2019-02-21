@@ -163,6 +163,8 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
                                 tglDeleteColor.setSelected(false);
                                 selectedTexture.save();
                                 FormMain.formMain.updateListProjectView(selectedTexture.getPath());
+                                
+                                FormMain.reloadChildWindows();
                             } else {
                                 image = selectedTexture.getImage();
                                 redraw();                                    

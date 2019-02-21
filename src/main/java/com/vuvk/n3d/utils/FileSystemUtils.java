@@ -410,7 +410,7 @@ public final class FileSystemUtils {
         texturesForRepath.clear();
         materialsForRepath.clear();
         pathsForMove.clear();
-                
+
         return true;
     }
                 
