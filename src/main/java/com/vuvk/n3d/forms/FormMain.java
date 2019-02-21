@@ -967,6 +967,9 @@ public class FormMain extends javax.swing.JFrame {
 
     private void popupPVMIRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRenameActionPerformed
         if (listProjectView.getSelectedIndex() != -1) {
+        
+            // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+            Material.saveAll();
             
             List list = listProjectView.getSelectedValuesList();
             
@@ -1094,12 +1097,15 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMICopyActionPerformed
 
     private void popuvPVMIPasteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popuvPVMIPasteActionPerformed
-        if (copyPaths != null && copyPaths.size() > 0) {              
+        if (copyPaths != null && copyPaths.size() > 0) {          
+        
+            // сохраняем имеющиеся ресурсы, чтобы перенести правильно их конфиги
+            Material.saveAll();    
             
             String currentPathString = FileSystemUtils.getProjectPath(currentPath);
             for (Path path : copyPaths) {                   
                 // вырезаем?
-                if (!isCutMode) {
+                /*if (!isCutMode) {
                     if (!FileSystemUtils.recursiveCopyFiles(path, currentPath)) {
                         MessageDialog.showError("Возникли ошибки при копировании файлов.");
                     } 
@@ -1111,8 +1117,22 @@ public class FormMain extends javax.swing.JFrame {
                     isCutMode = false;
                     copyPaths.clear();
                     copyPaths = null;                    
-                }
+                }*/
+                Path dest = Paths.get(currentPathString + path.getFileName());
+                if (!isCutMode) {
+                    if (!FileSystemUtils.recursiveCopyFiles(path, dest)) {
+                        MessageDialog.showError("Возникли ошибки при копировании файлов.");
+                    } 
+                } else {
+                    if (!FileSystemUtils.recursiveMoveFiles(path, dest)) {
+                        MessageDialog.showError("Возникли ошибки при переносе файлов.");
+                    }
+                }              
             }
+                   
+            isCutMode = false;
+            copyPaths.clear();
+            copyPaths = null;   
             
             fillTreeFolders(true);
             fillListProjectView();            
