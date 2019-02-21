@@ -181,13 +181,19 @@ public class Material extends Resource {
         
         // создаем материалы по данным из конфига
         for (JsonElement element : jsonData.getAsJsonArray()) {
+            JsonElement jsonId   = ((JsonObject)element).get("id");
             JsonElement jsonPath = ((JsonObject)element).get("path");
+            
+            if (jsonId == null || jsonPath == null) {
+                continue;
+            }
             
             // если материал существует
             Path path = Paths.get(jsonPath.getAsString());
             if (pathIsMaterial(path)) {
                 // добавляем в базу новый материал
-                new Material(path);
+                new Material(path)
+                    .setId(jsonId.getAsInt());
             }
         }
         
@@ -232,6 +238,7 @@ public class Material extends Resource {
         JsonArray array = new JsonArray(MATERIALS.size());
         for (Material mat : MATERIALS) {
             JsonObject object = new JsonObject();
+            object.addProperty("id", mat.getId());
             object.addProperty("path", mat.getPath());
             array.add(object);
         }
@@ -343,34 +350,12 @@ public class Material extends Resource {
             double editorVersion = Double.parseDouble(Const.MATERIAL_VERSION);
             if (editorVersion < configVersion) {
                 return false;
-            }
-            
-            // id
-            JsonElement jsonId = config.get("id");
-            if (jsonId != null) {
-                // считаем новый id из json
-                long newId = jsonId.getAsLong();
-                // если уже такой id есть и он не принадлежит данному объекту, 
-                // то назначить новый id
-                Material clone = Material.getById(newId);
-                if (clone != null && 
-                    !this.equals(clone)
-                   ) {
-                    for (Material mat : MATERIALS) {
-                        if (mat.getId() > newId) {
-                            newId = mat.getId();
-                        }
-                    }
-                    ++newId;
-                }
-                setId(newId);
-            }
+            }            
             // тип
             JsonElement jsonType = config.get("type");
             if (jsonType != null) {
                 setType(Type.valueOf(jsonType.getAsString()));
-            }            
-            
+            }
             // кадры
             JsonElement jsonFrames = config.get("frames");
             if (jsonFrames == null) {
@@ -421,7 +406,7 @@ public class Material extends Resource {
         JsonObject object = new JsonObject();
         object.addProperty("identificator", Const.MATERIAL_IDENTIFICATOR);
         object.addProperty("version", Const.MATERIAL_VERSION);
-        object.addProperty("id", getId());
+        //object.addProperty("id", getId());
         object.addProperty("type",  type.toString());
         object.add("frames", jsonFrames);
         
