@@ -639,8 +639,10 @@ public class FormMain extends javax.swing.JFrame {
         popupPV = new javax.swing.JPopupMenu();
         popupPVMenuAdd = new javax.swing.JMenu();
         popupPVMIFolder = new javax.swing.JMenuItem();
+        popupPVResource = new javax.swing.JMenu();
         popupPVMITexture = new javax.swing.JMenuItem();
         popupPVMIMaterial = new javax.swing.JMenuItem();
+        popupPVMISound = new javax.swing.JMenuItem();
         popupPVMICopy = new javax.swing.JMenuItem();
         popupPVMICut = new javax.swing.JMenuItem();
         popuvPVMIPaste = new javax.swing.JMenuItem();
@@ -672,6 +674,8 @@ public class FormMain extends javax.swing.JFrame {
         });
         popupPVMenuAdd.add(popupPVMIFolder);
 
+        popupPVResource.setText("Ресурс");
+
         popupPVMITexture.setText("Текстура");
         popupPVMITexture.setToolTipText("");
         popupPVMITexture.addActionListener(new java.awt.event.ActionListener() {
@@ -679,7 +683,7 @@ public class FormMain extends javax.swing.JFrame {
                 popupPVMITextureActionPerformed(evt);
             }
         });
-        popupPVMenuAdd.add(popupPVMITexture);
+        popupPVResource.add(popupPVMITexture);
 
         popupPVMIMaterial.setText("Материал");
         popupPVMIMaterial.addActionListener(new java.awt.event.ActionListener() {
@@ -687,7 +691,17 @@ public class FormMain extends javax.swing.JFrame {
                 popupPVMIMaterialActionPerformed(evt);
             }
         });
-        popupPVMenuAdd.add(popupPVMIMaterial);
+        popupPVResource.add(popupPVMIMaterial);
+
+        popupPVMISound.setText("Звук/Музыка");
+        popupPVMISound.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMISoundActionPerformed(evt);
+            }
+        });
+        popupPVResource.add(popupPVMISound);
+
+        popupPVMenuAdd.add(popupPVResource);
 
         popupPV.add(popupPVMenuAdd);
 
@@ -1256,6 +1270,11 @@ public class FormMain extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
+    private void popupPVMISoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISoundActionPerformed
+        DialogOpenSound dlg = new DialogOpenSound(this, true);
+        dlg.setVisible(true);
+    }//GEN-LAST:event_popupPVMISoundActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1368,8 +1387,10 @@ public class FormMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem popupPVMIMaterial;
     private javax.swing.JMenuItem popupPVMIRemove;
     private javax.swing.JMenuItem popupPVMIRename;
+    private javax.swing.JMenuItem popupPVMISound;
     private javax.swing.JMenuItem popupPVMITexture;
     private javax.swing.JMenu popupPVMenuAdd;
+    private javax.swing.JMenu popupPVResource;
     private javax.swing.JMenuItem popuvPVMIPaste;
     private javax.swing.JSplitPane splProjectManager;
     private javax.swing.JTree treeFolders;
