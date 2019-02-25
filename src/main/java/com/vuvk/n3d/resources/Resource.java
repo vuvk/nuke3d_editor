@@ -163,7 +163,7 @@ public abstract class Resource {
      * Получить хранилище всех ресурсов данного типа
      * @return Список ресурсов
      */
-    protected abstract List<Resource> getContainer();
+    protected abstract List getContainer();
     
     /**
      * Загрузить из файла

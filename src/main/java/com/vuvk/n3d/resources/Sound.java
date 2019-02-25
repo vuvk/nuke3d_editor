@@ -31,11 +31,23 @@ public class Sound extends Resource {
     /** Список всех звуков (контейнер) */
     public static final ArrayList<Sound> SOUNDS = new ArrayList<>();
 
+    public static boolean loadAll() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static boolean saveConfig() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public static boolean closeAll() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     /** Initialization */
-    @Override
+    /*@Override
     protected void init(Path path) {
         super.init(path);
-    }
+    }*/
     
     public Sound(Path path) {
         super(path);

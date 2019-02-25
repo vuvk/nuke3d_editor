@@ -23,6 +23,7 @@ import com.vuvk.n3d.Global;
 import com.vuvk.n3d.components.PreviewElement;
 import com.vuvk.n3d.components.PreviewElement.Type;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
@@ -93,6 +94,8 @@ public class FormMain extends javax.swing.JFrame {
     public static FormTextureEditor formTextureEditor = null;
     /** ссылка на форму редактора материала */
     public static FormMaterialEditor formMaterialEditor = null;
+    /** ссылка на форму редактора звуков */
+    //public static FormSoundEditor formSoundEditor = null;
         
     /** проект открыт? */
     public static boolean isProjectOpened = false;
@@ -173,6 +176,7 @@ public class FormMain extends javax.swing.JFrame {
         closeChildWindows();
         Texture.loadAll();
         Material.loadAll();
+        //Sound.loadAll();
 
         MenuItemOpenProject.setEnabled (false);
         MenuItemSaveProject.setEnabled (true );
@@ -203,6 +207,10 @@ public class FormMain extends javax.swing.JFrame {
             MessageDialog.showError("Не удалось сохранить материалы проекта! Повторите попытку.");
         }
         
+        /*if (!Sound.saveConfig()) {
+            MessageDialog.showError("Не удалось сохранить звуки проекта! Повторите попытку.");
+        }*/
+        
         MessageDialog.showInformation("Процедура сохранения проекта завершена.");   
     }
     
@@ -227,6 +235,7 @@ public class FormMain extends javax.swing.JFrame {
         closeChildWindows();
         Texture.closeAll();
         Material.closeAll();
+        //Sound.closeAll();
 
         MenuItemOpenProject.setEnabled (true );
         MenuItemSaveProject.setEnabled (false);
@@ -331,6 +340,48 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Открыть форму редактирования звука
+     */
+    void openFormSoundEditor() {
+        /*List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.SOUND) {
+                
+                Sound snd = Sound.getByPath(element.getPath());
+                if (mat != null) {
+                    boolean firstRun = false;
+                    if (formSoundEditor == null) {
+                        formSoundEditor = new FormSoundEditor();
+                        Desktop.add(formSoundEditor);
+                        firstRun = true;
+                    }
+
+                    formSoundEditor.selectedSound = snd;
+                    // свернуто?
+                    if (formSoundEditor.isIcon()) {
+                        try {
+                            formSoundEditor.setIcon(false);
+                        } catch (PropertyVetoException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    // невидимое?
+                    } else {
+                        formSoundEditor.setVisible(true); 
+                        formSoundEditor.prepareForm(firstRun);
+                    }
+                    Desktop.moveToFront(formSoundEditor);
+                } else {
+                    // если не нашёл, а файл есть, значит проект битый 
+                    // или файл был "подброшен"
+                    MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                            "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+                }
+            }
+        }*/        
+    }
+    
+    /**
      * Закрыть окно редактирования текстур
      */
     public static void closeFormTextureEditor() {
@@ -351,6 +402,16 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Закрыть окно редактирования звуков
+     */
+    public static void closeFormSoundEditor() {  
+        /*if (formSoundEditor != null) {
+            formSoundEditor.dispose();
+            formSoundEditor = null;
+        }*/
+    }
+    
+    /**
      * Перезагрузить открытые окна
      */
     public static void reloadChildWindows() {
@@ -360,6 +421,9 @@ public class FormMain extends javax.swing.JFrame {
         if (formMaterialEditor != null) {
             formMaterialEditor.prepareForm(false);
         }
+        /*if (formSoundEditor != null) {
+            formSoundEditor.prepareForm(false);
+        }*/
     }
     /** 
      * Закрыть все вызванные ранее дочерние окна
@@ -367,6 +431,7 @@ public class FormMain extends javax.swing.JFrame {
     public static void closeChildWindows() {
         closeFormTextureEditor();
         closeFormMaterialEditor();
+        closeFormSoundEditor();
     }
         
     /**
@@ -950,6 +1015,10 @@ public class FormMain extends javax.swing.JFrame {
                         openFormMaterialEditor();
                         break;
                         
+                    case SOUND:                        
+                        openFormSoundEditor();
+                        break;
+                        
                     default:
                         break;
                 }
@@ -1166,7 +1235,8 @@ public class FormMain extends javax.swing.JFrame {
         if (txrFile != null) {
             // копируем текстуру к себе в папку ресурсов
             String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+            String extension = "." + Const.TEXTURE_FORMAT_EXT;
+            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
             
             // файл с таким же именем существует?
             if (Files.exists(newPath)) {
@@ -1183,7 +1253,7 @@ public class FormMain extends javax.swing.JFrame {
                             return;    // отмена?
                         } else {
                             baseName = newName;
-                            newPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
+                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
                         }
                     }   
                 // YES
@@ -1272,7 +1342,64 @@ public class FormMain extends javax.swing.JFrame {
 
     private void popupPVMISoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISoundActionPerformed
         DialogOpenSound dlg = new DialogOpenSound(this, true);
-        dlg.setVisible(true);
+        dlg.setVisible(true);        
+        
+        File sndFile = DialogOpenSound.selectedFile;
+        if (sndFile != null) {
+            // копируем к себе в папку ресурсов
+            String baseName = FilenameUtils.getBaseName(sndFile.getName());     
+            String extension = "." + FileSystemUtils.getFileExtension(sndFile);
+            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
+            
+            // файл с таким же именем существует?
+            if (Files.exists(newPath)) {
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return;
+                // NO
+                } else if (!answer.booleanValue()) {
+                    // решил переименовать
+                    while (Files.exists(newPath)) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
+                        if (newName == null) {
+                            return;    // отмена?
+                        } else {
+                            baseName = newName;
+                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+                        }
+                    }
+                // YES
+                } else {
+                    FileSystemUtils.remove(newPath);
+                }
+            }
+            
+            // создаем файл у себя
+            try {
+                FileUtils.copyFile(sndFile, newPath.toFile());
+            } catch (IOException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return;
+            }
+            
+            fillListProjectView();            
+            new Sound(newPath);
+            
+            // открываем окно редактирования
+            DefaultListModel model = (DefaultListModel) listProjectView.getModel();
+            for (Object obj : model.toArray()) {
+                PreviewElement element = (PreviewElement)obj;
+                if (element.getType() == PreviewElement.Type.SOUND && 
+                    element.getName().equals(baseName)
+                   ) {                    
+                    listProjectView.setSelectedValue(element, true);
+                    openFormSoundEditor();
+                    break;
+                }
+            }
+        }
     }//GEN-LAST:event_popupPVMISoundActionPerformed
 
     /**
