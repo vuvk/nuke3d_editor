@@ -25,6 +25,7 @@ import com.vuvk.n3d.forms.FormTextureEditor;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileVisitResult;
@@ -35,6 +36,8 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -519,8 +522,6 @@ public final class FileSystemUtils {
         // всё успешно удалено?
         return !Files.exists(path);
     }
-    
-    
     
     private FileSystemUtils(){}
 }

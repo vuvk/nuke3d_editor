@@ -29,7 +29,6 @@ import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -39,15 +38,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * Класс хранимой текстуры в редакторе
@@ -177,20 +171,10 @@ public final class Texture extends Resource {
     }
             
     /** Initialization */
-    protected void init(Path path) {   
-        // ищем максимальный id и инкрементируем его
-        long newId = 0;
-        for (Texture txr : TEXTURES) {
-            if (txr.getId() > newId) {
-                newId = txr.getId();
-            }
-        }
-        ++newId;
-        
-        setId(newId);
-        setPath(path);   
+    @Override
+    protected void init(Path path) {
+        super.init(path);
         load(path);
-        TEXTURES.add(this);
     }
     
     public Texture(Path path) {
@@ -240,8 +224,8 @@ public final class Texture extends Resource {
      * Деструктор
      */
     public void dispose() {
+        super.dispose();
         image = null;
-        TEXTURES.remove(this);
     }
         
     /**
@@ -300,6 +284,10 @@ public final class Texture extends Resource {
             }
         }
         return null;
+    }    
+    @Override
+    protected List getContainer() {
+        return TEXTURES;
     }
     /**
      * Проверка является ли указанный путь текстурой
