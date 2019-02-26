@@ -95,7 +95,7 @@ public class FormMain extends javax.swing.JFrame {
     /** ссылка на форму редактора материала */
     public static FormMaterialEditor formMaterialEditor = null;
     /** ссылка на форму редактора звуков */
-    //public static FormSoundEditor formSoundEditor = null;
+    public static FormSoundEditor formSoundEditor = null;
         
     /** проект открыт? */
     public static boolean isProjectOpened = false;
@@ -343,13 +343,13 @@ public class FormMain extends javax.swing.JFrame {
      * Открыть форму редактирования звука
      */
     void openFormSoundEditor() {
-        /*List list = listProjectView.getSelectedValuesList();
+        List list = listProjectView.getSelectedValuesList();
         if (list.size() > 0) {
             PreviewElement element = (PreviewElement)list.get(0);
             if (element.getType() == PreviewElement.Type.SOUND) {
                 
                 Sound snd = Sound.getByPath(element.getPath());
-                if (mat != null) {
+                if (snd != null) {
                     boolean firstRun = false;
                     if (formSoundEditor == null) {
                         formSoundEditor = new FormSoundEditor();
@@ -378,7 +378,7 @@ public class FormMain extends javax.swing.JFrame {
                                             "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
                 }
             }
-        }*/        
+        }       
     }
     
     /**
@@ -405,10 +405,10 @@ public class FormMain extends javax.swing.JFrame {
      * Закрыть окно редактирования звуков
      */
     public static void closeFormSoundEditor() {  
-        /*if (formSoundEditor != null) {
+        if (formSoundEditor != null) {
             formSoundEditor.dispose();
             formSoundEditor = null;
-        }*/
+        }
     }
     
     /**
@@ -421,9 +421,9 @@ public class FormMain extends javax.swing.JFrame {
         if (formMaterialEditor != null) {
             formMaterialEditor.prepareForm(false);
         }
-        /*if (formSoundEditor != null) {
+        if (formSoundEditor != null) {
             formSoundEditor.prepareForm(false);
-        }*/
+        }
     }
     /** 
      * Закрыть все вызванные ранее дочерние окна
