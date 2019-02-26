@@ -66,6 +66,40 @@ public class Sound extends Resource {
         return true;
     }
 
+    /**
+     * Получить ссылку на звук по пути до файла
+     * @param path Путь до файла
+     * @return Звук, если есть такой в базе, иначе null
+     */
+    public static Sound getByPath(String path) {
+        for (Sound snd : SOUNDS) {
+            if (snd.getPath().equals(path)) {
+                return snd;
+            }
+        }        
+        return null;
+    }
+    /**
+     * Получить ссылку на звук по пути до файла
+     * @param path Путь до файла
+     * @return Звук, если есть такой в базе, иначе null
+     */
+    public static Sound getByPath(Path path) {
+        return getByPath(path.toString());
+    }
+    /**
+     * Получить ссылку на звук по id
+     * @param id Идентификатор материала
+     * @return Звук, если есть такой в базе, иначе null
+     */
+    public static Sound getById(long id) {
+        for (Sound snd : SOUNDS) {
+            if (snd.getId() == id) {
+                return snd;
+            }
+        }
+        return null;
+    }
     @Override
     protected List getContainer() {
         return SOUNDS;
