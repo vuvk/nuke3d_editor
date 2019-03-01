@@ -21,7 +21,6 @@ import com.bulenkov.darcula.DarculaLaf;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.components.PreviewElement;
-import com.vuvk.n3d.components.PreviewElement.Type;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
@@ -29,10 +28,7 @@ import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Image;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -40,44 +36,30 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import static javax.swing.SwingConstants.BOTTOM;
-import static javax.swing.SwingConstants.CENTER;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -280,6 +262,7 @@ public class FormMain extends javax.swing.JFrame {
                             formTextureEditor.setIcon(false);
                         } catch (PropertyVetoException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
                         }
                     // невидимое?
                     } else {
@@ -322,6 +305,7 @@ public class FormMain extends javax.swing.JFrame {
                             formMaterialEditor.setIcon(false);
                         } catch (PropertyVetoException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
                         }
                     // невидимое?
                     } else {
@@ -364,6 +348,7 @@ public class FormMain extends javax.swing.JFrame {
                             formSoundEditor.setIcon(false);
                         } catch (PropertyVetoException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
                         }
                     // невидимое?
                     } else {
@@ -689,7 +674,7 @@ public class FormMain extends javax.swing.JFrame {
         clearTreeFolders();
         clearListProjectView();
         listProjectView.setEnabled(false);
-        treeFolders.setEnabled(false);
+        treeFolders.setEnabled(false);  
     }
 
     /** This method is called from within the constructor to
@@ -1490,7 +1475,7 @@ public class FormMain extends javax.swing.JFrame {
                 formMain = new FormMain();
                 formMain.setVisible(true);
             }
-        });        
+        }); 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
