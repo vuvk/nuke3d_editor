@@ -371,7 +371,12 @@ public class FormMain extends javax.swing.JFrame {
      */
     public static void closeFormTextureEditor() {
         if (formTextureEditor != null) {
-            formTextureEditor.dispose();
+            try {
+                formTextureEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
             formTextureEditor = null;
         }        
     }
@@ -381,7 +386,12 @@ public class FormMain extends javax.swing.JFrame {
      */
     public static void closeFormMaterialEditor() {  
         if (formMaterialEditor != null) {
-            formMaterialEditor.dispose();
+            try {
+                formMaterialEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
             formMaterialEditor = null;
         }
     }
@@ -391,7 +401,12 @@ public class FormMain extends javax.swing.JFrame {
      */
     public static void closeFormSoundEditor() {  
         if (formSoundEditor != null) {
-            formSoundEditor.dispose();
+            try {
+                formSoundEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
             formSoundEditor = null;
         }
     }
