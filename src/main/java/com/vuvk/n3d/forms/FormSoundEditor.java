@@ -29,7 +29,6 @@ import java.awt.Container;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.event.InternalFrameEvent;
 /*
 import javax.media.Manager;
 import javax.media.NoPlayerException;
@@ -154,10 +153,11 @@ public final class FormSoundEditor extends javax.swing.JInternalFrame {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.allowSoftwareMode = true;
         config.resizable = false;
-        config.vSyncEnabled = true;
+        config.vSyncEnabled = false;
+        config.useGL30 = false;
         
         gdxEngine = new LwjglAWTCanvas(new AudioPlayer(), config);
-        gdxEngine.getCanvas().setSize(container.getWidth(), 1);
+        gdxEngine.getCanvas().setSize(1, 1);
 
         container.add(gdxEngine.getCanvas(), BorderLayout.LINE_START);
 
