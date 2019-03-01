@@ -141,6 +141,7 @@ public final class FormSoundEditor extends javax.swing.JInternalFrame {
         
         // получить имя редактируемого файла
         txtName.setText(selectedSound.getName());
+        chkMusic.setSelected(selectedSound.isMusic());
                 
         if (firstRun) {
             setLocation((getParent().getWidth() >> 1) - (getWidth() >> 1), 0); 
@@ -204,7 +205,7 @@ public final class FormSoundEditor extends javax.swing.JInternalFrame {
 
         setClosable(true);
         setIconifiable(true);
-        setTitle("Звук/музыка");
+        setTitle("Редактор звуков");
         setToolTipText("");
         setMaximumSize(new java.awt.Dimension(544, 660));
         setMinimumSize(new java.awt.Dimension(544, 660));
@@ -261,6 +262,11 @@ public final class FormSoundEditor extends javax.swing.JInternalFrame {
         });
 
         chkMusic.setText("Фоновая музыка");
+        chkMusic.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                chkMusicStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -320,6 +326,10 @@ public final class FormSoundEditor extends javax.swing.JInternalFrame {
         gdxEngine.stop();        
         gdxEngine.exit();
     }//GEN-LAST:event_formInternalFrameClosing
+
+    private void chkMusicStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_chkMusicStateChanged
+        selectedSound.setMusic(chkMusic.isSelected());
+    }//GEN-LAST:event_chkMusicStateChanged
     
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

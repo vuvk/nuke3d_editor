@@ -158,7 +158,7 @@ public class FormMain extends javax.swing.JFrame {
         closeChildWindows();
         Texture.loadAll();
         Material.loadAll();
-        //Sound.loadAll();
+        Sound.loadAll();
 
         MenuItemOpenProject.setEnabled (false);
         MenuItemSaveProject.setEnabled (true );
@@ -189,9 +189,9 @@ public class FormMain extends javax.swing.JFrame {
             MessageDialog.showError("Не удалось сохранить материалы проекта! Повторите попытку.");
         }
         
-        /*if (!Sound.saveConfig()) {
+        if (!Sound.saveConfig()) {
             MessageDialog.showError("Не удалось сохранить звуки проекта! Повторите попытку.");
-        }*/
+        }
         
         MessageDialog.showInformation("Процедура сохранения проекта завершена.");   
     }
@@ -217,7 +217,7 @@ public class FormMain extends javax.swing.JFrame {
         closeChildWindows();
         Texture.closeAll();
         Material.closeAll();
-        //Sound.closeAll();
+        Sound.closeAll();
 
         MenuItemOpenProject.setEnabled (true );
         MenuItemSaveProject.setEnabled (false);
