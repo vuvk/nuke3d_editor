@@ -17,6 +17,7 @@
 */
 package com.vuvk.n3d.forms;
 
+import com.vuvk.n3d.components.ImageFileView;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -44,11 +45,12 @@ public class DialogOpenSound extends javax.swing.JDialog {
         FileNameExtensionFilter filterWav = new FileNameExtensionFilter("Waveform Audio File (WAV)", "wav");
         FileNameExtensionFilter filterOgg  = new FileNameExtensionFilter("Ogg Vorbis (OGG)", "ogg");
         FileNameExtensionFilter filterMP3  = new FileNameExtensionFilter("MPEG-1/2/2.5 Layer 3 (MP3)", "mp3");
-        FileChooser.removeChoosableFileFilter(FileChooser.getFileFilter());
+        FileChooser.setAcceptAllFileFilterUsed(false);
         FileChooser.setFileFilter(filterAll);
         FileChooser.addChoosableFileFilter(filterWav);
         FileChooser.addChoosableFileFilter(filterOgg);
-        FileChooser.addChoosableFileFilter(filterMP3);       
+        FileChooser.addChoosableFileFilter(filterMP3);  
+        FileChooser.setFileView(new ImageFileView());
                 
         setLocationRelativeTo(null);
     }
