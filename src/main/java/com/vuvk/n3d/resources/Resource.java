@@ -42,8 +42,8 @@ public abstract class Resource {
     /** Путь до ресурса */
     protected String path;
     
-    /** Initialization */
-    protected void init(Path path) { 
+    
+    protected Resource(Path path) {        
         List<Resource> container = getContainer();
         
         // ищем максимальный id и инкрементируем его
@@ -58,16 +58,6 @@ public abstract class Resource {
         setId(newId);
         setPath(path);   
         container.add(this);        
-    }
-    
-    protected Resource() {
-        this((Path)null);
-    }
-    protected Resource(File path) {
-        this(path.toPath());
-    }
-    protected Resource(Path path) {
-        init(path);
     }
     
     /**

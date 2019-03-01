@@ -170,18 +170,12 @@ public final class Texture extends Resource {
         return (TEXTURES.isEmpty());
     }
             
-    /** Initialization */
-    @Override
-    protected void init(Path path) {
-        super.init(path);
-        load(path);
+    public Texture(File path) {
+        this(path.toPath());
     }
-    
     public Texture(Path path) {
         super(path);
-    }
-    public Texture(File path) {
-        super(path);
+        load(path);
     }
         
     /**

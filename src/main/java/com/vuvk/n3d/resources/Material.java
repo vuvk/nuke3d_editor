@@ -281,10 +281,12 @@ public class Material extends Resource {
         }
     }
     
-    /** Initialization */
-    @Override
-    protected void init(Path path) {   
-        super.init(path);
+    
+    public Material(File path) {
+        this(path.toPath());
+    }
+    public Material(Path path) {
+        super(path);
         
         type = Type.Default; 
         frames = new ArrayList<>();        
@@ -294,13 +296,6 @@ public class Material extends Resource {
         } else {
             save(); 
         }
-    }
-    
-    public Material(Path path) {
-        super(path);
-    }
-    public Material(File path) {
-        super(path);
     }
         
     /**

@@ -43,16 +43,11 @@ public class Sound extends Resource {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    /** Initialization */
-    /*@Override
-    protected void init(Path path) {
-        super.init(path);
-    }*/
     
-    public Sound(Path path) {
-        super(path);
-    }
     public Sound(File path) {
+        this(path.toPath());
+    }
+    public Sound(Path path) {
         super(path);
     }
 
