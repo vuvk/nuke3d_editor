@@ -146,16 +146,22 @@ public class FormTextureSelector extends javax.swing.JDialog {
             }
         });
 
-        ButtonClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/cancel_small.png"))); // NOI18N
-        ButtonClose.setText("Отменить");
+        ButtonClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_close_white_24dp.png"))); // NOI18N
+        ButtonClose.setToolTipText("Закрыть");
+        ButtonClose.setMaximumSize(new java.awt.Dimension(64, 64));
+        ButtonClose.setMinimumSize(new java.awt.Dimension(64, 64));
+        ButtonClose.setPreferredSize(new java.awt.Dimension(64, 64));
         ButtonClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ButtonCloseActionPerformed(evt);
             }
         });
 
-        ButtonApply.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/apply.png"))); // NOI18N
-        ButtonApply.setText("Принять");
+        ButtonApply.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_check_white_24dp.png"))); // NOI18N
+        ButtonApply.setToolTipText("Выбрать");
+        ButtonApply.setMaximumSize(new java.awt.Dimension(64, 64));
+        ButtonApply.setMinimumSize(new java.awt.Dimension(64, 64));
+        ButtonApply.setPreferredSize(new java.awt.Dimension(64, 64));
         ButtonApply.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ButtonApplyActionPerformed(evt);
@@ -191,20 +197,20 @@ public class FormTextureSelector extends javax.swing.JDialog {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 822, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(ButtonApply, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(ButtonApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(ButtonClose)))
+                        .addComponent(ButtonClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ButtonApply)
-                    .addComponent(ButtonClose))
+                    .addComponent(ButtonApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ButtonClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 

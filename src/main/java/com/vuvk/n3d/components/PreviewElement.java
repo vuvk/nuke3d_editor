@@ -21,18 +21,15 @@ import com.vuvk.n3d.Const;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import org.apache.commons.io.FilenameUtils;
 
 
@@ -81,13 +78,23 @@ public class PreviewElement {
             }
         }
     }
+        
+    public PreviewElement(File path) {
+        this(path.toPath());        
+    }    
+    public PreviewElement(Path path) {
+        this(path, false);
+    }    
+    public PreviewElement(File path, boolean isUp) {
+        this(path.toPath(), isUp);        
+    }    
     
     /**
      * Инициализация элемента
      * @param path Путь, которому соответствует элемент
      * @param isUp Это кнопка "ВВЕРХ"?
      */
-    private void init(Path path, boolean isUp) {
+    public PreviewElement(Path path, boolean isUp) {        
         loadIcons();
         
         this.path = FileSystemUtils.getProjectPath(path);      
@@ -146,27 +153,6 @@ public class PreviewElement {
                 name = FilenameUtils.getBaseName(fileName);
                 break;
         }
-    }
-    
-    /**
-     * Инициализация элемента, которому соответствует реальный путь
-     * @param path Путь, которому соответствует элемент
-     */
-    private void init(Path path) {
-        init(path, false);
-    }
-    
-    public PreviewElement(File path) {
-        init(path.toPath());        
-    }    
-    public PreviewElement(Path path) {
-        init(path);
-    }    
-    public PreviewElement(File path, boolean isUp) {
-        init(path.toPath(), isUp);        
-    }    
-    public PreviewElement(Path path, boolean isUp) {
-        init(path, isUp);
     }
     
     /**

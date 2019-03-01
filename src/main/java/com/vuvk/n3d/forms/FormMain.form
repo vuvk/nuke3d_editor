@@ -21,23 +21,38 @@
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMIFolderActionPerformed"/>
               </Events>
             </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="popupPVMITexture">
+            <Menu class="javax.swing.JMenu" name="popupPVResource">
               <Properties>
-                <Property name="text" type="java.lang.String" value="&#x422;&#x435;&#x43a;&#x441;&#x442;&#x443;&#x440;&#x430;"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
+                <Property name="text" type="java.lang.String" value="&#x420;&#x435;&#x441;&#x443;&#x440;&#x441;"/>
               </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMITextureActionPerformed"/>
-              </Events>
-            </MenuItem>
-            <MenuItem class="javax.swing.JMenuItem" name="popupPVMIMaterial">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="&#x41c;&#x430;&#x442;&#x435;&#x440;&#x438;&#x430;&#x43b;"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMIMaterialActionPerformed"/>
-              </Events>
-            </MenuItem>
+              <SubComponents>
+                <MenuItem class="javax.swing.JMenuItem" name="popupPVMITexture">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="&#x422;&#x435;&#x43a;&#x441;&#x442;&#x443;&#x440;&#x430;"/>
+                    <Property name="toolTipText" type="java.lang.String" value=""/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMITextureActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="popupPVMIMaterial">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="&#x41c;&#x430;&#x442;&#x435;&#x440;&#x438;&#x430;&#x43b;"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMIMaterialActionPerformed"/>
+                  </Events>
+                </MenuItem>
+                <MenuItem class="javax.swing.JMenuItem" name="popupPVMISound">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="&#x417;&#x432;&#x443;&#x43a;/&#x41c;&#x443;&#x437;&#x44b;&#x43a;&#x430;"/>
+                  </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMISoundActionPerformed"/>
+                  </Events>
+                </MenuItem>
+              </SubComponents>
+            </Menu>
           </SubComponents>
         </Menu>
         <MenuItem class="javax.swing.JMenuItem" name="popupPVMICopy">

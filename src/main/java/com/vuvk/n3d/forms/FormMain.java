@@ -21,17 +21,14 @@ import com.bulenkov.darcula.DarculaLaf;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.components.PreviewElement;
-import com.vuvk.n3d.components.PreviewElement.Type;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Image;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -39,44 +36,30 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import static javax.swing.SwingConstants.BOTTOM;
-import static javax.swing.SwingConstants.CENTER;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.event.InternalFrameEvent;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -93,6 +76,8 @@ public class FormMain extends javax.swing.JFrame {
     public static FormTextureEditor formTextureEditor = null;
     /** ссылка на форму редактора материала */
     public static FormMaterialEditor formMaterialEditor = null;
+    /** ссылка на форму редактора звуков */
+    public static FormSoundEditor formSoundEditor = null;
         
     /** проект открыт? */
     public static boolean isProjectOpened = false;
@@ -173,6 +158,7 @@ public class FormMain extends javax.swing.JFrame {
         closeChildWindows();
         Texture.loadAll();
         Material.loadAll();
+        Sound.loadAll();
 
         MenuItemOpenProject.setEnabled (false);
         MenuItemSaveProject.setEnabled (true );
@@ -203,6 +189,10 @@ public class FormMain extends javax.swing.JFrame {
             MessageDialog.showError("Не удалось сохранить материалы проекта! Повторите попытку.");
         }
         
+        if (!Sound.saveConfig()) {
+            MessageDialog.showError("Не удалось сохранить звуки проекта! Повторите попытку.");
+        }
+        
         MessageDialog.showInformation("Процедура сохранения проекта завершена.");   
     }
     
@@ -227,6 +217,7 @@ public class FormMain extends javax.swing.JFrame {
         closeChildWindows();
         Texture.closeAll();
         Material.closeAll();
+        Sound.closeAll();
 
         MenuItemOpenProject.setEnabled (true );
         MenuItemSaveProject.setEnabled (false);
@@ -271,6 +262,7 @@ public class FormMain extends javax.swing.JFrame {
                             formTextureEditor.setIcon(false);
                         } catch (PropertyVetoException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
                         }
                     // невидимое?
                     } else {
@@ -313,6 +305,7 @@ public class FormMain extends javax.swing.JFrame {
                             formMaterialEditor.setIcon(false);
                         } catch (PropertyVetoException ex) {
                             Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
                         }
                     // невидимое?
                     } else {
@@ -331,11 +324,59 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Открыть форму редактирования звука
+     */
+    void openFormSoundEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.SOUND) {
+                
+                Sound snd = Sound.getByPath(element.getPath());
+                if (snd != null) {
+                    boolean firstRun = false;
+                    if (formSoundEditor == null) {
+                        formSoundEditor = new FormSoundEditor();
+                        Desktop.add(formSoundEditor);
+                        firstRun = true;
+                    }
+
+                    formSoundEditor.selectedSound = snd;
+                    // свернуто?
+                    if (formSoundEditor.isIcon()) {
+                        try {
+                            formSoundEditor.setIcon(false);
+                        } catch (PropertyVetoException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
+                        }
+                    // невидимое?
+                    } else {
+                        formSoundEditor.setVisible(true); 
+                        formSoundEditor.prepareForm(firstRun);
+                    }
+                    Desktop.moveToFront(formSoundEditor);
+                } else {
+                    // если не нашёл, а файл есть, значит проект битый 
+                    // или файл был "подброшен"
+                    MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                            "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+                }
+            }
+        }       
+    }
+    
+    /**
      * Закрыть окно редактирования текстур
      */
     public static void closeFormTextureEditor() {
         if (formTextureEditor != null) {
-            formTextureEditor.dispose();
+            try {
+                formTextureEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
             formTextureEditor = null;
         }        
     }
@@ -345,8 +386,28 @@ public class FormMain extends javax.swing.JFrame {
      */
     public static void closeFormMaterialEditor() {  
         if (formMaterialEditor != null) {
-            formMaterialEditor.dispose();
+            try {
+                formMaterialEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
             formMaterialEditor = null;
+        }
+    }
+    
+    /**
+     * Закрыть окно редактирования звуков
+     */
+    public static void closeFormSoundEditor() {  
+        if (formSoundEditor != null) {
+            try {
+                formSoundEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
+            formSoundEditor = null;
         }
     }
     
@@ -360,6 +421,9 @@ public class FormMain extends javax.swing.JFrame {
         if (formMaterialEditor != null) {
             formMaterialEditor.prepareForm(false);
         }
+        if (formSoundEditor != null) {
+            formSoundEditor.prepareForm(false);
+        }
     }
     /** 
      * Закрыть все вызванные ранее дочерние окна
@@ -367,6 +431,7 @@ public class FormMain extends javax.swing.JFrame {
     public static void closeChildWindows() {
         closeFormTextureEditor();
         closeFormMaterialEditor();
+        closeFormSoundEditor();
     }
         
     /**
@@ -624,7 +689,7 @@ public class FormMain extends javax.swing.JFrame {
         clearTreeFolders();
         clearListProjectView();
         listProjectView.setEnabled(false);
-        treeFolders.setEnabled(false);
+        treeFolders.setEnabled(false);  
     }
 
     /** This method is called from within the constructor to
@@ -639,8 +704,10 @@ public class FormMain extends javax.swing.JFrame {
         popupPV = new javax.swing.JPopupMenu();
         popupPVMenuAdd = new javax.swing.JMenu();
         popupPVMIFolder = new javax.swing.JMenuItem();
+        popupPVResource = new javax.swing.JMenu();
         popupPVMITexture = new javax.swing.JMenuItem();
         popupPVMIMaterial = new javax.swing.JMenuItem();
+        popupPVMISound = new javax.swing.JMenuItem();
         popupPVMICopy = new javax.swing.JMenuItem();
         popupPVMICut = new javax.swing.JMenuItem();
         popuvPVMIPaste = new javax.swing.JMenuItem();
@@ -672,6 +739,8 @@ public class FormMain extends javax.swing.JFrame {
         });
         popupPVMenuAdd.add(popupPVMIFolder);
 
+        popupPVResource.setText("Ресурс");
+
         popupPVMITexture.setText("Текстура");
         popupPVMITexture.setToolTipText("");
         popupPVMITexture.addActionListener(new java.awt.event.ActionListener() {
@@ -679,7 +748,7 @@ public class FormMain extends javax.swing.JFrame {
                 popupPVMITextureActionPerformed(evt);
             }
         });
-        popupPVMenuAdd.add(popupPVMITexture);
+        popupPVResource.add(popupPVMITexture);
 
         popupPVMIMaterial.setText("Материал");
         popupPVMIMaterial.addActionListener(new java.awt.event.ActionListener() {
@@ -687,7 +756,17 @@ public class FormMain extends javax.swing.JFrame {
                 popupPVMIMaterialActionPerformed(evt);
             }
         });
-        popupPVMenuAdd.add(popupPVMIMaterial);
+        popupPVResource.add(popupPVMIMaterial);
+
+        popupPVMISound.setText("Звук/Музыка");
+        popupPVMISound.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMISoundActionPerformed(evt);
+            }
+        });
+        popupPVResource.add(popupPVMISound);
+
+        popupPVMenuAdd.add(popupPVResource);
 
         popupPV.add(popupPVMenuAdd);
 
@@ -936,6 +1015,10 @@ public class FormMain extends javax.swing.JFrame {
                         openFormMaterialEditor();
                         break;
                         
+                    case SOUND:                        
+                        openFormSoundEditor();
+                        break;
+                        
                     default:
                         break;
                 }
@@ -1152,7 +1235,8 @@ public class FormMain extends javax.swing.JFrame {
         if (txrFile != null) {
             // копируем текстуру к себе в папку ресурсов
             String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + "." + Const.TEXTURE_FORMAT_EXT);
+            String extension = "." + Const.TEXTURE_FORMAT_EXT;
+            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
             
             // файл с таким же именем существует?
             if (Files.exists(newPath)) {
@@ -1169,7 +1253,7 @@ public class FormMain extends javax.swing.JFrame {
                             return;    // отмена?
                         } else {
                             baseName = newName;
-                            newPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.TEXTURE_FORMAT_EXT);
+                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
                         }
                     }   
                 // YES
@@ -1255,6 +1339,68 @@ public class FormMain extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_popupPVMIMaterialActionPerformed
+
+    private void popupPVMISoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISoundActionPerformed
+        DialogOpenSound dlg = new DialogOpenSound(this, true);
+        dlg.setVisible(true);        
+        
+        File sndFile = DialogOpenSound.selectedFile;
+        if (sndFile != null) {
+            // копируем к себе в папку ресурсов
+            String baseName = FilenameUtils.getBaseName(sndFile.getName());     
+            String extension = "." + FileSystemUtils.getFileExtension(sndFile);
+            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
+            
+            // файл с таким же именем существует?
+            if (Files.exists(newPath)) {
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return;
+                // NO
+                } else if (!answer.booleanValue()) {
+                    // решил переименовать
+                    while (Files.exists(newPath)) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
+                        if (newName == null) {
+                            return;    // отмена?
+                        } else {
+                            baseName = newName;
+                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+                        }
+                    }
+                // YES
+                } else {
+                    FileSystemUtils.remove(newPath);
+                }
+            }
+            
+            // создаем файл у себя
+            try {
+                FileUtils.copyFile(sndFile, newPath.toFile());
+            } catch (IOException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return;
+            }
+            
+            fillListProjectView();            
+            new Sound(newPath);
+            
+            // открываем окно редактирования
+            DefaultListModel model = (DefaultListModel) listProjectView.getModel();
+            for (Object obj : model.toArray()) {
+                PreviewElement element = (PreviewElement)obj;
+                if (element.getType() == PreviewElement.Type.SOUND && 
+                    element.getName().equals(baseName)
+                   ) {                    
+                    listProjectView.setSelectedValue(element, true);
+                    openFormSoundEditor();
+                    break;
+                }
+            }
+        }
+    }//GEN-LAST:event_popupPVMISoundActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1344,7 +1490,7 @@ public class FormMain extends javax.swing.JFrame {
                 formMain = new FormMain();
                 formMain.setVisible(true);
             }
-        });        
+        }); 
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1368,8 +1514,10 @@ public class FormMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem popupPVMIMaterial;
     private javax.swing.JMenuItem popupPVMIRemove;
     private javax.swing.JMenuItem popupPVMIRename;
+    private javax.swing.JMenuItem popupPVMISound;
     private javax.swing.JMenuItem popupPVMITexture;
     private javax.swing.JMenu popupPVMenuAdd;
+    private javax.swing.JMenu popupPVResource;
     private javax.swing.JMenuItem popuvPVMIPaste;
     private javax.swing.JSplitPane splProjectManager;
     private javax.swing.JTree treeFolders;

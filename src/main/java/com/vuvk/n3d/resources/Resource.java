@@ -24,6 +24,7 @@ import com.vuvk.n3d.utils.MessageDialog;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
@@ -41,17 +42,22 @@ public abstract class Resource {
     /** Путь до ресурса */
     protected String path;
     
-    /** Initialization */
-    protected abstract void init(Path path);
     
-    protected Resource() {
-        this((Path)null);
-    }
-    public Resource(File path) {
-        this(path.toPath());
-    }
-    public Resource(Path path) {
-        init(path);
+    protected Resource(Path path) {        
+        List<Resource> container = getContainer();
+        
+        // ищем максимальный id и инкрементируем его
+        long newId = 0;
+        for (Resource res : container) {
+            if (res.getId() > newId) {
+                newId = res.getId();
+            }
+        }
+        ++newId;
+        
+        setId(newId);
+        setPath(path);   
+        container.add(this);        
     }
     
     /**
@@ -144,6 +150,12 @@ public abstract class Resource {
     }
     
     /**
+     * Получить хранилище всех ресурсов данного типа
+     * @return Список ресурсов
+     */
+    protected abstract List getContainer();
+    
+    /**
      * Загрузить из файла
      * @param path Путь до файла
      * @return true в случае успеха
@@ -192,18 +204,20 @@ public abstract class Resource {
     /**
      * Деструктор
      */
-    public abstract void dispose();
+    public void dispose() {
+        getContainer().remove(this);
+    }
     
     /**
      * Деструктор для GC
      */
-    public void finalize() {        
+    public void finalize() { 
+        dispose();         
         try {
             super.finalize();
         } catch (Throwable ex) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
-        }
-        dispose();        
+        }      
     }
 }

@@ -21,9 +21,7 @@ package com.vuvk.n3d.utils;
  *
  * @author Anton "Vuvk" Shcherbatykh
  */
-public final class MathUtils {    
-    private MathUtils(){}
-    
+public final class MathUtils {        
     /** 
      * проверка является ли число степенью двойки
      * @param number число для проверки
@@ -51,4 +49,7 @@ public final class MathUtils {
         
         return 1 << res;
     }
+    
+    
+    private MathUtils(){}
 }

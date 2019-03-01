@@ -14,6 +14,8 @@ Nuke3D uses a number of open source projects to work properly:
 
 * [gson] - A Java serialization/deserialization library to convert Java Objects into JSON and back 
 * [Apache Commons IO] - The Apache Commons IO library contains utility classes, stream implementations, file filters, file comparators, endian transformation classes, and much more.
+* [Apache Commons Lang] - Apache Commons Lang, a package of Java utility classes for the classes that are in java.lang's hierarchy, or are considered to be so standard as to justify existence in java.lang.
+* [libGDX] - libGDX is a cross-platform Java game development framework based on OpenGL (ES) that works on Windows, Linux, Mac OS X, Android, your WebGL enabled browser and iOS.
 * [Darcula] - Darcula Look and Feel 
 * [Material design icons] - Material design icons is the official icon set from Google. 
 * ...
@@ -42,5 +44,7 @@ GNU GPL v3
 
    [gson]: <https://github.com/google/gson>
    [Apache Commons IO]: <https://github.com/apache/commons-io>
+   [Apache Commons Lang]: <https://github.com/apache/commons-lang>
+   [libGDX]: <https://github.com/libgdx/libgdx>
    [Darcula]: <https://github.com/bulenkov/Darcula>
    [Material Design icons]: <https://github.com/google/material-design-icons>

@@ -68,6 +68,18 @@ public final class Const {
     public static final String MATERIAL_CONFIG_VERSION = MATERIAL_CONFIG_MAJOR + "." + MATERIAL_CONFIG_MINOR;
     
     
+    /** доступные расширения звуков для загрузки */
+    public static final List<String> SOUND_EXTS = Arrays.asList("wav", "ogg", "mp3");
+    /** Путь до сохранённых параметров звуков */
+    public static final String SOUND_CONFIG_STRING = CONFIG_STRING + "sounds.sav";
+    /** идентификатор конфига звуков */
+    public static final String SOUND_CONFIG_IDENTIFICATOR = "N3D_SOUNDS";
+    /** версия конфига звуков */
+    static final int SOUND_CONFIG_MAJOR = 0;
+    static final int SOUND_CONFIG_MINOR = 1;
+    public static final String SOUND_CONFIG_VERSION = SOUND_CONFIG_MAJOR + "." + SOUND_CONFIG_MINOR;
+    
+    
     /** Размер иконок превью */
     public static final int ICON_PREVIEW_WIDTH  = 64;
     public static final int ICON_PREVIEW_HEIGHT = 64;

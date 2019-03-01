@@ -25,6 +25,9 @@ import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.MouseInputListener;
 
 /**
@@ -406,7 +409,12 @@ public final class FormTextureEditor extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        dispose();
+        try {
+            setClosed(true);
+        } catch (PropertyVetoException ex) {
+            Logger.getLogger(FormMaterialEditor.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+        }
     }//GEN-LAST:event_btnCloseActionPerformed
         
     private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed

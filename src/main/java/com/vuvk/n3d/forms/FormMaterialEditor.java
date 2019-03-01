@@ -25,6 +25,9 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyVetoException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -260,7 +263,12 @@ public final class FormMaterialEditor extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_cmbMaterialTypeActionPerformed
 
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        dispose();
+        try {
+            setClosed(true);
+        } catch (PropertyVetoException ex) {
+            Logger.getLogger(FormMaterialEditor.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+        }
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void tglStretchedStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglStretchedStateChanged

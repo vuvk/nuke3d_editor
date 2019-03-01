@@ -18,13 +18,13 @@
 package com.vuvk.n3d.forms;
 
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.components.ImageFileView;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -57,12 +57,13 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         FileNameExtensionFilter filterPng  = new FileNameExtensionFilter("PNG image", "png");
         FileNameExtensionFilter filterBmp  = new FileNameExtensionFilter("BMP image", "bmp");
         FileNameExtensionFilter filterGif  = new FileNameExtensionFilter("GIF image", "gif");
-        FileChooser.removeChoosableFileFilter(FileChooser.getFileFilter());
+        FileChooser.setAcceptAllFileFilterUsed(false);
         FileChooser.setFileFilter(filterAll);
         FileChooser.addChoosableFileFilter(filterJpeg);
         FileChooser.addChoosableFileFilter(filterPng);
         FileChooser.addChoosableFileFilter(filterBmp);
         FileChooser.addChoosableFileFilter(filterGif);
+        FileChooser.setFileView(new ImageFileView());
         
         panelImagePreview = new PanelImagePreview(this);
         panelImagePreview.setSize(512, 512);

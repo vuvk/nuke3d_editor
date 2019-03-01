@@ -21,10 +21,13 @@ import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.forms.FormMain;
 import com.vuvk.n3d.forms.FormMaterialEditor;
+import com.vuvk.n3d.forms.FormSoundEditor;
 import com.vuvk.n3d.forms.FormTextureEditor;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.FileVisitResult;
@@ -35,6 +38,8 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -110,6 +115,7 @@ public final class FileSystemUtils {
         // списки путей для добавления
         final List<Path> texturesForAdd  = new LinkedList<>();
         final List<Path> materialsForAdd = new LinkedList<>();
+        final List<Path> soundsForAdd    = new LinkedList<>();
         
         /**
          * класс для обработки обнаруженных файлов и папок    
@@ -119,16 +125,25 @@ public final class FileSystemUtils {
              * Обработать путь - добавить его в список добавления пути, если это известный ресурс
              * @param path Путь для проверки
              */
-            public void process(Path path) {
-                // по расширению файла определяем что это
-                switch (getFileExtension(path)) {
-                    case Const.TEXTURE_FORMAT_EXT :
-                        texturesForAdd.add(path);
-                        break;
+            public void process(Path path) {               
+                String ext = getFileExtension(path);
+                List list = null;
 
-                    case Const.MATERIAL_FORMAT_EXT :
-                        materialsForAdd.add(path);
+                // по расширению файла определяем что это
+                switch (ext) {
+                    case Const.TEXTURE_FORMAT_EXT  : list = texturesForAdd;  break;
+                    case Const.MATERIAL_FORMAT_EXT : list = materialsForAdd; break;
+
+                    default:
+                        // звук?
+                        if (Const.SOUND_EXTS.contains(ext)) {
+                            list = soundsForAdd;
+                        }
                         break;
+                }
+
+                if (list != null) {
+                    list.add(path);
                 }
             }
         }
@@ -167,9 +182,15 @@ public final class FileSystemUtils {
                 new Material(forAdd);
             }
         }
+        for (Path forAdd : soundsForAdd) {
+            if ((Sound.getByPath(forAdd)) == null) {
+                new Sound(forAdd);
+            }
+        }
         
         texturesForAdd.clear();
         materialsForAdd.clear();
+        soundsForAdd.clear();
     }
     
     /**
@@ -210,6 +231,7 @@ public final class FileSystemUtils {
         // списки путей для изменения (пара "старый путь" - "новый путь")
         final List<Pair<String, String>> texturesForRepath  = new LinkedList<>();
         final List<Pair<String, String>> materialsForRepath = new LinkedList<>(); 
+        final List<Pair<String, String>> soundsForRepath    = new LinkedList<>(); 
         
         // список переносимых путей (откуда - куда)
         final List<Pair<Path, Path>> pathsForMove = new LinkedList();        
@@ -291,15 +313,24 @@ public final class FileSystemUtils {
                     
                     // в режиме переноса нужно обновить ссылки
                     if (isCutMode) {
+                        String ext = getFileExtension(path);
+                        List list = null;
+                        
                         // по расширению файла определяем что это
-                        switch (getFileExtension(path)) {
-                            case Const.TEXTURE_FORMAT_EXT :                                
-                                texturesForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
+                        switch (ext) {
+                            case Const.TEXTURE_FORMAT_EXT  : list = texturesForRepath;  break;
+                            case Const.MATERIAL_FORMAT_EXT : list = materialsForRepath; break;
+                                
+                            default:
+                                // звук?
+                                if (Const.SOUND_EXTS.contains(ext)) {
+                                    list = soundsForRepath;
+                                }
                                 break;
-
-                            case Const.MATERIAL_FORMAT_EXT :
-                                materialsForRepath.add(new ImmutablePair<String, String>(oldPathString, newPathString));
-                                break;
+                        }
+                        
+                        if (list != null) {
+                            list.add(new ImmutablePair<String, String>(oldPathString, newPathString));
                         }
                     }
                 }
@@ -392,6 +423,12 @@ public final class FileSystemUtils {
                     mat.setPath(paths.getRight());
                 }
             } 
+            for (Pair<String, String> paths : soundsForRepath) {
+                Sound snd = Sound.getByPath(paths.getLeft());
+                if (snd != null) {
+                    snd.setPath(paths.getRight());
+                }
+            } 
             
             // если исходный путь был папкой и нет пропущенных файлов, то смело удалить её
             if (Files.exists(src)      && 
@@ -409,6 +446,7 @@ public final class FileSystemUtils {
         
         texturesForRepath.clear();
         materialsForRepath.clear();
+        soundsForRepath.clear();
         pathsForMove.clear();
 
         return true;
@@ -421,8 +459,9 @@ public final class FileSystemUtils {
      */
     public static boolean remove(Path path) {   
         // списки путей для изменения
-        final List<String> texturesForDelete = new LinkedList<>();
+        final List<String> texturesForDelete  = new LinkedList<>();
         final List<String> materialsForDelete = new LinkedList<>();
+        final List<String> soundsForDelete    = new LinkedList<>();
         
         /**
          * класс для обработки обнаруженных файлов и папок    
@@ -432,16 +471,25 @@ public final class FileSystemUtils {
              * Обработать путь - добавить его в список удаления пути, если это известный ресурс
              * @param path Путь для проверки
              */
-            public void process(Path path) {
-                // по расширению файла определяем что это
-                switch (getFileExtension(path)) {
-                    case Const.TEXTURE_FORMAT_EXT :
-                        texturesForDelete.add(getProjectPath(path));
-                        break;
+            public void process(Path path) {                
+                String ext = getFileExtension(path);
+                List list = null;
 
-                    case Const.MATERIAL_FORMAT_EXT :
-                        materialsForDelete.add(getProjectPath(path));
+                // по расширению файла определяем что это
+                switch (ext) {
+                    case Const.TEXTURE_FORMAT_EXT  : list = texturesForDelete;  break;
+                    case Const.MATERIAL_FORMAT_EXT : list = materialsForDelete; break;
+
+                    default:
+                        // звук?
+                        if (Const.SOUND_EXTS.contains(ext)) {
+                            list = soundsForDelete;
+                        }
                         break;
+                }
+
+                if (list != null) {
+                    list.add(getProjectPath(path));
                 }
                 
                 try {
@@ -512,15 +560,29 @@ public final class FileSystemUtils {
                 Material.MATERIALS.remove(mat);
             }
         }
+        // звуки
+        for (String filePath : soundsForDelete) {
+            Sound snd = Sound.getByPath(filePath);
+            if (snd != null) {
+                // закрыть окно с открытой удаляемым материалом
+                if (FormMain.formSoundEditor != null && 
+                    FormSoundEditor.selectedSound != null &&
+                    FormSoundEditor.selectedSound.equals(snd)
+                   ) {
+                    FormMain.closeFormSoundEditor();
+                }
+                
+                Sound.SOUNDS.remove(snd);
+            }
+        }
         
         texturesForDelete.clear();
         materialsForDelete.clear();
+        soundsForDelete.clear();
  
         // всё успешно удалено?
         return !Files.exists(path);
     }
-    
-    
     
     private FileSystemUtils(){}
 }

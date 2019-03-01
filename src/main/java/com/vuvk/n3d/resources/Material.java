@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.io.FilenameUtils;
@@ -280,36 +281,21 @@ public class Material extends Resource {
         }
     }
     
-    /** Initialization */
-    protected void init(Path path) {   
-        // ищем максимальный id и инкрементируем его
-        long newId = 0;
-        for (Material mat : MATERIALS) {
-            if (mat.getId() > newId) {
-                newId = mat.getId();
-            }
-        }
-        ++newId;
+    
+    public Material(File path) {
+        this(path.toPath());
+    }
+    public Material(Path path) {
+        super(path);
         
         type = Type.Default; 
-        frames = new ArrayList<>();
-        
-        setId(newId);
-        setPath(path);  
+        frames = new ArrayList<>();        
         
         if (Files.exists(path)) {
             load(path);
         } else {
             save(); 
         }
-        MATERIALS.add(this);
-    }
-    
-    public Material(Path path) {
-        super(path);
-    }
-    public Material(File path) {
-        super(path);
     }
         
     /**
@@ -427,8 +413,8 @@ public class Material extends Resource {
      * Деструктор
      */
     public void dispose() {
+        super.dispose();
         frames.clear();
-        MATERIALS.remove(this);
     }
         
     /**
@@ -571,6 +557,10 @@ public class Material extends Resource {
             }
         }
         return null;
+    }
+    @Override
+    protected List getContainer() {
+        return MATERIALS;
     }
     /**
      * Проверка является ли указанный путь материалом
