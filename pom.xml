@@ -61,13 +61,6 @@
             <id>gdx-releases</id>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
         </repository>
-        
-        <!--
-	<repository>
-	   <id>jitpack.io</id>
-	   <url>https://jitpack.io</url>
-        </repository>
-        -->
     </repositories>
     
           
@@ -183,20 +176,19 @@
             <version>1.0.3</version>
         </dependency>
         
+        <!-- libGDX -->
         <!-- core dependencies -->
         <dependency>
             <groupId>com.badlogicgames.gdx</groupId>
             <artifactId>gdx</artifactId>
             <version>1.9.9</version>
         </dependency>
-
         <!-- desktop-specific dependencies -->
         <dependency>
             <groupId>com.badlogicgames.gdx</groupId>
             <artifactId>gdx-backend-lwjgl</artifactId>
             <version>1.9.9</version>
         </dependency>
-
         <dependency>
             <groupId>com.badlogicgames.gdx</groupId>
             <artifactId>gdx-platform</artifactId>
@@ -204,6 +196,7 @@
             <classifier>natives-desktop</classifier>
         </dependency>
         
+        <!-- Darcula -->
         <!-- https://mvnrepository.com/artifact/com.bulenkov/darcula -->
         <!--
         <dependency>
@@ -218,54 +211,20 @@
             <artifactId>darcula</artifactId>
             <version>0.9.2</version>
         </dependency>
-        -->
-        
+        -->        
         <!-- https://mvnrepository.com/artifact/org.clojars.nakkaya/darcula -->
         <dependency>
             <groupId>org.clojars.nakkaya</groupId>
             <artifactId>darcula</artifactId>
             <version>1.0.0</version>
-        </dependency>        
+        </dependency> 
         
-        <!--
+        <!-- JAVE -->
+        <!-- https://mvnrepository.com/artifact/ws.schild/jave-all-deps -->
         <dependency>
-            <groupId>com.github.goxr3plus</groupId>
-            <artifactId>java-stream-player</artifactId>
-            <version>V8.0.0</version>
-         </dependency>
-        -->
-        
-        <!--
-        <dependency>
-            <groupId>com.googlecode.soundlibs</groupId>
-            <artifactId>basicplayer</artifactId>
-            <version>3.0.0.0</version>
+            <groupId>ws.schild</groupId>
+            <artifactId>jave-all-deps</artifactId>
+            <version>2.4.5</version>
         </dependency>
-        <dependency>
-            <groupId>com.googlecode.soundlibs</groupId>
-            <artifactId>jlayer</artifactId>
-            <version>1.0.1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.soundlibs</groupId>
-            <artifactId>vorbisspi</artifactId>
-            <version>1.0.3.3</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.soundlibs</groupId>
-            <artifactId>mp3spi</artifactId>
-            <version>1.9.5.4</version>
-        </dependency>
-        -->
-        
-        <!-- https://mvnrepository.com/artifact/javax.media/jmf -->
-        <!--
-        <dependency>
-            <groupId>javax.media</groupId>
-            <artifactId>jmf</artifactId>
-            <version>2.1.1e</version>
-        </dependency>
-        -->
-
     </dependencies>   
 </project>
