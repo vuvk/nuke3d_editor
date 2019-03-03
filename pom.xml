@@ -53,6 +53,7 @@
         </repository>
         
         <!-- LibGDX -->
+        <!--
         <repository>
             <id>gdx-nightlies</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
@@ -61,6 +62,7 @@
             <id>gdx-releases</id>
             <url>https://oss.sonatype.org/content/repositories/releases/</url>
         </repository>
+        -->
     </repositories>
     
           
@@ -143,6 +145,34 @@
                 </executions>
             </plugin>
             -->
+            
+            <!-- Переименовать ffmpeg-i386.exe в ffmpeg-x86.exe 
+                 Грязный хак для исправления ошибки в JAVE 2.4.5 на Win32
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <unzip src="${project.build.directory}/lib/jave-native-win32-2.4.5.jar" dest="${project.build.directory}/unpacked/" />
+                                <move todir="${project.build.directory}/unpacked/ws/schild/jave/native/" includeemptydirs="false">
+                                    <fileset dir="${project.build.directory}/unpacked/ws/schild/jave/native/"/>
+                                    <mapper type="glob" from="ffmpeg-i386.exe" to="$ffmpeg-x86.exe"/>
+                                </move>
+                                <jar destfile="${project.build.directory}/lib/jave-native-win32-2.4.5.jar" basedir="${project.build.directory}/unpacked" />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     
