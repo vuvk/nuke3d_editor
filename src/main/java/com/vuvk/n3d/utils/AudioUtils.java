@@ -1,5 +1,5 @@
 /**
-    Utilities for Encoding/Decoding audio files (Nuke3D Editor)
+    Utilities for convert formats of audio files (Nuke3D Editor)
     Copyright (C) 2019 Anton "Vuvk" Shcherbatykh <vuvk69@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -15,23 +15,15 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-/**
- * https://github.com/a-schild/jave2
- */
 package com.vuvk.n3d.utils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import ws.schild.jave.AudioAttributes;
-import ws.schild.jave.DefaultFFMPEGLocator;
 import ws.schild.jave.Encoder;
 import ws.schild.jave.EncoderException;
+import ws.schild.jave.EncoderProgressListener;
 import ws.schild.jave.EncodingAttributes;
 import ws.schild.jave.MultimediaObject;
 
@@ -41,15 +33,34 @@ import ws.schild.jave.MultimediaObject;
  */
 public final class AudioUtils {
     /*
-     * audio formats
+     * audio formats and codec
      */
-    private static final String OGG_FORMAT = "ogg";
-    private static final String MP3_FORMAT = "mp3";
-    private static final String WAV_FORMAT = "wav";
+    public static enum AudioFormat {  
+        WAV("wav", "libwavpack"),      
+        OGG("ogg", "libvorbis"),
+        MP3("mp3", "libmp3lame"),
+        FLAC("flac", "flac");
+        
+        private String abbreviation;
+        private String codec;
+        
+        AudioFormat(String abbreviation, String codec) {
+            this.abbreviation = abbreviation;
+            this.codec = codec;
+        }
+
+        String getAbbreviation() {
+            return abbreviation;
+        }
+        
+        String getCodec() {
+            return abbreviation;
+        }
+    }
     
     /** Минимальный битрейт.
      *  minimal bitrate. */
-    public static final int BITRATE = 256000;
+    public static final int GOOD_BITRATE = 256000;
     /** Количество каналов для стерео.
      *  count of channels (stereo). */
     public static final int STEREO = 2; 
@@ -59,52 +70,93 @@ public final class AudioUtils {
     /** Частота дискретизации с хорошим качеством.
      *  sample rate for good quality. */
     public static final int GOOD_SAMPLE_RATE = 44100;
-
-    /**
-     * Используемый кодек для конверсии в ogg.
-     * Codecs to be used.
-     */
-    private static final String OGG_CODEC = "libvorbis";
     
     /** Logger object */
     private static final Logger LOG = Logger.getLogger(AudioUtils.class.getName());
     
+    /**
+     * Конвертирование аудио-файла в файл указанного формата с установками по умолчанию.
+     * @param source Исходный файл
+     * @param target Целевой файл
+     * @param outputAudioFormat Формат выходного файла
+     * @return true в случае успеха
+     */
+    public static final boolean convert(File source, File target, AudioFormat outputAudioFormat) {
+        return convert(source, target, 
+                       outputAudioFormat, null, 
+                       GOOD_BITRATE, STEREO, GOOD_SAMPLE_RATE);
+    }
     
     /**
-     * Конвертирование файла mp3 в файл формата ogg c установками по умолчанию.
+     * Конвертирование аудио-файла в файл указанного формата с установками по умолчанию и отслеживанием прогресса.
      * @param source Исходный файл
      * @param target Целевой файл
+     * @param outputAudioFormat Формат выходного файла
+     * @param listener Слушатель для отслеживания процесса конвертации
+     * @return true в случае успеха
      */
-    public static void convertToOgg(File source, File target) {
-        convertToOgg(source, target, BITRATE, STEREO, GOOD_SAMPLE_RATE);
+    public static final boolean convert(File source, File target, 
+                                        AudioFormat outputAudioFormat,
+                                        EncoderProgressListener listener) {
+        return convert(source, target, 
+                       outputAudioFormat, listener, 
+                       GOOD_BITRATE, STEREO, GOOD_SAMPLE_RATE);
     }
+    
     /**
-     * Конвертирование файла mp3 в файл формата ogg.
+     * Конвертирование аудио-файла в файл указанного формата.
      * @param source Исходный файл
      * @param target Целевой файл
+     * @param outputAudioFormat Формат выходного файла
      * @param bitrate Битрейт (б/с)
      * @param channels Количество каналов. 2 - стерео, 1 - моно
      * @param sampleRate Частота дискредитации
+     * @return true в случае успеха
      */
-    public static void convertToOgg(File source, File target, int bitrate, int channels, int sampleRate) {
+    public static final boolean convert(File source, File target, 
+                                        AudioFormat outputAudioFormat, 
+                                        int bitrate, int channels, int sampleRate) {
+        return convert(source, target, 
+                       outputAudioFormat, null, 
+                       bitrate, channels, sampleRate);
+    }
+    
+    /**
+     * Конвертирование аудио-файла в файл указанного формата с отслеживанием прогресса.
+     * @param source Исходный файл
+     * @param target Целевой файл
+     * @param outputAudioFormat Формат выходного файла
+     * @param listener Слушатель для отслеживания процесса конвертации (может быть null)
+     * @param bitrate Битрейт (б/с)
+     * @param channels Количество каналов. 2 - стерео, 1 - моно
+     * @param sampleRate Частота дискредитации
+     * @return true в случае успеха
+     */
+    public static final boolean convert(File source, File target, 
+                                        AudioFormat outputAudioFormat, 
+                                        EncoderProgressListener listener,
+                                        int bitrate, int channels, int sampleRate) {
         Encoder encoder = new Encoder();
         
         AudioAttributes audioAttributes = new AudioAttributes();
-        audioAttributes.setCodec(OGG_CODEC);
+        audioAttributes.setCodec(outputAudioFormat.getCodec());
         audioAttributes.setBitRate(bitrate);
         audioAttributes.setChannels(channels);
         audioAttributes.setSamplingRate(sampleRate);
         
         EncodingAttributes encodeAttributes = new EncodingAttributes(); 
-        encodeAttributes.setFormat(OGG_FORMAT);
+        encodeAttributes.setFormat(outputAudioFormat.getAbbreviation());
         encodeAttributes.setAudioAttributes(audioAttributes);
         
         try {
-            encoder.encode(new MultimediaObject(source), target, encodeAttributes);
+            encoder.encode(new MultimediaObject(source), target, encodeAttributes, listener);
         } catch (IllegalArgumentException | EncoderException ex) {
             LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
+            return false;
         }
+        
+        return true;       
     }
     
     private AudioUtils() {}
