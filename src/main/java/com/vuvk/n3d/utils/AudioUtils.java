@@ -41,20 +41,20 @@ public final class AudioUtils {
         MP3("mp3", "libmp3lame"),
         FLAC("flac", "flac");
         
-        private String abbreviation;
+        private String format;
         private String codec;
         
-        AudioFormat(String abbreviation, String codec) {
-            this.abbreviation = abbreviation;
-            this.codec = codec;
+        AudioFormat(String format, String codec) {
+            this.format = format;
+            this.codec  = codec;
         }
 
-        String getAbbreviation() {
-            return abbreviation;
+        String getFormat() {
+            return format;
         }
         
         String getCodec() {
-            return abbreviation;
+            return codec;
         }
     }
     
@@ -145,7 +145,7 @@ public final class AudioUtils {
         audioAttributes.setSamplingRate(sampleRate);
         
         EncodingAttributes encodeAttributes = new EncodingAttributes(); 
-        encodeAttributes.setFormat(outputAudioFormat.getAbbreviation());
+        encodeAttributes.setFormat(outputAudioFormat.getFormat());
         encodeAttributes.setAudioAttributes(audioAttributes);
         
         try {
