@@ -44,12 +44,12 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="txtName" pref="428" max="32767" attributes="0"/>
+                          <Component id="txtName" pref="0" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="cmbChannels" pref="128" max="32767" attributes="0"/>
                                   <Component id="cmbSampleRate" pref="128" max="32767" attributes="0"/>
-                                  <Component id="jSpinner1" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="sprBitrate" alignment="0" max="32767" attributes="0"/>
                               </Group>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
@@ -57,7 +57,12 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="btnConvert" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="barProgress" min="-2" pref="395" max="-2" attributes="0"/>
+                          <Component id="lblProgress" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -81,7 +86,7 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblBitrate" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jSpinner1" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
+                  <Component id="sprBitrate" alignment="3" min="-2" pref="27" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -92,6 +97,11 @@
               <Group type="103" groupAlignment="1" attributes="0">
                   <Component id="btnConvert" min="-2" max="-2" attributes="0"/>
                   <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Component id="lblProgress" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="barProgress" min="-2" pref="26" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -124,10 +134,11 @@
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
           <StringArray count="2">
-            <StringItem index="0" value="&#x421;&#x442;&#x435;&#x440;&#x435;&#x43e;"/>
-            <StringItem index="1" value="&#x41c;&#x43e;&#x43d;&#x43e;"/>
+            <StringItem index="0" value="&#x41c;&#x43e;&#x43d;&#x43e;"/>
+            <StringItem index="1" value="&#x421;&#x442;&#x435;&#x440;&#x435;&#x43e;"/>
           </StringArray>
         </Property>
+        <Property name="selectedIndex" type="int" value="1"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
@@ -211,11 +222,18 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCancelActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JSpinner" name="jSpinner1">
+    <Component class="javax.swing.JSpinner" name="sprBitrate">
       <Properties>
         <Property name="model" type="javax.swing.SpinnerModel" editor="org.netbeans.modules.form.editors2.SpinnerModelEditor">
-          <SpinnerModel initial="256" maximum="320" minimum="0" numberType="java.lang.Integer" stepSize="8" type="number"/>
+          <SpinnerModel initial="256" maximum="1024" minimum="8" numberType="java.lang.Integer" stepSize="8" type="number"/>
         </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JProgressBar" name="barProgress">
+    </Component>
+    <Component class="javax.swing.JLabel" name="lblProgress">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="&#x41f;&#x440;&#x43e;&#x433;&#x440;&#x435;&#x441;&#x441;"/>
       </Properties>
     </Component>
   </SubComponents>

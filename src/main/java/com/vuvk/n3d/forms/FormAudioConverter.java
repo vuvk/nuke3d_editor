@@ -5,20 +5,82 @@
  */
 package com.vuvk.n3d.forms;
 
+import com.vuvk.n3d.utils.AudioUtils;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import javax.swing.Timer;
+import ws.schild.jave.EncoderProgressListener;
+import ws.schild.jave.MultimediaInfo;
 
 /**
  *
  * @author Admin
  */
 public class FormAudioConverter extends javax.swing.JDialog {
+    
+    private File inputAudio;
+    private File outputAudio;
+    
+    /**
+     * Класс отображения процесса конвертации
+     */
+    class EncoderListener implements EncoderProgressListener {
+        
+        @Override
+        public void sourceInfo(MultimediaInfo mi) {
+            //
+        }
 
+        @Override
+        public void progress(int permil) {                                         
+            double progress = permil * 0.1;
+            barProgress.setValue((int)progress);
+            barProgress.getParent().repaint();
+        }
+
+        @Override
+        public void message(String message) {
+            System.out.println(message);
+        }        
+    }
+
+    /**
+     * Управление доступностью элементов настройки конвертации
+     * @param mode true - элементы доступны
+     */
+    void enableOptions(boolean mode) {
+        cmbChannels.setEnabled(mode);
+        cmbSampleRate.setEnabled(mode);
+        sprBitrate.setEnabled(mode);
+        btnConvert.setEnabled(mode);
+    }
+    
+    /**
+     * Управление видимостью элементов прогресса конвертации
+     * @param mode true - элементы видимы
+     */
+    void visibleProgress(boolean mode) {
+        lblProgress.setVisible(mode);
+        barProgress.setVisible(mode);
+        btnCancel.setVisible(mode);
+    }
+    
     /**
      * Creates new form FormAudioConverter
      */
     public FormAudioConverter(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        
+        setLocationRelativeTo(null);
+        
+        enableOptions(true);
+        visibleProgress(false);
+        
+        inputAudio  = new File("example.mp3");
+        outputAudio = new File("example.ogg");
     }
 
     /**
@@ -39,7 +101,9 @@ public class FormAudioConverter extends javax.swing.JDialog {
         cmbSampleRate = new javax.swing.JComboBox<>();
         btnConvert = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
-        jSpinner1 = new javax.swing.JSpinner();
+        sprBitrate = new javax.swing.JSpinner();
+        barProgress = new javax.swing.JProgressBar();
+        lblProgress = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Аудио конвертер");
@@ -57,7 +121,8 @@ public class FormAudioConverter extends javax.swing.JDialog {
         txtName.setMinimumSize(new java.awt.Dimension(432, 27));
         txtName.setPreferredSize(new java.awt.Dimension(432, 27));
 
-        cmbChannels.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Стерео", "Моно" }));
+        cmbChannels.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Моно", "Стерео" }));
+        cmbChannels.setSelectedIndex(1);
 
         lblChannels.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblChannels.setText("Канал");
@@ -93,7 +158,9 @@ public class FormAudioConverter extends javax.swing.JDialog {
             }
         });
 
-        jSpinner1.setModel(new javax.swing.SpinnerNumberModel(256, 0, 320, 8));
+        sprBitrate.setModel(new javax.swing.SpinnerNumberModel(256, 8, 1024, 8));
+
+        lblProgress.setText("Прогресс");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -110,16 +177,20 @@ public class FormAudioConverter extends javax.swing.JDialog {
                             .addComponent(lblChannels, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 428, Short.MAX_VALUE)
+                            .addComponent(txtName, javax.swing.GroupLayout.PREFERRED_SIZE, 1, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(cmbChannels, 0, 128, Short.MAX_VALUE)
                                     .addComponent(cmbSampleRate, 0, 128, Short.MAX_VALUE)
-                                    .addComponent(jSpinner1))
+                                    .addComponent(sprBitrate))
                                 .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnConvert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(barProgress, javax.swing.GroupLayout.PREFERRED_SIZE, 395, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblProgress))
+                        .addGap(18, 18, 18)
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -137,7 +208,7 @@ public class FormAudioConverter extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblBitrate)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(sprBitrate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbSampleRate, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -145,7 +216,11 @@ public class FormAudioConverter extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnConvert, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblProgress)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(barProgress, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -153,11 +228,40 @@ public class FormAudioConverter extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnConvertActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConvertActionPerformed
+        enableOptions(false);
+        visibleProgress(true);
+        barProgress.setValue(0);             
         
+        //битрейт = частота дискретизации × разрядность × каналы
+        
+        new Thread(() -> {
+            int channels = cmbChannels.getSelectedIndex() + 1;     // 1 or 2
+            int bitrate = (Integer)sprBitrate.getValue() * 1000;
+            int sampleRate = 0;
+            switch (cmbSampleRate.getSelectedIndex()) {
+                case 0 : sampleRate = 8000;  break;
+                case 1 : sampleRate = 11025; break;
+                case 2 : sampleRate = 16000; break;
+                case 3 : sampleRate = 22050; break;
+                case 4 : sampleRate = 24000; break;
+                case 5 : sampleRate = 32000; break;
+                case 6 : sampleRate = 44100; break;
+                case 7 : sampleRate = 48000; break;
+            }   
+
+            AudioUtils.convert(inputAudio, outputAudio,
+                    AudioUtils.AudioFormat.OGG,
+                    new EncoderListener(),
+                    bitrate, channels, sampleRate);
+            
+            enableOptions(true);
+            visibleProgress(false);        
+        }).start();
     }//GEN-LAST:event_btnConvertActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        // TODO add your handling code here:
+        enableOptions(true);
+        visibleProgress(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
     /**
@@ -203,15 +307,17 @@ public class FormAudioConverter extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JProgressBar barProgress;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnConvert;
     private javax.swing.JComboBox<String> cmbChannels;
     private javax.swing.JComboBox<String> cmbSampleRate;
-    private javax.swing.JSpinner jSpinner1;
     private javax.swing.JLabel lblBitrate;
     private javax.swing.JLabel lblChannels;
     private javax.swing.JLabel lblName;
+    private javax.swing.JLabel lblProgress;
     private javax.swing.JLabel lblSampleRate;
+    private javax.swing.JSpinner sprBitrate;
     private javax.swing.JTextField txtName;
     // End of variables declaration//GEN-END:variables
 }
