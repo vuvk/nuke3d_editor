@@ -6,11 +6,9 @@
 package com.vuvk.n3d.forms;
 
 import com.vuvk.n3d.utils.AudioUtils;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import javax.swing.Timer;
+import org.apache.commons.io.FilenameUtils;
 import ws.schild.jave.EncoderProgressListener;
 import ws.schild.jave.MultimediaInfo;
 
@@ -19,9 +17,14 @@ import ws.schild.jave.MultimediaInfo;
  * @author Admin
  */
 public class FormAudioConverter extends javax.swing.JDialog {
-    
-    private File inputAudio;
-    private File outputAudio;
+    /** входной аудио файл */
+    private File inputFile;
+    /** выходной аудио файл */
+    private File outputFile;
+    /** результат конвертации */
+    private File resultFile = null;
+    /** ссылка на текущее окно */
+    FormAudioConverter formAudioConverter;
     
     /**
      * Класс отображения процесса конвертации
@@ -78,9 +81,8 @@ public class FormAudioConverter extends javax.swing.JDialog {
         
         enableOptions(true);
         visibleProgress(false);
-        
-        inputAudio  = new File("example.mp3");
-        outputAudio = new File("example.ogg");
+                
+        formAudioConverter = this;
     }
 
     /**
@@ -111,6 +113,11 @@ public class FormAudioConverter extends javax.swing.JDialog {
         setMinimumSize(new java.awt.Dimension(544, 0));
         setModal(true);
         setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         lblName.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblName.setText("Имя");
@@ -249,63 +256,61 @@ public class FormAudioConverter extends javax.swing.JDialog {
                 case 7 : sampleRate = 48000; break;
             }   
 
-            AudioUtils.convert(inputAudio, outputAudio,
-                    AudioUtils.AudioFormat.OGG,
-                    new EncoderListener(),
-                    bitrate, channels, sampleRate);
-            
-            enableOptions(true);
-            visibleProgress(false);        
+            if (AudioUtils.convert(inputFile, outputFile,
+                                   AudioUtils.AudioFormat.OGG,
+                                   new EncoderListener(),
+                                   bitrate, channels, sampleRate)
+               ) {            
+                // запоминаем результат и пора закрывать окно
+                resultFile = outputFile;
+                formAudioConverter.dispatchEvent(new WindowEvent(formAudioConverter, WindowEvent.WINDOW_CLOSING));
+            } else {
+                resultFile = null;
+            }
         }).start();
     }//GEN-LAST:event_btnConvertActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        AudioUtils.getEncoder().abortEncoding();
+        
+        if (outputFile.exists()) {
+            outputFile.delete();
+        }
+        resultFile = null;
+        
         enableOptions(true);
         visibleProgress(false);
     }//GEN-LAST:event_btnCancelActionPerformed
 
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        AudioUtils.getEncoder().abortEncoding();
+    }//GEN-LAST:event_formWindowClosing
+
+    @Override
+    public void setVisible(boolean b) {
+        throw new UnsupportedOperationException("Use 'execute()' for set visible AudioConverter!");
+    }        
+    
     /**
-     * @param args the command line arguments
+     * Открыть окно аудиоконвертера. 
+     * @param inputFile Входной файл для конверсии
+     * @param outputFile Выходной файл конверсии
+     * @return Полученный файл, либо null, если конверсия отменена или не удалась.
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormAudioConverter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormAudioConverter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormAudioConverter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormAudioConverter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    public File execute(File inputFile, File outputFile) {
+        if (!inputFile.exists()) {
+            return null;
         }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                FormAudioConverter dialog = new FormAudioConverter(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
-
+        
+        this.inputFile  = inputFile;
+        this.outputFile = outputFile;
+        txtName.setText(FilenameUtils.getBaseName(inputFile.getName()));
+        
+        super.setVisible(true);
+        
+        return resultFile;
+    }    
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JProgressBar barProgress;
     private javax.swing.JButton btnCancel;
