@@ -20,6 +20,7 @@ package com.vuvk.n3d.forms;
 import com.vuvk.n3d.utils.AudioUtils;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import javax.swing.SpinnerNumberModel;
 import org.apache.commons.io.FilenameUtils;
 import ws.schild.jave.EncoderProgressListener;
 import ws.schild.jave.MultimediaInfo;
@@ -83,6 +84,57 @@ public class FormAudioConverter extends javax.swing.JDialog {
     }
     
     /**
+     * Установить возможный диапазон значений битрейта
+     */
+    void updateBitrateRange() {
+        SpinnerNumberModel model = (SpinnerNumberModel) sprBitrate.getModel();
+        
+        int min = 0, 
+            max = 0;
+        
+        switch (cmbChannels.getSelectedIndex()) {
+            // моно
+            case 0 : 
+                switch (cmbSampleRate.getSelectedIndex()) {
+                    case 0 : min = 8;  max = 40;  break; // 8000
+                    case 1 : min = 16; max = 48;  break; // 11025
+                    case 2 : min = 16; max = 96;  break; // 16000
+                    case 3 : min = 16; max = 88;  break; // 22050
+                    case 4 : min = 16; max = 88;  break; // 24000
+                    case 5 : min = 32; max = 184; break; // 32000
+                    case 6 : min = 32; max = 240; break; // 44100
+                    case 7 : min = 32; max = 240; break; // 48000
+                }  
+                break;
+                
+            // стерео
+            case 1 : 
+                switch (cmbSampleRate.getSelectedIndex()) {
+                    case 0 : min = 16; max = 80;  break; // 8000
+                    case 1 : min = 16; max = 96;  break; // 11025
+                    case 2 : min = 24; max = 200; break; // 16000
+                    case 3 : min = 32; max = 176; break; // 22050
+                    case 4 : min = 32; max = 176; break; // 24000
+                    case 5 : min = 64; max = 376; break; // 32000
+                    case 6 : min = 64; max = 496; break; // 44100
+                    case 7 : min = 48; max = 496; break; // 48000
+                }  
+                break;
+        }
+        
+        int value = (Integer) model.getValue();
+        
+        if (value < min) {
+            model.setValue(min);
+        } else if (value > max) {
+            model.setValue(max);
+        }
+        
+        model.setMinimum(min);
+        model.setMaximum(max);
+    }
+    
+    /**
      * Creates new form FormAudioConverter
      */
     public FormAudioConverter(java.awt.Frame parent, boolean modal) {
@@ -93,6 +145,7 @@ public class FormAudioConverter extends javax.swing.JDialog {
         
         enableOptions(true);
         visibleProgress(false);
+        updateBitrateRange();
                 
         formAudioConverter = this;
     }
@@ -142,6 +195,11 @@ public class FormAudioConverter extends javax.swing.JDialog {
 
         cmbChannels.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Моно", "Стерео" }));
         cmbChannels.setSelectedIndex(1);
+        cmbChannels.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbChannelsActionPerformed(evt);
+            }
+        });
 
         lblChannels.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblChannels.setText("Канал");
@@ -154,6 +212,11 @@ public class FormAudioConverter extends javax.swing.JDialog {
 
         cmbSampleRate.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "8000 Гц", "11025 Гц", "16000 Гц", "22050 Гц", "24000 Гц", "32000 Гц", "44100 Гц", "48000 Гц" }));
         cmbSampleRate.setSelectedIndex(6);
+        cmbSampleRate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cmbSampleRateActionPerformed(evt);
+            }
+        });
 
         btnConvert.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_forward_white_48dp.png"))); // NOI18N
         btnConvert.setToolTipText("Конвертировать");
@@ -298,6 +361,14 @@ public class FormAudioConverter extends javax.swing.JDialog {
         AudioUtils.getEncoder().abortEncoding();
     }//GEN-LAST:event_formWindowClosing
 
+    private void cmbChannelsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbChannelsActionPerformed
+        updateBitrateRange();
+    }//GEN-LAST:event_cmbChannelsActionPerformed
+
+    private void cmbSampleRateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbSampleRateActionPerformed
+        updateBitrateRange();
+    }//GEN-LAST:event_cmbSampleRateActionPerformed
+
     @Override
     public void setVisible(boolean b) {
         throw new UnsupportedOperationException("Use 'execute()' for set visible AudioConverter!");
@@ -316,7 +387,7 @@ public class FormAudioConverter extends javax.swing.JDialog {
         
         this.inputFile  = inputFile;
         this.outputFile = outputFile;
-        txtName.setText(FilenameUtils.getBaseName(inputFile.getName()));
+        txtName.setText(FilenameUtils.getBaseName(outputFile.getName()));
         
         super.setVisible(true);
         
