@@ -19,3 +19,7 @@ hs_err_pid*
 /resources/
 /config/
 *.mp3
+*.ogg
+*.flac
+*.wav
+*.aac
