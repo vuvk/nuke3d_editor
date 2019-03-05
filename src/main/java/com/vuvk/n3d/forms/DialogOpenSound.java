@@ -29,7 +29,7 @@ import org.apache.commons.io.FileUtils;
  */
 public class DialogOpenSound extends javax.swing.JDialog {    
     /** выбранный файл */
-    public static File selectedFile = null;
+    File selectedFile = null;
     /** путь до ресурсов */
     public static File currentPath = FileUtils.getUserDirectory();
     
@@ -41,15 +41,19 @@ public class DialogOpenSound extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        FileNameExtensionFilter filterAll  = new FileNameExtensionFilter("All knowns formats", "wav", "ogg", "mp3");
-        FileNameExtensionFilter filterWav = new FileNameExtensionFilter("Waveform Audio File (WAV)", "wav");
+        FileNameExtensionFilter filterAll  = new FileNameExtensionFilter("All knowns formats", "wav", "ogg", "mp3", "flac");
+        FileNameExtensionFilter filterWav  = new FileNameExtensionFilter("Waveform Audio File (WAV)", "wav");
         FileNameExtensionFilter filterOgg  = new FileNameExtensionFilter("Ogg Vorbis (OGG)", "ogg");
         FileNameExtensionFilter filterMP3  = new FileNameExtensionFilter("MPEG-1/2/2.5 Layer 3 (MP3)", "mp3");
+        FileNameExtensionFilter filterFlac = new FileNameExtensionFilter("Free Lossless Audio Codec", "flac");
+        
         FileChooser.setAcceptAllFileFilterUsed(false);
         FileChooser.setFileFilter(filterAll);
         FileChooser.addChoosableFileFilter(filterWav);
         FileChooser.addChoosableFileFilter(filterOgg);
         FileChooser.addChoosableFileFilter(filterMP3);  
+        FileChooser.addChoosableFileFilter(filterFlac);
+        
         FileChooser.setFileView(new ImageFileView());
                 
         setLocationRelativeTo(null);
@@ -83,11 +87,6 @@ public class DialogOpenSound extends javax.swing.JDialog {
                 FileChooserActionPerformed(evt);
             }
         });
-        FileChooser.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                FileChooserPropertyChange(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -110,7 +109,7 @@ public class DialogOpenSound extends javax.swing.JDialog {
             // нажато "Открыть"
             case JFileChooser.APPROVE_SELECTION :
                 selectedFile = FileChooser.getSelectedFile();        
-                currentPath = FileChooser.getCurrentDirectory();
+                currentPath  = FileChooser.getCurrentDirectory();
                 break;
                 
             // нажато "отмена
@@ -122,10 +121,21 @@ public class DialogOpenSound extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_FileChooserActionPerformed
 
-    private void FileChooserPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_FileChooserPropertyChange
+    @Override
+    public void setVisible(boolean b) {
+        throw new UnsupportedOperationException("Use 'execute()' for set visible DialogOpenSound!");
+    }  
+    
+    /**
+     * Открыть диалог открытия звуков
+     * @return Выбранный файл, либо null, если операция отменена или не удалась.
+     */
+    public File execute() {
+        super.setVisible(true);
         
-    }//GEN-LAST:event_FileChooserPropertyChange
-
+        return selectedFile;
+    }    
+    
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         selectedFile = null;
         FileChooser.setCurrentDirectory(currentPath);

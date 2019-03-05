@@ -1341,10 +1341,7 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
     private void popupPVMISoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISoundActionPerformed
-        DialogOpenSound dlg = new DialogOpenSound(this, true);
-        dlg.setVisible(true);        
-        
-        File sndFile = DialogOpenSound.selectedFile;
+        File sndFile = new DialogOpenSound(this, true).execute();
         if (sndFile != null) {
             String baseName = FilenameUtils.getBaseName(sndFile.getName());     
             String extension = "." + Const.SOUND_FORMAT_EXT;
