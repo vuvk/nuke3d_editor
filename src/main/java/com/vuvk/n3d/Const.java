@@ -68,8 +68,10 @@ public final class Const {
     public static final String MATERIAL_CONFIG_VERSION = MATERIAL_CONFIG_MAJOR + "." + MATERIAL_CONFIG_MINOR;
     
     
+    /** расширение файла импортированного звука */
+    public static final String SOUND_FORMAT_EXT = "ogg";
     /** доступные расширения звуков для загрузки */
-    public static final List<String> SOUND_EXTS = Arrays.asList("wav", "ogg", "mp3");
+    public static final List<String> SOUND_EXTS = Arrays.asList("wav", "ogg", "mp3", "flac");
     /** Путь до сохранённых параметров звуков */
     public static final String SOUND_CONFIG_STRING = CONFIG_STRING + "sounds.sav";
     /** идентификатор конфига звуков */

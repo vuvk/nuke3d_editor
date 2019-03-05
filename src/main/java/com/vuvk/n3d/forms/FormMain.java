@@ -1346,9 +1346,8 @@ public class FormMain extends javax.swing.JFrame {
         
         File sndFile = DialogOpenSound.selectedFile;
         if (sndFile != null) {
-            // копируем к себе в папку ресурсов
             String baseName = FilenameUtils.getBaseName(sndFile.getName());     
-            String extension = "." + FileSystemUtils.getFileExtension(sndFile);
+            String extension = "." + Const.SOUND_FORMAT_EXT;
             Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
             
             // файл с таким же именем существует?
@@ -1375,15 +1374,27 @@ public class FormMain extends javax.swing.JFrame {
                 }
             }
             
-            // создаем файл у себя
-            try {
-                FileUtils.copyFile(sndFile, newPath.toFile());
-            } catch (IOException ex) {
-                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                return;
+            // если исходный файл с расширением ogg, то просто его копировать. А иначе конвертировать в ogg
+            if (Const.SOUND_FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
+                // создаем файл у себя
+                try {
+                    FileUtils.copyFile(sndFile, newPath.toFile());
+                } catch (IOException ex) {
+                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageDialog.showException(ex);
+                    return;
+                }
+            // файл не ogg
+            } else {
+                File importedFile = new FormAudioConverter(this, true)
+                                        .execute(sndFile, newPath.toFile());
+                if (importedFile == null) {
+                    return;
+                } else {
+                    newPath = importedFile.toPath();
+                }
             }
-            
+                        
             fillListProjectView();            
             new Sound(newPath);
             
@@ -1483,7 +1494,7 @@ public class FormMain extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
-                
+                        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
