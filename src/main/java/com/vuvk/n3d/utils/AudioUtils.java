@@ -70,6 +70,8 @@ public final class AudioUtils {
     /** Частота дискретизации с хорошим качеством.
      *  sample rate for good quality. */
     public static final int GOOD_SAMPLE_RATE = 44100;
+    /** кодировщик */
+    private static Encoder encoder = new Encoder();
     
     /** Logger object */
     private static final Logger LOG = Logger.getLogger(AudioUtils.class.getName());
@@ -136,8 +138,6 @@ public final class AudioUtils {
                                         AudioFormat outputAudioFormat, 
                                         EncoderProgressListener listener,
                                         int bitrate, int channels, int sampleRate) {
-        Encoder encoder = new Encoder();
-        
         AudioAttributes audioAttributes = new AudioAttributes();
         audioAttributes.setCodec(outputAudioFormat.getCodec());
         audioAttributes.setBitRate(bitrate);
@@ -157,6 +157,14 @@ public final class AudioUtils {
         }
         
         return true;       
+    }
+    
+    /**
+     * Получить ссылку на кодировщик
+     * @return Кодировщик
+     */
+    public static Encoder getEncoder() {
+        return encoder;
     }
     
     private AudioUtils() {}
