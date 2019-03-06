@@ -670,6 +670,24 @@ public class FormMain extends javax.swing.JFrame {
         
         Global.initPathResources();
         Global.initPathConfig();
+
+        // задаем кастомный рендерер
+        listProjectView.setCellRenderer(new ProjectViewCellRenderer());
+        
+        // кастомные иконки для дерева
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeFolders.getCellRenderer();
+        ImageIcon leafIcon = new ImageIcon(Const.ICONS.get("SmallFolderClose"));
+        ImageIcon openIcon = new ImageIcon(Const.ICONS.get("SmallFolderOpen"));
+        renderer.setOpenIcon(openIcon);
+        renderer.setLeafIcon(leafIcon);
+        renderer.setClosedIcon(leafIcon);
+        
+        setIconImage(Const.ICONS.get("FormMainIcon"));
+        
+        clearTreeFolders();
+        clearListProjectView();
+        listProjectView.setEnabled(false);
+        treeFolders.setEnabled(false);  
         
         setLocationRelativeTo(null);
         //fillListProjectView();        
@@ -1094,23 +1112,7 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMIRenameActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        // задаем кастомный рендерер
-        listProjectView.setCellRenderer(new ProjectViewCellRenderer());
         
-        // кастомные иконки для дерева
-        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeFolders.getCellRenderer();
-        ImageIcon leafIcon = new ImageIcon(Const.ICONS.get("SmallFolderClose"));
-        ImageIcon openIcon = new ImageIcon(Const.ICONS.get("SmallFolderOpen"));
-        renderer.setOpenIcon(openIcon);
-        renderer.setLeafIcon(leafIcon);
-        renderer.setClosedIcon(leafIcon);
-        
-        clearTreeFolders();
-        clearListProjectView();
-        listProjectView.setEnabled(false);
-        treeFolders.setEnabled(false);  
-        
-        setIconImage(Const.ICONS.get("FormMainIcon"));
     }//GEN-LAST:event_formWindowOpened
 
     private void popupPVMIRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRemoveActionPerformed

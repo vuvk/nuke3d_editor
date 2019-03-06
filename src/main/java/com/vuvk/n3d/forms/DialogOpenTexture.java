@@ -52,17 +52,22 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        FileNameExtensionFilter filterAll  = new FileNameExtensionFilter("All knowns formats", "jpg", "jpeg", "png", "bmp", "gif");
-        FileNameExtensionFilter filterJpeg = new FileNameExtensionFilter("JPEG image", "jpg", "jpeg");
-        FileNameExtensionFilter filterPng  = new FileNameExtensionFilter("PNG image", "png");
-        FileNameExtensionFilter filterBmp  = new FileNameExtensionFilter("BMP image", "bmp");
-        FileNameExtensionFilter filterGif  = new FileNameExtensionFilter("GIF image", "gif");
+        /** фильтры доступных расширений */
+        FileNameExtensionFilter[] filters = {
+            new FileNameExtensionFilter("All knowns formats",                (String[]) Const.TEXTURE_EXTS.toArray()),
+            new FileNameExtensionFilter("JPEG format",                       "jpg", "jpeg"),
+            new FileNameExtensionFilter("Portable Network Graphics (PNG)",   "png"),
+            new FileNameExtensionFilter("Microsoft Windows bitmap (BMP)",    "bmp"),
+            new FileNameExtensionFilter("Graphics Interchange Format (GIF)", "gif")
+        };
+        
         FileChooser.setAcceptAllFileFilterUsed(false);
-        FileChooser.setFileFilter(filterAll);
-        FileChooser.addChoosableFileFilter(filterJpeg);
-        FileChooser.addChoosableFileFilter(filterPng);
-        FileChooser.addChoosableFileFilter(filterBmp);
-        FileChooser.addChoosableFileFilter(filterGif);
+        for (FileNameExtensionFilter filter : filters) {
+            FileChooser.addChoosableFileFilter(filter);
+        }
+        FileChooser.setFileFilter(filters[0]);
+        
+        // кастомные иконки
         FileChooser.setFileView(new ImageFileView());
         
         panelImagePreview = new PanelImagePreview(this);
