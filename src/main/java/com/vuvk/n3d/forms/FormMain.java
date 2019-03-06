@@ -1350,66 +1350,78 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
     private void popupPVMISoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISoundActionPerformed
-        File sndFile = new DialogOpenSound(this, true).execute();
-        if (sndFile != null) {
-            String baseName = FilenameUtils.getBaseName(sndFile.getName());     
-            String extension = "." + Const.SOUND_FORMAT_EXT;
-            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
-            
-            // файл с таким же именем существует?
-            if (Files.exists(newPath)) {
-                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
-                // CANCEL
-                if (answer == null) {
-                    return;
-                // NO
-                } else if (!answer.booleanValue()) {
-                    // решил переименовать
-                    while (Files.exists(newPath)) {
-                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
-                        if (newName == null) {
-                            return;    // отмена?
-                        } else {
-                            baseName = newName;
-                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+        File[] files = new DialogOpenSound(this, true).execute();
+        if (files == null || files.length == 0) {
+            return;
+        }
+        
+        String lastName = null;
+        
+        for (File sndFile : files) {
+            if (sndFile != null) {
+                String baseName = FilenameUtils.getBaseName(sndFile.getName());     
+                String extension = "." + Const.SOUND_FORMAT_EXT;
+                Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
+
+                // файл с таким же именем существует?
+                if (Files.exists(newPath)) {
+                    Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
+                    // CANCEL
+                    if (answer == null) {
+                        return;
+                    // NO
+                    } else if (!answer.booleanValue()) {
+                        // решил переименовать
+                        while (Files.exists(newPath)) {
+                            String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
+                            if (newName == null) {
+                                return;    // отмена?
+                            } else {
+                                baseName = newName;
+                                newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+                            }
                         }
+                    // YES
+                    } else {
+                        FileSystemUtils.remove(newPath);
                     }
-                // YES
+                }
+
+                // если исходный файл с расширением ogg, то просто его копировать. А иначе конвертировать в ogg
+                if (Const.SOUND_FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
+                    // создаем файл у себя
+                    try {
+                        FileUtils.copyFile(sndFile, newPath.toFile());
+                    } catch (IOException ex) {
+                        Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                        MessageDialog.showException(ex);
+                        return;
+                    }
+                // файл не ogg
                 } else {
-                    FileSystemUtils.remove(newPath);
+                    File importedFile = new FormAudioConverter(this, true)
+                                            .execute(sndFile, newPath.toFile());
+                    if (importedFile == null) {
+                        return;
+                    } else {
+                        newPath = importedFile.toPath();
+                    }
                 }
+
+                fillListProjectView();            
+                new Sound(newPath);
+                
+                lastName = baseName;
             }
-            
-            // если исходный файл с расширением ogg, то просто его копировать. А иначе конвертировать в ogg
-            if (Const.SOUND_FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
-                // создаем файл у себя
-                try {
-                    FileUtils.copyFile(sndFile, newPath.toFile());
-                } catch (IOException ex) {
-                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                    MessageDialog.showException(ex);
-                    return;
-                }
-            // файл не ogg
-            } else {
-                File importedFile = new FormAudioConverter(this, true)
-                                        .execute(sndFile, newPath.toFile());
-                if (importedFile == null) {
-                    return;
-                } else {
-                    newPath = importedFile.toPath();
-                }
-            }
-                        
-            fillListProjectView();            
-            new Sound(newPath);
-            
+        }
+        
+        if (lastName != null) {
             // открываем окно редактирования
             DefaultListModel model = (DefaultListModel) listProjectView.getModel();
             for (Object obj : model.toArray()) {
                 PreviewElement element = (PreviewElement)obj;
                 if (element.getType() == PreviewElement.Type.SOUND && 
-                    element.getName().equals(baseName)
+                    element.getName().equals(lastName)
                    ) {                    
                     listProjectView.setSelectedValue(element, true);
                     openFormSoundEditor();

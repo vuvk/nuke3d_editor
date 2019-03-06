@@ -37,7 +37,7 @@ import org.apache.commons.io.FileUtils;
  * @author Anton "Vuvk" Shcherbatykh
  */
 public class DialogOpenTexture extends javax.swing.JDialog {    
-    /** выбранный файл */
+    /** выбранные файлы */
     File[] selectedFiles = null;
     /** путь до ресурсов */
     public static File currentPath = FileUtils.getUserDirectory();
