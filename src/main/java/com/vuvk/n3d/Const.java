@@ -34,26 +34,28 @@ import java.util.logging.Level;
 public final class Const {
     /** набор иконок */
     public final static HashMap<String, BufferedImage> ICONS = new HashMap<>();
-    static {
-            try {
-                // for jFrames
-                ICONS.put("FormMainIcon", ImageIO.read(Const.class.getClass().getResource("/com/vuvk/n3d/ico/jframes/NUKE3D.png")));
-                
-                // small icons
-                ICONS.put("SmallFolderClose", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp.png")));        
-                ICONS.put("SmallFolderOpen",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/small/ic_folder_open_white_18dp.png")));        
-                                
-                // for preview element
-                ICONS.put("LevelUp",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_arrow_upward_white_48dp.png")));        
-                ICONS.put("Folder",   ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_folder_open_white_48dp.png")));      
-                ICONS.put("Material", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_color_lens_white_48dp.png")));         
-                ICONS.put("Sound",    ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));         
-                ICONS.put("Unknown",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));  
-                
-            } catch (IOException ex) {
-                Logger.getLogger(Const.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-            }        
+    static {  
+        try {
+            // small icons
+            ICONS.put("SmallFolderClose", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp.png")));        
+            ICONS.put("SmallFolderOpen",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/small/ic_folder_open_white_18dp.png")));        
+
+            // for preview element
+            ICONS.put("LevelUp",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_arrow_upward_white_48dp.png")));        
+            ICONS.put("Folder",   ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_folder_open_white_48dp.png")));      
+            ICONS.put("Material", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_color_lens_white_48dp.png")));         
+            ICONS.put("Sound",    ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));         
+            ICONS.put("Unknown",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));  
+            
+            ICONS.put("Add",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_add_circle_white.png")));   
+
+            // for jFrames
+            ICONS.put("FormMainIcon", ImageIO.read(Const.class.getClass().getResource("/com/vuvk/n3d/ico/jframes/n3d.png")));              
+
+        } catch (IOException ex) {
+            Logger.getLogger(Const.class.getName()).log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+        }        
     }
     
     
@@ -102,7 +104,7 @@ public final class Const {
     /** расширение файла импортированного звука */
     public static final String SOUND_FORMAT_EXT = "ogg";
     /** доступные расширения звуков для загрузки */
-    public static final List<String> SOUND_EXTS = Arrays.asList("wav", "ogg", "mp3", "flac");
+    public static final List<String> SOUND_EXTS = Arrays.asList("aac", "aif", "aiff", "flac", "m4a", "m4p", "mp2", "mp3", "mpga", "ogg", "opus", "wav", "wma");
     /** Путь до сохранённых параметров звуков */
     public static final String SOUND_CONFIG_STRING = CONFIG_STRING + "sounds.sav";
     /** идентификатор конфига звуков */

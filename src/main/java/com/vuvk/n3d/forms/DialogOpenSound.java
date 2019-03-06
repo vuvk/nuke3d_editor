@@ -17,6 +17,7 @@
 */
 package com.vuvk.n3d.forms;
 
+import com.vuvk.n3d.Const;
 import com.vuvk.n3d.components.ImageFileView;
 import java.io.File;
 import javax.swing.JFileChooser;
@@ -41,19 +42,30 @@ public class DialogOpenSound extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
-        FileNameExtensionFilter filterAll  = new FileNameExtensionFilter("All knowns formats", "wav", "ogg", "mp3", "flac");
-        FileNameExtensionFilter filterWav  = new FileNameExtensionFilter("Waveform Audio File (WAV)", "wav");
-        FileNameExtensionFilter filterOgg  = new FileNameExtensionFilter("Ogg Vorbis (OGG)", "ogg");
-        FileNameExtensionFilter filterMP3  = new FileNameExtensionFilter("MPEG-1/2/2.5 Layer 3 (MP3)", "mp3");
-        FileNameExtensionFilter filterFlac = new FileNameExtensionFilter("Free Lossless Audio Codec", "flac");
+        /** фильтры доступных расширений */
+        FileNameExtensionFilter[] filters = {
+            new FileNameExtensionFilter("All knowns formats",                        (String[])Const.SOUND_EXTS.toArray()),
+            new FileNameExtensionFilter("MPEG-2 Advanced Audio Coding File (AAC)",   "aac"),
+            new FileNameExtensionFilter("Audio Interchange File Format (AIF, AIFF)", "aif", "aiff"),
+            new FileNameExtensionFilter("Free Lossless Audio Codec File (FLAC)",     "flac"),
+            new FileNameExtensionFilter("MPEG-4 Audio Layer (M4A)",                  "m4a"),
+            new FileNameExtensionFilter("iTunes Music Store Audio File (M4P)",       "m4p"),
+            new FileNameExtensionFilter("MPEG Layer II Compressed Audio File (MP2)", "mp2"),
+            new FileNameExtensionFilter("MPEG-1/2/2.5 Layer 3 Audio (MP3)",          "mp3"),
+            new FileNameExtensionFilter("MPEG-1 Layer 3 Audio File (MPGA)",          "mpga"),
+            new FileNameExtensionFilter("Ogg Vorbis Audio File (OGG)",               "ogg"),
+            new FileNameExtensionFilter("Opus Audio File (OPUS)",                    "opus"),
+            new FileNameExtensionFilter("Waveform Audio File (WAV)",                 "wav"),
+            new FileNameExtensionFilter("Windows Media (Metafile) (WMA)",            "wma")
+        };
         
         FileChooser.setAcceptAllFileFilterUsed(false);
-        FileChooser.setFileFilter(filterAll);
-        FileChooser.addChoosableFileFilter(filterWav);
-        FileChooser.addChoosableFileFilter(filterOgg);
-        FileChooser.addChoosableFileFilter(filterMP3);  
-        FileChooser.addChoosableFileFilter(filterFlac);
+        for (FileNameExtensionFilter filter : filters) {
+            FileChooser.addChoosableFileFilter(filter);
+        }
+        FileChooser.setFileFilter(filters[0]);
         
+        // кастомные иконки
         FileChooser.setFileView(new ImageFileView());
                 
         setLocationRelativeTo(null);
