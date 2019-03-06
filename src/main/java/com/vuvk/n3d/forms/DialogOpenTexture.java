@@ -38,7 +38,7 @@ import org.apache.commons.io.FileUtils;
  */
 public class DialogOpenTexture extends javax.swing.JDialog {    
     /** выбранный файл */
-    public static File selectedFile = null;
+    File selectedFile = null;
     /** путь до ресурсов */
     public static File currentPath = FileUtils.getUserDirectory();
     /** поле для рисования предпросмотра */
@@ -174,6 +174,21 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         dispose();
     }//GEN-LAST:event_FileChooserActionPerformed
 
+    @Override
+    public void setVisible(boolean b) {
+        throw new UnsupportedOperationException("Use 'execute()' for set visible DialogOpenSound!");
+    }  
+    
+    /**
+     * Открыть диалог открытия текстур
+     * @return Выбранный файл, либо null, если операция отменена или не удалась.
+     */
+    public File execute() {
+        super.setVisible(true);
+        
+        return selectedFile;
+    }    
+    
     private void FileChooserPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_FileChooserPropertyChange
         switch (evt.getPropertyName()) {                
             // выбран файл

@@ -1228,10 +1228,7 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMICutActionPerformed
 
     private void popupPVMITextureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMITextureActionPerformed
-        DialogOpenTexture dlg = new DialogOpenTexture(this, true);
-        dlg.setVisible(true);
-        
-        File txrFile = DialogOpenTexture.selectedFile;
+        File txrFile = new DialogOpenTexture(this, true).execute();
         if (txrFile != null) {
             // копируем текстуру к себе в папку ресурсов
             String baseName = FilenameUtils.getBaseName(txrFile.getName());     
