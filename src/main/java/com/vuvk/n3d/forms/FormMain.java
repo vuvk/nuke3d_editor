@@ -670,26 +670,9 @@ public class FormMain extends javax.swing.JFrame {
         
         Global.initPathResources();
         Global.initPathConfig();
-                
+        
         setLocationRelativeTo(null);
-        //fillListProjectView();
-        
-        // задаем кастомный рендерер
-        listProjectView.setCellRenderer(new ProjectViewCellRenderer());
-        
-        // кастомные иконки для дерева
-        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeFolders.getCellRenderer();
-        Icon leafIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp__.png"));
-        Icon openIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_open_white_18dp__.png"));
-        Icon closedIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp__.png"));
-        renderer.setOpenIcon(openIcon);
-        renderer.setClosedIcon(closedIcon);
-        renderer.setLeafIcon(leafIcon);
-        
-        clearTreeFolders();
-        clearListProjectView();
-        listProjectView.setEnabled(false);
-        treeFolders.setEnabled(false);  
+        //fillListProjectView();        
     }
 
     /** This method is called from within the constructor to
@@ -821,12 +804,9 @@ public class FormMain extends javax.swing.JFrame {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
-            public void windowActivated(java.awt.event.WindowEvent evt) {
-                formWindowActivated(evt);
-            }
         });
 
-        jSplitPane3.setDividerLocation(600);
+        jSplitPane3.setDividerLocation(550);
         jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         Desktop.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.focus"));
@@ -840,13 +820,13 @@ public class FormMain extends javax.swing.JFrame {
         );
         DesktopLayout.setVerticalGroup(
             DesktopLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 384, Short.MAX_VALUE)
+            .add(0, 549, Short.MAX_VALUE)
         );
 
         jSplitPane3.setLeftComponent(Desktop);
 
         splProjectManager.setMinimumSize(new java.awt.Dimension(128, 32));
-        splProjectManager.setPreferredSize(new java.awt.Dimension(340, 200));
+        splProjectManager.setPreferredSize(new java.awt.Dimension(340, 250));
 
         jScrollPane1.setMinimumSize(new java.awt.Dimension(128, 128));
         jScrollPane1.setPreferredSize(new java.awt.Dimension(200, 386));
@@ -982,10 +962,6 @@ public class FormMain extends javax.swing.JFrame {
             setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         }
     }//GEN-LAST:event_formWindowClosing
-
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        
-    }//GEN-LAST:event_formWindowActivated
     
     private void treeFoldersMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeFoldersMousePressed
         if (evt.getButton() == MouseEvent.BUTTON1) {  
@@ -1118,7 +1094,23 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMIRenameActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        //fillTreeFolders(true); // заполнит дерево и выберет ветку, что спровоцирует отрисовку вьюшки
+        // задаем кастомный рендерер
+        listProjectView.setCellRenderer(new ProjectViewCellRenderer());
+        
+        // кастомные иконки для дерева
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeFolders.getCellRenderer();
+        ImageIcon leafIcon = new ImageIcon(Const.ICONS.get("SmallFolderClose"));
+        ImageIcon openIcon = new ImageIcon(Const.ICONS.get("SmallFolderOpen"));
+        renderer.setOpenIcon(openIcon);
+        renderer.setLeafIcon(leafIcon);
+        renderer.setClosedIcon(leafIcon);
+        
+        clearTreeFolders();
+        clearListProjectView();
+        listProjectView.setEnabled(false);
+        treeFolders.setEnabled(false);  
+        
+        setIconImage(Const.ICONS.get("FormMainIcon"));
     }//GEN-LAST:event_formWindowOpened
 
     private void popupPVMIRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRemoveActionPerformed
