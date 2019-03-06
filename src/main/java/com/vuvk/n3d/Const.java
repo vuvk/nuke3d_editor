@@ -104,7 +104,7 @@ public final class Const {
     /** расширение файла импортированного звука */
     public static final String SOUND_FORMAT_EXT = "ogg";
     /** доступные расширения звуков для загрузки */
-    public static final List<String> SOUND_EXTS = Arrays.asList("wav", "ogg", "mp3", "flac");
+    public static final List<String> SOUND_EXTS = Arrays.asList("aac", "aif", "aiff", "flac", "m4a", "m4p", "mp2", "mp3", "mpga", "ogg", "opus", "wav", "wma");
     /** Путь до сохранённых параметров звуков */
     public static final String SOUND_CONFIG_STRING = CONFIG_STRING + "sounds.sav";
     /** идентификатор конфига звуков */
