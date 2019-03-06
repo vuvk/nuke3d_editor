@@ -17,17 +17,48 @@
 */
 package com.vuvk.n3d;
 
+import com.vuvk.n3d.utils.MessageDialog;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  *
  * @author Anton "Vuvk" Shcherbatykh
  */
 public final class Const {
+    /** набор иконок */
+    public final static HashMap<String, BufferedImage> ICONS = new HashMap<>();
+    static {
+            try {
+                // for jFrames
+                ICONS.put("FormMainIcon", ImageIO.read(Const.class.getClass().getResource("/com/vuvk/n3d/ico/jframes/NUKE3D.png")));
+                
+                // small icons
+                ICONS.put("SmallFolderClose", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp.png")));        
+                ICONS.put("SmallFolderOpen",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/small/ic_folder_open_white_18dp.png")));        
+                                
+                // for preview element
+                ICONS.put("LevelUp",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_arrow_upward_white_48dp.png")));        
+                ICONS.put("Folder",   ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_folder_open_white_48dp.png")));      
+                ICONS.put("Material", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_color_lens_white_48dp.png")));         
+                ICONS.put("Sound",    ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));         
+                ICONS.put("Unknown",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));  
+                
+            } catch (IOException ex) {
+                Logger.getLogger(Const.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }        
+    }
+    
+    
     /** имя папки, содержащей все ресурсы проекта */
     public static final String RESOURCES_STRING = "resources/";
-    //public static final String TEXTURE_SAVE_PATH = RESOURCES_STRING + "textures.sav";
     /** имя папки, в которой будут сохраняться настройки проекта */
     public static final String CONFIG_STRING = "config/";
     
@@ -37,7 +68,7 @@ public final class Const {
     /** максимальная высота текстуры */
     public static final int TEXTURE_MAX_HEIGHT = 512;    
     /** расширение файла импортированной текстуры */
-    public static final String TEXTURE_FORMAT_EXT = "txr";
+    public static final String TEXTURE_FORMAT_EXT = "png";
     /** доступные расширения текстур для загрузки */
     public static final List<String> TEXTURE_EXTS = Arrays.asList("jpg", "jpeg", "png", "bmp", "gif");
     /** Путь до сохранённых параметров текстур */
@@ -68,8 +99,10 @@ public final class Const {
     public static final String MATERIAL_CONFIG_VERSION = MATERIAL_CONFIG_MAJOR + "." + MATERIAL_CONFIG_MINOR;
     
     
+    /** расширение файла импортированного звука */
+    public static final String SOUND_FORMAT_EXT = "ogg";
     /** доступные расширения звуков для загрузки */
-    public static final List<String> SOUND_EXTS = Arrays.asList("wav", "ogg", "mp3");
+    public static final List<String> SOUND_EXTS = Arrays.asList("wav", "ogg", "mp3", "flac");
     /** Путь до сохранённых параметров звуков */
     public static final String SOUND_CONFIG_STRING = CONFIG_STRING + "sounds.sav";
     /** идентификатор конфига звуков */

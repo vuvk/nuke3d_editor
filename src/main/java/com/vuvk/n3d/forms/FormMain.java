@@ -670,26 +670,9 @@ public class FormMain extends javax.swing.JFrame {
         
         Global.initPathResources();
         Global.initPathConfig();
-                
+        
         setLocationRelativeTo(null);
-        //fillListProjectView();
-        
-        // задаем кастомный рендерер
-        listProjectView.setCellRenderer(new ProjectViewCellRenderer());
-        
-        // кастомные иконки для дерева
-        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeFolders.getCellRenderer();
-        Icon leafIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp__.png"));
-        Icon openIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_open_white_18dp__.png"));
-        Icon closedIcon = new ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/small/ic_folder_white_18dp__.png"));
-        renderer.setOpenIcon(openIcon);
-        renderer.setClosedIcon(closedIcon);
-        renderer.setLeafIcon(leafIcon);
-        
-        clearTreeFolders();
-        clearListProjectView();
-        listProjectView.setEnabled(false);
-        treeFolders.setEnabled(false);  
+        //fillListProjectView();        
     }
 
     /** This method is called from within the constructor to
@@ -821,12 +804,9 @@ public class FormMain extends javax.swing.JFrame {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
-            public void windowActivated(java.awt.event.WindowEvent evt) {
-                formWindowActivated(evt);
-            }
         });
 
-        jSplitPane3.setDividerLocation(600);
+        jSplitPane3.setDividerLocation(550);
         jSplitPane3.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         Desktop.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.focus"));
@@ -840,13 +820,13 @@ public class FormMain extends javax.swing.JFrame {
         );
         DesktopLayout.setVerticalGroup(
             DesktopLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 384, Short.MAX_VALUE)
+            .add(0, 549, Short.MAX_VALUE)
         );
 
         jSplitPane3.setLeftComponent(Desktop);
 
         splProjectManager.setMinimumSize(new java.awt.Dimension(128, 32));
-        splProjectManager.setPreferredSize(new java.awt.Dimension(340, 200));
+        splProjectManager.setPreferredSize(new java.awt.Dimension(340, 250));
 
         jScrollPane1.setMinimumSize(new java.awt.Dimension(128, 128));
         jScrollPane1.setPreferredSize(new java.awt.Dimension(200, 386));
@@ -982,10 +962,6 @@ public class FormMain extends javax.swing.JFrame {
             setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         }
     }//GEN-LAST:event_formWindowClosing
-
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        
-    }//GEN-LAST:event_formWindowActivated
     
     private void treeFoldersMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_treeFoldersMousePressed
         if (evt.getButton() == MouseEvent.BUTTON1) {  
@@ -1118,7 +1094,23 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMIRenameActionPerformed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        //fillTreeFolders(true); // заполнит дерево и выберет ветку, что спровоцирует отрисовку вьюшки
+        // задаем кастомный рендерер
+        listProjectView.setCellRenderer(new ProjectViewCellRenderer());
+        
+        // кастомные иконки для дерева
+        DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) treeFolders.getCellRenderer();
+        ImageIcon leafIcon = new ImageIcon(Const.ICONS.get("SmallFolderClose"));
+        ImageIcon openIcon = new ImageIcon(Const.ICONS.get("SmallFolderOpen"));
+        renderer.setOpenIcon(openIcon);
+        renderer.setLeafIcon(leafIcon);
+        renderer.setClosedIcon(leafIcon);
+        
+        clearTreeFolders();
+        clearListProjectView();
+        listProjectView.setEnabled(false);
+        treeFolders.setEnabled(false);  
+        
+        setIconImage(Const.ICONS.get("FormMainIcon"));
     }//GEN-LAST:event_formWindowOpened
 
     private void popupPVMIRemoveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMIRemoveActionPerformed
@@ -1228,59 +1220,68 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMICutActionPerformed
 
     private void popupPVMITextureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMITextureActionPerformed
-        DialogOpenTexture dlg = new DialogOpenTexture(this, true);
-        dlg.setVisible(true);
+        File[] files = new DialogOpenTexture(this, true).execute();
+        if (files == null || files.length == 0) {
+            return;
+        }
         
-        File txrFile = DialogOpenTexture.selectedFile;
-        if (txrFile != null) {
-            // копируем текстуру к себе в папку ресурсов
-            String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-            String extension = "." + Const.TEXTURE_FORMAT_EXT;
-            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
-            
-            // файл с таким же именем существует?
-            if (Files.exists(newPath)) {
-                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
-                // CANCEL
-                if (answer == null) {
-                    return;
-                // NO
-                } else if (!answer.booleanValue()) {
-                    // решил переименовать
-                    while (Files.exists(newPath)) {
-                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
-                        if (newName == null) {
-                            return;    // отмена?
-                        } else {
-                            baseName = newName;
-                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
-                        }
-                    }   
-                // YES
-                } else {
-                    FileSystemUtils.remove(newPath);
+        String lastName = null; 
+        
+        for (File txrFile : files) {
+            if (txrFile != null) {
+                // копируем текстуру к себе в папку ресурсов
+                String baseName = FilenameUtils.getBaseName(txrFile.getName());     
+                String extension = "." + Const.TEXTURE_FORMAT_EXT;
+                Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
+
+                // файл с таким же именем существует?
+                if (Files.exists(newPath)) {
+                    Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
+                    // CANCEL
+                    if (answer == null) {
+                        continue;
+                    // NO
+                    } else if (!answer.booleanValue()) {
+                        // решил переименовать
+                        while (Files.exists(newPath)) {
+                            String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
+                            if (newName == null) {
+                                continue;    // отмена?
+                            } else {
+                                baseName = newName;
+                                newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+                            }
+                        }   
+                    // YES
+                    } else {
+                        FileSystemUtils.remove(newPath);
+                    }
                 }
+
+                // создаем файл у себя
+                try {
+                    BufferedImage img = ImageUtils.prepareImage(ImageIO.read(txrFile));
+                    ImageIO.write(img, "png", newPath.toFile());
+                } catch (Exception ex) {
+                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageDialog.showException(ex);
+                    continue;
+                }
+
+                fillListProjectView();            
+                new Texture(newPath);
+                
+                lastName = baseName;
             }
-            
-            // создаем файл у себя
-            try {
-                BufferedImage img = ImageUtils.prepareImage(ImageIO.read(txrFile));
-                ImageIO.write(img, "png", newPath.toFile());
-            } catch (Exception ex) {
-                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                return;
-            }
-            
-            fillListProjectView();            
-            new Texture(newPath);
-            
-            // открываем окно редактирования текстуры
+        }
+        
+        // открываем окно редактирования текстуры
+        if (lastName != null) {
             DefaultListModel model = (DefaultListModel) listProjectView.getModel();
             for (Object obj : model.toArray()) {
                 PreviewElement element = (PreviewElement)obj;
                 if (element.getType() == PreviewElement.Type.TEXTURE && 
-                    element.getName().equals(baseName)
+                    element.getName().equals(lastName)
                    ) {                    
                     listProjectView.setSelectedValue(element, true);
                     openFormTextureEditor();
@@ -1341,58 +1342,78 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMIMaterialActionPerformed
 
     private void popupPVMISoundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISoundActionPerformed
-        DialogOpenSound dlg = new DialogOpenSound(this, true);
-        dlg.setVisible(true);        
+        File[] files = new DialogOpenSound(this, true).execute();
+        if (files == null || files.length == 0) {
+            return;
+        }
         
-        File sndFile = DialogOpenSound.selectedFile;
-        if (sndFile != null) {
-            // копируем к себе в папку ресурсов
-            String baseName = FilenameUtils.getBaseName(sndFile.getName());     
-            String extension = "." + FileSystemUtils.getFileExtension(sndFile);
-            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
-            
-            // файл с таким же именем существует?
-            if (Files.exists(newPath)) {
-                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
-                // CANCEL
-                if (answer == null) {
-                    return;
-                // NO
-                } else if (!answer.booleanValue()) {
-                    // решил переименовать
-                    while (Files.exists(newPath)) {
-                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
-                        if (newName == null) {
-                            return;    // отмена?
-                        } else {
-                            baseName = newName;
-                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+        String lastName = null;
+        
+        for (File sndFile : files) {
+            if (sndFile != null) {
+                String baseName = FilenameUtils.getBaseName(sndFile.getName());     
+                String extension = "." + Const.SOUND_FORMAT_EXT;
+                Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
+
+                // файл с таким же именем существует?
+                if (Files.exists(newPath)) {
+                    Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
+                    // CANCEL
+                    if (answer == null) {
+                        return;
+                    // NO
+                    } else if (!answer.booleanValue()) {
+                        // решил переименовать
+                        while (Files.exists(newPath)) {
+                            String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
+                            if (newName == null) {
+                                return;    // отмена?
+                            } else {
+                                baseName = newName;
+                                newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+                            }
                         }
+                    // YES
+                    } else {
+                        FileSystemUtils.remove(newPath);
                     }
-                // YES
-                } else {
-                    FileSystemUtils.remove(newPath);
                 }
+
+                // если исходный файл с расширением ogg, то просто его копировать. А иначе конвертировать в ogg
+                if (Const.SOUND_FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
+                    // создаем файл у себя
+                    try {
+                        FileUtils.copyFile(sndFile, newPath.toFile());
+                    } catch (IOException ex) {
+                        Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                        MessageDialog.showException(ex);
+                        return;
+                    }
+                // файл не ogg
+                } else {
+                    File importedFile = new FormAudioConverter(this, true)
+                                            .execute(sndFile, newPath.toFile());
+                    if (importedFile == null) {
+                        return;
+                    } else {
+                        newPath = importedFile.toPath();
+                    }
+                }
+
+                fillListProjectView();            
+                new Sound(newPath);
+                
+                lastName = baseName;
             }
-            
-            // создаем файл у себя
-            try {
-                FileUtils.copyFile(sndFile, newPath.toFile());
-            } catch (IOException ex) {
-                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                return;
-            }
-            
-            fillListProjectView();            
-            new Sound(newPath);
-            
+        }
+        
+        if (lastName != null) {
             // открываем окно редактирования
             DefaultListModel model = (DefaultListModel) listProjectView.getModel();
             for (Object obj : model.toArray()) {
                 PreviewElement element = (PreviewElement)obj;
                 if (element.getType() == PreviewElement.Type.SOUND && 
-                    element.getName().equals(baseName)
+                    element.getName().equals(lastName)
                    ) {                    
                     listProjectView.setSelectedValue(element, true);
                     openFormSoundEditor();
@@ -1483,7 +1504,7 @@ public class FormMain extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
-                
+                        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {

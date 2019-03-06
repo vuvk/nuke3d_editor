@@ -48,10 +48,10 @@
           <ComponentRef name="null"/>
         </Property>
         <Property name="autoscrolls" type="boolean" value="true"/>
+        <Property name="multiSelectionEnabled" type="boolean" value="true"/>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="FileChooserActionPerformed"/>
-        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="FileChooserPropertyChange"/>
       </Events>
     </Component>
   </SubComponents>
