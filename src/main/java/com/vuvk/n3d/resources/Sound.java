@@ -248,7 +248,7 @@ public class Sound extends Resource {
         return (path != null &&
                 Files.exists(path) && 
                 !Files.isDirectory(path) && 
-                Const.SOUND_EXTS.contains(FileSystemUtils.getFileExtension(path)));
+                FileSystemUtils.getFileExtension(path).equals(Const.SOUND_FORMAT_EXT));
     }
     
 }
