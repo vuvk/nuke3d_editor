@@ -42,9 +42,7 @@ public class PreviewElement {
         MATERIAL,   // материал
         SOUND,      // звуковой файл
         UNKNOWN     // неизвестная фигня
-    }
-    /** набор иконок */
-    public static ArrayList<BufferedImage> icons = null;    
+    }   
 
     /** тип элемента */
     private Type type;
@@ -59,25 +57,6 @@ public class PreviewElement {
     /** какую иконку рисовать с этим элементом */
     private BufferedImage icon;
     
-    /**
-     * Загрузка иконок для элементов
-     */
-    private void loadIcons() {
-        if (icons == null) {
-            icons = new ArrayList<>();
-            try {
-                icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_arrow_upward_white_48dp.png")));        // Level Up
-                icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_folder_open_white_48dp.png")));         // Folder
-                icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_color_lens_white_48dp.png")));          // Material
-                icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));          // Audio
-                icons.add(ImageIO.read(getClass().getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));   // Unknown
-                
-            } catch (IOException ex) {
-                Logger.getLogger(PreviewElement.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-            }
-        }
-    }
         
     public PreviewElement(File path) {
         this(path.toPath());        
@@ -95,8 +74,6 @@ public class PreviewElement {
      * @param isUp Это кнопка "ВВЕРХ"?
      */
     public PreviewElement(Path path, boolean isUp) {        
-        loadIcons();
-        
         this.path = FileSystemUtils.getProjectPath(path);      
         this.fileName = path.getFileName().toString();
         
@@ -104,11 +81,11 @@ public class PreviewElement {
             if (isUp) {
                 type = Type.LEVELUP;
                 name = "Вверх";
-                icon = icons.get(0);
+                icon = Const.ICONS.get("LevelUp");
             } else {
                 type = Type.FOLDER;
                 name = fileName;
-                icon = icons.get(1);
+                icon = Const.ICONS.get("Folder");
             }
             
             extension = "";
@@ -127,18 +104,18 @@ public class PreviewElement {
                 
                 case Const.MATERIAL_FORMAT_EXT:
                     type = Type.MATERIAL;
-                    icon = icons.get(2);
+                    icon = Const.ICONS.get("Material");
                     break;
                     
                 case Const.SOUND_FORMAT_EXT:
                     type = Type.SOUND;
-                    icon = icons.get(3);
+                    icon = Const.ICONS.get("Sound");
                     break;
                     
                 default :
                     type = Type.UNKNOWN;
                     name = fileName;
-                    icon = icons.get(4);
+                    icon = Const.ICONS.get("Unknown");
                     break;
             }  
         }    

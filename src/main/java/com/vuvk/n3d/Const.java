@@ -17,14 +17,38 @@
 */
 package com.vuvk.n3d;
 
+import com.vuvk.n3d.utils.MessageDialog;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  *
  * @author Anton "Vuvk" Shcherbatykh
  */
 public final class Const {
+    /** набор иконок */
+    public final static HashMap<String, BufferedImage> ICONS = new HashMap<>();
+    static {
+            try {
+                ICONS.put("LevelUp",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_arrow_upward_white_48dp.png")));        // Level Up
+                ICONS.put("Folder",   ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_folder_open_white_48dp.png")));         // Folder
+                ICONS.put("Material", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_color_lens_white_48dp.png")));          // Material
+                ICONS.put("Sound",    ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));          // Audio
+                ICONS.put("Unknown",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));   // Unknown
+                
+            } catch (IOException ex) {
+                Logger.getLogger(Const.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }        
+    }
+    
+    
     /** имя папки, содержащей все ресурсы проекта */
     public static final String RESOURCES_STRING = "resources/";
     //public static final String TEXTURE_SAVE_PATH = RESOURCES_STRING + "textures.sav";
