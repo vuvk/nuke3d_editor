@@ -37,7 +37,7 @@ public final class Const {
     /** максимальная высота текстуры */
     public static final int TEXTURE_MAX_HEIGHT = 512;    
     /** расширение файла импортированной текстуры */
-    public static final String TEXTURE_FORMAT_EXT = "txr";
+    public static final String TEXTURE_FORMAT_EXT = "png";
     /** доступные расширения текстур для загрузки */
     public static final List<String> TEXTURE_EXTS = Arrays.asList("jpg", "jpeg", "png", "bmp", "gif");
     /** Путь до сохранённых параметров текстур */

@@ -115,7 +115,7 @@ public class PreviewElement {
         } else {
             extension = FileSystemUtils.getFileExtension(path.toFile());
             switch (extension) {
-                case "txr":
+                case Const.TEXTURE_FORMAT_EXT:
                     try {
                         icon = ImageUtils.resizeImage(ImageIO.read(path.toFile()), Const.ICON_PREVIEW_WIDTH, Const.ICON_PREVIEW_HEIGHT);
                     } catch (IOException ex) {
@@ -125,14 +125,12 @@ public class PreviewElement {
                     type = Type.TEXTURE;
                     break;
                 
-                case "mat":
+                case Const.MATERIAL_FORMAT_EXT:
                     type = Type.MATERIAL;
                     icon = icons.get(2);
                     break;
                     
-                case "wav":
-                case "mp3":
-                case "ogg":
+                case Const.SOUND_FORMAT_EXT:
                     type = Type.SOUND;
                     icon = icons.get(3);
                     break;
