@@ -73,6 +73,7 @@
                 <includes>
                     <include>com/vuvk/n3d/ico/*.png</include>
                     <include>com/vuvk/n3d/ico/small/*.png</include>
+                    <include>com/vuvk/n3d/ico/jframes/*.png</include>
                 </includes>
             </resource>
         </resources>
