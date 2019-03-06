@@ -44,19 +44,19 @@ public class DialogOpenSound extends javax.swing.JDialog {
         
         /** фильтры доступных расширений */
         FileNameExtensionFilter[] filters = {
-            new FileNameExtensionFilter("All knowns formats",                  (String[])Const.SOUND_EXTS.toArray()),
-            new FileNameExtensionFilter("MPEG-2 Advanced Audio Coding File",   "aac"),
-            new FileNameExtensionFilter("Audio Interchange File Format",       "aif", "aiff"),
-            new FileNameExtensionFilter("Free Lossless Audio Codec File",      "flac"),
-            new FileNameExtensionFilter("MPEG-4 Audio Layer",                  "m4a"),
-            new FileNameExtensionFilter("iTunes Music Store Audio File",       "m4p"),
-            new FileNameExtensionFilter("MPEG Layer II Compressed Audio File", "mp2"),
-            new FileNameExtensionFilter("MPEG-1/2/2.5 Layer 3 Audio",          "mp3"),
-            new FileNameExtensionFilter("MPEG-1 Layer 3 Audio File",           "mpga"),
-            new FileNameExtensionFilter("Ogg Vorbis Audio File",               "ogg"),
-            new FileNameExtensionFilter("Opus Audio File",                     "opus"),
-            new FileNameExtensionFilter("Waveform Audio File",                 "wav"),
-            new FileNameExtensionFilter("Windows Media (Metafile)",            "wma")
+            new FileNameExtensionFilter("All knowns formats",                        (String[])Const.SOUND_EXTS.toArray()),
+            new FileNameExtensionFilter("MPEG-2 Advanced Audio Coding File (AAC)",   "aac"),
+            new FileNameExtensionFilter("Audio Interchange File Format (AIF, AIFF)", "aif", "aiff"),
+            new FileNameExtensionFilter("Free Lossless Audio Codec File (FLAC)",     "flac"),
+            new FileNameExtensionFilter("MPEG-4 Audio Layer (M4A)",                  "m4a"),
+            new FileNameExtensionFilter("iTunes Music Store Audio File (M4P)",       "m4p"),
+            new FileNameExtensionFilter("MPEG Layer II Compressed Audio File (MP2)", "mp2"),
+            new FileNameExtensionFilter("MPEG-1/2/2.5 Layer 3 Audio (MP3)",          "mp3"),
+            new FileNameExtensionFilter("MPEG-1 Layer 3 Audio File (MPGA)",          "mpga"),
+            new FileNameExtensionFilter("Ogg Vorbis Audio File (OGG)",               "ogg"),
+            new FileNameExtensionFilter("Opus Audio File (OPUS)",                    "opus"),
+            new FileNameExtensionFilter("Waveform Audio File (WAV)",                 "wav"),
+            new FileNameExtensionFilter("Windows Media (Metafile) (WMA)",            "wma")
         };
         
         FileChooser.setAcceptAllFileFilterUsed(false);
