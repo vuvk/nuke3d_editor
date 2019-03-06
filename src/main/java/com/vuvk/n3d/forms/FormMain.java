@@ -1228,56 +1228,68 @@ public class FormMain extends javax.swing.JFrame {
     }//GEN-LAST:event_popupPVMICutActionPerformed
 
     private void popupPVMITextureActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMITextureActionPerformed
-        File txrFile = new DialogOpenTexture(this, true).execute();
-        if (txrFile != null) {
-            // копируем текстуру к себе в папку ресурсов
-            String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-            String extension = "." + Const.TEXTURE_FORMAT_EXT;
-            Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
-            
-            // файл с таким же именем существует?
-            if (Files.exists(newPath)) {
-                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
-                // CANCEL
-                if (answer == null) {
-                    return;
-                // NO
-                } else if (!answer.booleanValue()) {
-                    // решил переименовать
-                    while (Files.exists(newPath)) {
-                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
-                        if (newName == null) {
-                            return;    // отмена?
-                        } else {
-                            baseName = newName;
-                            newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
-                        }
-                    }   
-                // YES
-                } else {
-                    FileSystemUtils.remove(newPath);
+        File[] files = new DialogOpenTexture(this, true).execute();
+        if (files == null || files.length == 0) {
+            return;
+        }
+        
+        String lastName = null; 
+        
+        for (File txrFile : files) {
+            if (txrFile != null) {
+                // копируем текстуру к себе в папку ресурсов
+                String baseName = FilenameUtils.getBaseName(txrFile.getName());     
+                String extension = "." + Const.TEXTURE_FORMAT_EXT;
+                Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
+
+                // файл с таким же именем существует?
+                if (Files.exists(newPath)) {
+                    Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + baseName + "\"\nуже существует! Перезаписать?");
+                    // CANCEL
+                    if (answer == null) {
+                        continue;
+                    // NO
+                    } else if (!answer.booleanValue()) {
+                        // решил переименовать
+                        while (Files.exists(newPath)) {
+                            String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + baseName + "\":", baseName);
+                            if (newName == null) {
+                                continue;    // отмена?
+                            } else {
+                                baseName = newName;
+                                newPath = Paths.get(currentPath.toString() + "/" + newName + extension);
+                            }
+                        }   
+                    // YES
+                    } else {
+                        FileSystemUtils.remove(newPath);
+                    }
                 }
+
+                // создаем файл у себя
+                try {
+                    BufferedImage img = ImageUtils.prepareImage(ImageIO.read(txrFile));
+                    ImageIO.write(img, "png", newPath.toFile());
+                } catch (Exception ex) {
+                    Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                    MessageDialog.showException(ex);
+                    continue;
+                }
+
+                fillListProjectView();            
+                new Texture(newPath);
+                
+                lastName = baseName;
             }
-            
-            // создаем файл у себя
-            try {
-                BufferedImage img = ImageUtils.prepareImage(ImageIO.read(txrFile));
-                ImageIO.write(img, "png", newPath.toFile());
-            } catch (Exception ex) {
-                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
-                MessageDialog.showException(ex);
-                return;
-            }
-            
-            fillListProjectView();            
-            new Texture(newPath);
-            
-            // открываем окно редактирования текстуры
+        }
+        
+        // открываем окно редактирования текстуры
+        if (lastName != null) {
             DefaultListModel model = (DefaultListModel) listProjectView.getModel();
             for (Object obj : model.toArray()) {
                 PreviewElement element = (PreviewElement)obj;
                 if (element.getType() == PreviewElement.Type.TEXTURE && 
-                    element.getName().equals(baseName)
+                    element.getName().equals(lastName)
                    ) {                    
                     listProjectView.setSelectedValue(element, true);
                     openFormTextureEditor();

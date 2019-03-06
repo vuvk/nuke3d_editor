@@ -38,7 +38,7 @@ import org.apache.commons.io.FileUtils;
  */
 public class DialogOpenTexture extends javax.swing.JDialog {    
     /** выбранный файл */
-    File selectedFile = null;
+    File[] selectedFiles = null;
     /** путь до ресурсов */
     public static File currentPath = FileUtils.getUserDirectory();
     /** поле для рисования предпросмотра */
@@ -98,6 +98,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         FileChooser.setDialogTitle("");
         FileChooser.setFileFilter(null);
         FileChooser.setAutoscrolls(true);
+        FileChooser.setMultiSelectionEnabled(true);
         FileChooser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 FileChooserActionPerformed(evt);
@@ -161,13 +162,13 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         switch (evt.getActionCommand()) {
             // нажато "Открыть"
             case JFileChooser.APPROVE_SELECTION :
-                selectedFile = FileChooser.getSelectedFile();        
-                currentPath = FileChooser.getCurrentDirectory();
+                selectedFiles = FileChooser.getSelectedFiles();        
+                currentPath   = FileChooser.getCurrentDirectory();
                 break;
                 
-            // нажато "отмена
+            // нажато "отмена"
             case JFileChooser.CANCEL_SELECTION : 
-                selectedFile = null;
+                selectedFiles = null;
                 break;
         }
         
@@ -181,12 +182,12 @@ public class DialogOpenTexture extends javax.swing.JDialog {
     
     /**
      * Открыть диалог открытия текстур
-     * @return Выбранный файл, либо null, если операция отменена или не удалась.
+     * @return Выбранные файлы, либо null, если операция отменена или не удалась.
      */
-    public File execute() {
+    public File[] execute() {
         super.setVisible(true);
         
-        return selectedFile;
+        return selectedFiles;
     }    
     
     private void FileChooserPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_FileChooserPropertyChange
@@ -220,7 +221,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
     }//GEN-LAST:event_CheckStretchedStateChanged
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        selectedFile = null;
+        selectedFiles = null;
         FileChooser.setCurrentDirectory(currentPath);
     }//GEN-LAST:event_formWindowOpened
 

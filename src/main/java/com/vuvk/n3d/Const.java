@@ -51,7 +51,6 @@ public final class Const {
     
     /** имя папки, содержащей все ресурсы проекта */
     public static final String RESOURCES_STRING = "resources/";
-    //public static final String TEXTURE_SAVE_PATH = RESOURCES_STRING + "textures.sav";
     /** имя папки, в которой будут сохраняться настройки проекта */
     public static final String CONFIG_STRING = "config/";
     
