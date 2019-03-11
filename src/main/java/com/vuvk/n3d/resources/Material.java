@@ -148,7 +148,7 @@ public class Material extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File materialConfig = new File(Const.MATERIAL_CONFIG_STRING);
+        File materialConfig = new File(Const.MATERIALS_CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !materialConfig.exists()) {
@@ -168,8 +168,8 @@ public class Material extends Resource {
         
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.MATERIAL_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.MATERIAL_CONFIG_VERSION))
+                                  Const.MATERIALS_CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(Const.MATERIALS_CONFIG_VERSION))
            ) {
             return false;
         }
@@ -244,12 +244,12 @@ public class Material extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.MATERIAL_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.MATERIAL_CONFIG_VERSION);
+        config.addProperty("identificator", Const.MATERIALS_CONFIG_IDENTIFICATOR);
+        config.addProperty("version", Const.MATERIALS_CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг
-        try (Writer writer = new FileWriter(Const.MATERIAL_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(Const.MATERIALS_CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
