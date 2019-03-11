@@ -44,7 +44,8 @@ public final class Const {
             ICONS.put("LevelUp",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_arrow_upward_white_48dp.png")));        
             ICONS.put("Folder",   ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_folder_open_white_48dp.png")));      
             ICONS.put("Material", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_color_lens_white_48dp.png")));         
-            ICONS.put("Sound",    ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));         
+            ICONS.put("Sound",    ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_music_note_white_48dp.png")));          
+            ICONS.put("Skybox",   ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_language_white_24dp.png")));               
             ICONS.put("Unknown",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));  
             
             ICONS.put("Add",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_add_circle_white.png")));   
@@ -113,6 +114,24 @@ public final class Const {
     static final int SOUND_CONFIG_MAJOR = 0;
     static final int SOUND_CONFIG_MINOR = 1;
     public static final String SOUND_CONFIG_VERSION = SOUND_CONFIG_MAJOR + "." + SOUND_CONFIG_MINOR;
+    
+    
+    /** идентификатор скайбокса */
+    public static final String SKYBOX_IDENTIFICATOR = "N3D_SKYBOX";
+    /** версия скайбокса */
+    static final int SKYBOX_MAJOR = 0;
+    static final int SKYBOX_MINOR = 1;
+    public static final String SKYBOX_VERSION = SKYBOX_MAJOR + "." + SKYBOX_MINOR;
+    /** расширение файла импортированного скайбокса */
+    public static final String SKYBOX_FORMAT_EXT = "sky";
+    /** Путь до сохранённых параметров скайбоксов */
+    public static final String SKYBOXES_CONFIG_STRING = CONFIG_STRING + "skyboxes.sav";
+    /** идентификатор конфига скайбоксов */
+    public static final String SKYBOXES_CONFIG_IDENTIFICATOR = "N3D_SKYBOXES";
+    /** версия конфига скайбоксов */
+    static final int SKYBOXES_CONFIG_MAJOR = 0;
+    static final int SKYBOXES_CONFIG_MINOR = 1;
+    public static final String SKYBOXES_CONFIG_VERSION = SKYBOXES_CONFIG_MAJOR + "." + SKYBOXES_CONFIG_MINOR;
     
     
     /** Размер иконок превью */
