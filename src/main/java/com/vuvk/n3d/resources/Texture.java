@@ -245,40 +245,6 @@ public final class Texture extends Resource {
         image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
     }
     
-    /**
-     * Получить ссылку на текстуру по пути до файла
-     * @param path Путь до файла
-     * @return Текстура, если есть такая в базе, иначе null
-     */
-    public static Texture getByPath(String path) {
-        for (Texture txr : TEXTURES) {
-            if (txr.getPath().equals(path)) {
-                return txr;
-            }
-        }        
-        return null;
-    }
-    /**
-     * Получить ссылку на текстуру по пути до файла
-     * @param path Путь до файла
-     * @return Текстура, если есть такая в базе, иначе null
-     */
-    public static Texture getByPath(Path path) {        
-        return getByPath(path.toString());
-    }
-    /**
-     * Получить ссылку на текстуру по id
-     * @param id Идентификатор текстуры
-     * @return Текстура, если есть такая в базе, иначе null
-     */
-    public static Texture getById(long id) {
-        for (Texture txr : TEXTURES) {
-            if (txr.getId() == id) {
-                return txr;
-            }
-        }
-        return null;
-    }    
     @Override
     protected List getContainer() {
         return TEXTURES;

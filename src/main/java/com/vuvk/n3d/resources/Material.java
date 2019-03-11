@@ -273,7 +273,6 @@ public class Material extends Resource {
     /**
      * Проверка всех кадров всех материалов на наличие текстуры в базе.
      * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
-     * @return true, если все кадры валидные
      */
     public static void checkAll() {
         for (Material mat : MATERIALS) {
@@ -357,7 +356,11 @@ public class Material extends Resource {
                 }
 
                 // добавить кадр
-                pushFrame(new Frame(Texture.getById(jsonTxrId.getAsLong()), jsonDelay.getAsDouble()));
+                long id = jsonTxrId.getAsLong();
+                double delay = jsonDelay.getAsDouble();
+                Texture txr = (Texture) Resource.getById(id, Resource.Type.TEXTURE);
+                
+                pushFrame(new Frame(txr, delay));
             }
             
             return true;
@@ -524,40 +527,7 @@ public class Material extends Resource {
             frames.set(index, frame);
         }
     }    
-    /**
-     * Получить ссылку на материал по пути до файла
-     * @param path Путь до файла
-     * @return Материал, если есть такой в базе, иначе null
-     */
-    public static Material getByPath(String path) {
-        for (Material mat : MATERIALS) {
-            if (mat.getPath().equals(path)) {
-                return mat;
-            }
-        }        
-        return null;
-    }
-    /**
-     * Получить ссылку на материал по пути до файла
-     * @param path Путь до файла
-     * @return Материал, если есть такой в базе, иначе null
-     */
-    public static Material getByPath(Path path) {
-        return getByPath(path.toString());
-    }
-    /**
-     * Получить ссылку на материал по id
-     * @param id Идентификатор материала
-     * @return Материал, если есть такой в базе, иначе null
-     */
-    public static Material getById(long id) {
-        for (Material mat : MATERIALS) {
-            if (mat.getId() == id) {
-                return mat;
-            }
-        }
-        return null;
-    }
+    
     @Override
     protected List getContainer() {
         return MATERIALS;

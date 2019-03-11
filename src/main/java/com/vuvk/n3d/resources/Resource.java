@@ -24,6 +24,7 @@ import com.vuvk.n3d.utils.MessageDialog;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +36,18 @@ import org.apache.commons.io.FilenameUtils;
  * @author Anton "Vuvk" Shcherbatykh
  */
 public abstract class Resource {
+    
+    /**
+     * типы ресурсов
+     */
+    public static enum Type {
+        TEXTURE,
+        MATERIAL,
+        SOUND,
+        SKYBOX
+    }
+    
+    
     /** идентификатор */
     protected long id;
     /** имя */
@@ -199,6 +212,122 @@ public abstract class Resource {
         }
         
         return true;
+    }
+    
+    /**
+     * Получить ссылку на ресурс по пути до файла
+     * @param path Путь до файла
+     * @param type Тип ресурса для поиска
+     * @return ресурс, если есть такой в базе, иначе null
+     */
+    public static Resource getByPath(String path, Type type) {
+        List searchList = null;
+        
+        switch (type) {
+            case TEXTURE:
+                searchList = Texture.TEXTURES;
+                break;
+                
+            case MATERIAL:
+                searchList = Material.MATERIALS;
+                break;
+                
+            case SOUND:
+                searchList = Sound.SOUNDS;
+                break;
+                
+            case SKYBOX:
+                searchList = Skybox.SKYBOXES;
+                break;
+        }
+        
+        if (searchList != null) {
+            for (Iterator it = searchList.iterator(); it.hasNext(); ) {
+                Resource res = (Resource) it.next();
+                if (res.getPath().equals(path)) {
+                    return res;
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Получить ссылку на ресурс по пути до файла
+     * @param path Путь до файла
+     * @param type Тип ресурса для поиска
+     * @return ресурс, если есть такой в базе, иначе null
+     */
+    public static Resource getByPath(Path path, Type type) {
+        return getByPath(path.toString(), type);
+    }
+    
+    /**
+     * Получить ссылку на неизвестный ресурс по пути до файла. Долго
+     * @param path Путь до файла
+     * @return ресурс, если есть такой в базе, иначе null
+     */
+    public static Resource getByPath(String path) {
+        Resource res = null;
+        if ((res = getByPath(path, Type.TEXTURE)) != null) {
+            return res;
+        } else if ((res = getByPath(path, Type.MATERIAL)) != null) {
+            return res;
+        } else if ((res = getByPath(path, Type.SOUND)) != null) {
+            return res;
+        } else if ((res = getByPath(path, Type.SKYBOX)) != null) {
+            return res;
+        }
+        return null;
+    }
+    
+    /**
+     * Получить ссылку на неизвестный ресурс по пути до файла. Долго
+     * @param path Путь до файла
+     * @return ресурс, если есть такой в базе, иначе null
+     */
+    public static Resource getByPath(Path path) {        
+        return getByPath(path.toString());
+    }
+    
+    /**
+     * Получить ссылку на ресурс по id
+     * @param id Идентификатор материала
+     * @param type Тип ресурса для поиска
+     * @return ресурс, если есть такой в базе, иначе null
+     */
+    public static Resource getById(long id, Type type) {
+        List searchList = null;
+        
+        switch (type) {
+            case TEXTURE:
+                searchList = Texture.TEXTURES;
+                break;
+                
+            case MATERIAL:
+                searchList = Material.MATERIALS;
+                break;
+                
+            case SOUND:
+                searchList = Sound.SOUNDS;
+                break;
+                
+            case SKYBOX:
+                searchList = Skybox.SKYBOXES;
+                break;
+        }
+        
+        if (searchList != null) {
+            for (Iterator it = searchList.iterator(); it.hasNext(); ) {
+                Resource res = (Resource) it.next();
+                if (res.getId() == id) {
+                    return res;
+                }
+            }
+        }
+        
+        return null;
     }
     
     /**

@@ -22,6 +22,7 @@ import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.components.PreviewElement;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Resource;
 import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
@@ -246,7 +247,7 @@ public class FormMain extends javax.swing.JFrame {
             PreviewElement element = (PreviewElement)list.get(0);
             if (element.getType() == PreviewElement.Type.TEXTURE) {
                 
-                Texture txr = Texture.getByPath(element.getPath());
+                Texture txr = (Texture) Resource.getByPath(element.getPath(), Resource.Type.TEXTURE);
                 if (txr != null) {
                     boolean firstRun = false;
                     if (formTextureEditor == null) {
@@ -289,7 +290,7 @@ public class FormMain extends javax.swing.JFrame {
             PreviewElement element = (PreviewElement)list.get(0);
             if (element.getType() == PreviewElement.Type.MATERIAL) {
                 
-                Material mat = Material.getByPath(element.getPath());
+                Material mat = (Material) Resource.getByPath(element.getPath(), Resource.Type.MATERIAL);
                 if (mat != null) {
                     boolean firstRun = false;
                     if (formMaterialEditor == null) {
@@ -332,7 +333,7 @@ public class FormMain extends javax.swing.JFrame {
             PreviewElement element = (PreviewElement)list.get(0);
             if (element.getType() == PreviewElement.Type.SOUND) {
                 
-                Sound snd = Sound.getByPath(element.getPath());
+                Sound snd = (Sound) Resource.getByPath(element.getPath(), Resource.Type.SOUND);
                 if (snd != null) {
                     boolean firstRun = false;
                     if (formSoundEditor == null) {
