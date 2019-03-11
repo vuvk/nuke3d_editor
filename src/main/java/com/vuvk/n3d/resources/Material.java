@@ -148,7 +148,7 @@ public class Material extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File materialConfig = new File(Const.MATERIAL_CONFIG_STRING);
+        File materialConfig = new File(Const.MATERIALS_CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !materialConfig.exists()) {
@@ -168,8 +168,8 @@ public class Material extends Resource {
         
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.MATERIAL_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.MATERIAL_CONFIG_VERSION))
+                                  Const.MATERIALS_CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(Const.MATERIALS_CONFIG_VERSION))
            ) {
             return false;
         }
@@ -244,12 +244,12 @@ public class Material extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.MATERIAL_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.MATERIAL_CONFIG_VERSION);
+        config.addProperty("identificator", Const.MATERIALS_CONFIG_IDENTIFICATOR);
+        config.addProperty("version", Const.MATERIALS_CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг
-        try (Writer writer = new FileWriter(Const.MATERIAL_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(Const.MATERIALS_CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
@@ -273,7 +273,6 @@ public class Material extends Resource {
     /**
      * Проверка всех кадров всех материалов на наличие текстуры в базе.
      * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
-     * @return true, если все кадры валидные
      */
     public static void checkAll() {
         for (Material mat : MATERIALS) {
@@ -357,7 +356,11 @@ public class Material extends Resource {
                 }
 
                 // добавить кадр
-                pushFrame(new Frame(Texture.getById(jsonTxrId.getAsLong()), jsonDelay.getAsDouble()));
+                long id = jsonTxrId.getAsLong();
+                double delay = jsonDelay.getAsDouble();
+                Texture txr = (Texture) Resource.getById(id, Resource.Type.TEXTURE);
+                
+                pushFrame(new Frame(txr, delay));
             }
             
             return true;
@@ -524,40 +527,7 @@ public class Material extends Resource {
             frames.set(index, frame);
         }
     }    
-    /**
-     * Получить ссылку на материал по пути до файла
-     * @param path Путь до файла
-     * @return Материал, если есть такой в базе, иначе null
-     */
-    public static Material getByPath(String path) {
-        for (Material mat : MATERIALS) {
-            if (mat.getPath().equals(path)) {
-                return mat;
-            }
-        }        
-        return null;
-    }
-    /**
-     * Получить ссылку на материал по пути до файла
-     * @param path Путь до файла
-     * @return Материал, если есть такой в базе, иначе null
-     */
-    public static Material getByPath(Path path) {
-        return getByPath(path.toString());
-    }
-    /**
-     * Получить ссылку на материал по id
-     * @param id Идентификатор материала
-     * @return Материал, если есть такой в базе, иначе null
-     */
-    public static Material getById(long id) {
-        for (Material mat : MATERIALS) {
-            if (mat.getId() == id) {
-                return mat;
-            }
-        }
-        return null;
-    }
+    
     @Override
     protected List getContainer() {
         return MATERIALS;

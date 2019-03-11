@@ -33,7 +33,7 @@
               <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               <Component id="pnlFrames" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="pnlProperties" min="-2" pref="373" max="-2" attributes="0"/>
+              <Component id="pnlProperties" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>

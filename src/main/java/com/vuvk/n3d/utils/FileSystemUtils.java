@@ -24,6 +24,7 @@ import com.vuvk.n3d.forms.FormMaterialEditor;
 import com.vuvk.n3d.forms.FormSoundEditor;
 import com.vuvk.n3d.forms.FormTextureEditor;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Resource;
 import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
@@ -406,19 +407,19 @@ public final class FileSystemUtils {
         // заменяем часть пути (или весь) с учетом нового имени папки или файла
         if (isCutMode) {
             for (Pair<String, String> paths : texturesForRepath) {
-                Texture txr = Texture.getByPath(paths.getLeft());            
+                Texture txr = (Texture) Resource.getByPath(paths.getLeft(), Resource.Type.TEXTURE);            
                 if (txr != null) {
                     txr.setPath(paths.getRight());
                 }
             }
             for (Pair<String, String> paths : materialsForRepath) {
-                Material mat = Material.getByPath(paths.getLeft());
+                Material mat = (Material) Resource.getByPath(paths.getLeft(), Resource.Type.MATERIAL); 
                 if (mat != null) {
                     mat.setPath(paths.getRight());
                 }
             } 
             for (Pair<String, String> paths : soundsForRepath) {
-                Sound snd = Sound.getByPath(paths.getLeft());
+                Sound snd = (Sound) Resource.getByPath(paths.getLeft(), Resource.Type.SOUND); 
                 if (snd != null) {
                     snd.setPath(paths.getRight());
                 }
@@ -523,7 +524,7 @@ public final class FileSystemUtils {
         // удаляем из проекта то, что нашли
         // текстуры
         for (String filePath : texturesForDelete) {
-            Texture txr = Texture.getByPath(filePath);
+            Texture txr = (Texture) Resource.getByPath(filePath, Resource.Type.TEXTURE); 
             if (txr != null) {
                 // закрыть окно с открытой удаляемой текстурой
                 if (FormMain.formTextureEditor != null && 
@@ -538,7 +539,7 @@ public final class FileSystemUtils {
         }
         // материалы
         for (String filePath : materialsForDelete) {
-            Material mat = Material.getByPath(filePath);
+            Material mat = (Material) Resource.getByPath(filePath, Resource.Type.MATERIAL); 
             if (mat != null) {
                 // закрыть окно с открытой удаляемым материалом
                 if (FormMain.formMaterialEditor != null && 
@@ -553,7 +554,7 @@ public final class FileSystemUtils {
         }
         // звуки
         for (String filePath : soundsForDelete) {
-            Sound snd = Sound.getByPath(filePath);
+            Sound snd = (Sound) Resource.getByPath(filePath, Resource.Type.SOUND); 
             if (snd != null) {
                 // закрыть окно с открытой удаляемым материалом
                 if (FormMain.formSoundEditor != null && 

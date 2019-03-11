@@ -66,7 +66,7 @@ public final class Texture extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File textureConfig = new File(Const.TEXTURE_CONFIG_STRING);
+        File textureConfig = new File(Const.TEXTURES_CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !textureConfig.exists()) {
@@ -86,8 +86,8 @@ public final class Texture extends Resource {
               
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.TEXTURE_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.TEXTURE_CONFIG_VERSION))
+                                  Const.TEXTURES_CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(Const.TEXTURES_CONFIG_VERSION))
            ) {
             return false;
         }
@@ -144,12 +144,12 @@ public final class Texture extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.TEXTURE_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.TEXTURE_CONFIG_VERSION);
+        config.addProperty("identificator", Const.TEXTURES_CONFIG_IDENTIFICATOR);
+        config.addProperty("version", Const.TEXTURES_CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг текстур
-        try (Writer writer = new FileWriter(Const.TEXTURE_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(Const.TEXTURES_CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
@@ -245,40 +245,6 @@ public final class Texture extends Resource {
         image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
     }
     
-    /**
-     * Получить ссылку на текстуру по пути до файла
-     * @param path Путь до файла
-     * @return Текстура, если есть такая в базе, иначе null
-     */
-    public static Texture getByPath(String path) {
-        for (Texture txr : TEXTURES) {
-            if (txr.getPath().equals(path)) {
-                return txr;
-            }
-        }        
-        return null;
-    }
-    /**
-     * Получить ссылку на текстуру по пути до файла
-     * @param path Путь до файла
-     * @return Текстура, если есть такая в базе, иначе null
-     */
-    public static Texture getByPath(Path path) {        
-        return getByPath(path.toString());
-    }
-    /**
-     * Получить ссылку на текстуру по id
-     * @param id Идентификатор текстуры
-     * @return Текстура, если есть такая в базе, иначе null
-     */
-    public static Texture getById(long id) {
-        for (Texture txr : TEXTURES) {
-            if (txr.getId() == id) {
-                return txr;
-            }
-        }
-        return null;
-    }    
     @Override
     protected List getContainer() {
         return TEXTURES;

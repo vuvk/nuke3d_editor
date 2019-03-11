@@ -56,7 +56,7 @@ public class Sound extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File soundConfig = new File(Const.SOUND_CONFIG_STRING);
+        File soundConfig = new File(Const.SOUNDS_CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !soundConfig.exists()) {
@@ -76,8 +76,8 @@ public class Sound extends Resource {
               
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.SOUND_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.SOUND_CONFIG_VERSION))
+                                  Const.SOUNDS_CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(Const.SOUNDS_CONFIG_VERSION))
            ) {
             return false;
         }
@@ -139,12 +139,12 @@ public class Sound extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.SOUND_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.SOUND_CONFIG_VERSION);
+        config.addProperty("identificator", Const.SOUNDS_CONFIG_IDENTIFICATOR);
+        config.addProperty("version", Const.SOUNDS_CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг текстур
-        try (Writer writer = new FileWriter(Const.SOUND_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(Const.SOUNDS_CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
@@ -200,41 +200,7 @@ public class Sound extends Resource {
     public boolean isMusic() {
         return isMusic;
     }
-
-    /**
-     * Получить ссылку на звук по пути до файла
-     * @param path Путь до файла
-     * @return Звук, если есть такой в базе, иначе null
-     */
-    public static Sound getByPath(String path) {
-        for (Sound snd : SOUNDS) {
-            if (snd.getPath().equals(path)) {
-                return snd;
-            }
-        }        
-        return null;
-    }
-    /**
-     * Получить ссылку на звук по пути до файла
-     * @param path Путь до файла
-     * @return Звук, если есть такой в базе, иначе null
-     */
-    public static Sound getByPath(Path path) {
-        return getByPath(path.toString());
-    }
-    /**
-     * Получить ссылку на звук по id
-     * @param id Идентификатор материала
-     * @return Звук, если есть такой в базе, иначе null
-     */
-    public static Sound getById(long id) {
-        for (Sound snd : SOUNDS) {
-            if (snd.getId() == id) {
-                return snd;
-            }
-        }
-        return null;
-    }
+    
     @Override
     protected List getContainer() {
         return SOUNDS;
