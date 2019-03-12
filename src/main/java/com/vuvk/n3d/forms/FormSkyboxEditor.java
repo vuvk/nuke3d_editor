@@ -17,6 +17,7 @@
 */
 package com.vuvk.n3d.forms;
 
+import com.vuvk.n3d.Const;
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Skybox.Side;
@@ -25,6 +26,7 @@ import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Container;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,12 +51,44 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
 
         public SkyboxPreview(Container window, Skybox.Side side) {
             super(window);
-            setStretched(true);
+            setImage(null);
             this.side = side;
         }
         
+        /**
+         * Получить сторону куба, которая рисуется в превью
+         * @return значение енумератора Side
+         */
         public Skybox.Side getSide() {
             return side;
+        }        
+        
+        @Override
+        public void setImage(BufferedImage image) {
+            if (image != null) {
+                super.setImage(image);
+                setStretched(true);
+            } else {
+                super.setImage(Const.ICONS.get("Add"));
+                setStretched(false);
+            }
+        }
+        
+        /**
+          * вызвать окно выбора текстуры и назначить выбранную в сторону
+          */
+        void chooseTexture() {
+            FormTextureSelector form = new FormTextureSelector(FormMain.formMain, true);
+            form.setVisible(true);
+
+            if (form.selectedTexture != null) {
+                selectedSkybox.setTexture(form.selectedTexture, side);                
+                
+                sidePreviews[side.getNum()].setImage(form.selectedTexture.getImage());
+                sidePreviews[side.getNum()].redraw();
+            }
+
+            form.dispose();
         }
 
         @Override
@@ -64,7 +98,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            
+            chooseTexture();
         }
 
         @Override
@@ -287,7 +321,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
         );
 
         btnPreview.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_3d_rotation_white.png"))); // NOI18N
-        btnPreview.setToolTipText("Закрыть");
+        btnPreview.setToolTipText("Предпросмотр");
         btnPreview.setMaximumSize(new java.awt.Dimension(64, 64));
         btnPreview.setMinimumSize(new java.awt.Dimension(64, 64));
         btnPreview.setPreferredSize(new java.awt.Dimension(64, 64));

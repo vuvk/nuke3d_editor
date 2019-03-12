@@ -301,7 +301,7 @@
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
           <Image iconType="3" name="/com/vuvk/n3d/ico/ic_3d_rotation_white.png"/>
         </Property>
-        <Property name="toolTipText" type="java.lang.String" value="&#x417;&#x430;&#x43a;&#x440;&#x44b;&#x442;&#x44c;"/>
+        <Property name="toolTipText" type="java.lang.String" value="&#x41f;&#x440;&#x435;&#x434;&#x43f;&#x440;&#x43e;&#x441;&#x43c;&#x43e;&#x442;&#x440;"/>
         <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
           <Dimension value="[64, 64]"/>
         </Property>
