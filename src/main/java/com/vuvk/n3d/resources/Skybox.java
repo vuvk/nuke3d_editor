@@ -44,13 +44,35 @@ public class Skybox extends Resource {
         
         // номер стороны в массиве сторон
         private int num;
-        int getNum() {
+        public int getNum() {
             return num;
         }
         
         Side(int num) {
             this.num = num;
         }        
+        
+        /** 
+         * Получить сторону по номеру
+         * @param num номер стороны в промежутке [0-5]
+         * @return Константа енумератора: 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
+         */
+        public static Side getByNum(int num) {
+            if (num < 0) {
+                num = 0;
+            } else if (num >= 6) {
+                num = 5;
+            }
+            
+            switch (num) {
+                case 0 : return FRONT;
+                case 1 : return BACK;
+                case 2 : return LEFT;
+                case 3 : return RIGHT;
+                case 4 : return TOP;
+                default: return BOTTOM;
+            }
+        }
     }
     
     /** Список всех скайбоксов (контейнер) */
