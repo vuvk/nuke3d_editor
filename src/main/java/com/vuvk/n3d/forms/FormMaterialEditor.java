@@ -17,14 +17,9 @@
 */
 package com.vuvk.n3d.forms;
 
-import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.utils.MessageDialog;
-import java.awt.Color;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +48,7 @@ public final class FormMaterialEditor extends javax.swing.JInternalFrame {
             dispose();
         }
         
-        // получить имя редактируемой текстуры
+        // получить имя 
         txtName.setText(selectedMaterial.getName());
         // получить в панель предпросмотра ссылку на картинку
         Material.Frame frame = selectedMaterial.getFrame(0);

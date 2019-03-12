@@ -700,6 +700,7 @@ public class FormMain extends javax.swing.JFrame {
         popupPVMITexture = new javax.swing.JMenuItem();
         popupPVMIMaterial = new javax.swing.JMenuItem();
         popupPVMISound = new javax.swing.JMenuItem();
+        popupPVMISkybox = new javax.swing.JMenuItem();
         popupPVMICopy = new javax.swing.JMenuItem();
         popupPVMICut = new javax.swing.JMenuItem();
         popuvPVMIPaste = new javax.swing.JMenuItem();
@@ -757,6 +758,9 @@ public class FormMain extends javax.swing.JFrame {
             }
         });
         popupPVResource.add(popupPVMISound);
+
+        popupPVMISkybox.setText("jMenuItem1");
+        popupPVResource.add(popupPVMISkybox);
 
         popupPVMenuAdd.add(popupPVResource);
 
@@ -1539,6 +1543,7 @@ public class FormMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem popupPVMIMaterial;
     private javax.swing.JMenuItem popupPVMIRemove;
     private javax.swing.JMenuItem popupPVMIRename;
+    private javax.swing.JMenuItem popupPVMISkybox;
     private javax.swing.JMenuItem popupPVMISound;
     private javax.swing.JMenuItem popupPVMITexture;
     private javax.swing.JMenu popupPVMenuAdd;
