@@ -392,7 +392,6 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
     private javax.swing.JPanel pnlBack;
     private javax.swing.JPanel pnlBottom;
     private javax.swing.JPanel pnlFront;
-    private javax.swing.JPanel pnlFront1;
     private javax.swing.JPanel pnlLeft;
     private javax.swing.JPanel pnlRight;
     private javax.swing.JPanel pnlSides;
