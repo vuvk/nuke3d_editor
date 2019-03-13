@@ -45,7 +45,25 @@ import java.util.logging.Logger;
  * Класс хранимого скайбокса в редакторе
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class Skybox extends Resource {    
+public class Skybox extends Resource {  
+    
+    /** идентификатор скайбокса */
+    public static final String IDENTIFICATOR = "N3D_SKYBOX";
+    /** версия скайбокса */
+    static final int MAJOR = 0;
+    static final int MINOR = 1;
+    public static final String VERSION = MAJOR + "." + MINOR;
+    /** расширение файла импортированного скайбокса */
+    public static final String FORMAT_EXT = "sky";
+    /** Путь до сохранённых параметров скайбоксов */
+    public static final String CONFIG_STRING = Const.CONFIG_STRING + "skyboxes.sav";
+    /** идентификатор конфига скайбоксов */
+    public static final String CONFIG_IDENTIFICATOR = "N3D_SKYBOXES";
+    /** версия конфига скайбоксов */
+    static final int CONFIG_MAJOR = 0;
+    static final int CONFIG_MINOR = 1;
+    public static final String CONFIG_VERSION = CONFIG_MAJOR + "." + CONFIG_MINOR;
+    
     /**
      * стороны скайбокса
      */
@@ -107,7 +125,7 @@ public class Skybox extends Resource {
         return (path != null &&
                 Files.exists(path) && 
                 !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.SKYBOX_FORMAT_EXT));
+                FileSystemUtils.getFileExtension(path).equals(FORMAT_EXT));
     }
     
     /**
@@ -117,7 +135,7 @@ public class Skybox extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File skyboxConfig = new File(Const.SKYBOXES_CONFIG_STRING);
+        File skyboxConfig = new File(CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !skyboxConfig.exists()) {
@@ -137,8 +155,8 @@ public class Skybox extends Resource {
         
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.SKYBOXES_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.SKYBOXES_CONFIG_VERSION))
+                                  CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(CONFIG_VERSION))
            ) {
             return false;
         }
@@ -214,12 +232,12 @@ public class Skybox extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.SKYBOXES_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.SKYBOXES_CONFIG_VERSION);
+        config.addProperty("identificator", CONFIG_IDENTIFICATOR);
+        config.addProperty("version", CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг
-        try (Writer writer = new FileWriter(Const.SKYBOXES_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
@@ -345,7 +363,7 @@ public class Skybox extends Resource {
             // идентификатор
             JsonElement jsonIdentificator = config.get("identificator");
             if (jsonIdentificator == null || 
-                !jsonIdentificator.getAsString().equals(Const.SKYBOX_IDENTIFICATOR)
+                !jsonIdentificator.getAsString().equals(IDENTIFICATOR)
                ) {
                 return false;
             }
@@ -355,7 +373,7 @@ public class Skybox extends Resource {
                 return false;
             }
             double configVersion = jsonVersion.getAsDouble();
-            double editorVersion = Double.parseDouble(Const.SKYBOX_VERSION);
+            double editorVersion = Double.parseDouble(VERSION);
             if (editorVersion < configVersion) {
                 return false;
             }   
@@ -412,8 +430,8 @@ public class Skybox extends Resource {
         
         // общая информация об объекте
         JsonObject object = new JsonObject();
-        object.addProperty("identificator", Const.SKYBOX_IDENTIFICATOR);
-        object.addProperty("version", Const.SKYBOX_VERSION);
+        object.addProperty("identificator", IDENTIFICATOR);
+        object.addProperty("version", VERSION);
         object.add("sides", jsonSides);
         
         // сохраняем в привязанный файл

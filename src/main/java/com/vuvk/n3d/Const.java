@@ -64,24 +64,6 @@ public final class Const {
     public static final String CONFIG_STRING = "config/";  
     
     
-    /** идентификатор скайбокса */
-    public static final String SKYBOX_IDENTIFICATOR = "N3D_SKYBOX";
-    /** версия скайбокса */
-    static final int SKYBOX_MAJOR = 0;
-    static final int SKYBOX_MINOR = 1;
-    public static final String SKYBOX_VERSION = SKYBOX_MAJOR + "." + SKYBOX_MINOR;
-    /** расширение файла импортированного скайбокса */
-    public static final String SKYBOX_FORMAT_EXT = "sky";
-    /** Путь до сохранённых параметров скайбоксов */
-    public static final String SKYBOXES_CONFIG_STRING = CONFIG_STRING + "skyboxes.sav";
-    /** идентификатор конфига скайбоксов */
-    public static final String SKYBOXES_CONFIG_IDENTIFICATOR = "N3D_SKYBOXES";
-    /** версия конфига скайбоксов */
-    static final int SKYBOXES_CONFIG_MAJOR = 0;
-    static final int SKYBOXES_CONFIG_MINOR = 1;
-    public static final String SKYBOXES_CONFIG_VERSION = SKYBOXES_CONFIG_MAJOR + "." + SKYBOXES_CONFIG_MINOR;
-    
-    
     /** Размер иконок превью */
     public static final int ICON_PREVIEW_WIDTH  = 64;
     public static final int ICON_PREVIEW_HEIGHT = 64;
