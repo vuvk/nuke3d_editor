@@ -20,7 +20,6 @@ package com.vuvk.n3d.components;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
-import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
@@ -35,7 +34,9 @@ public class PanelImagePreview extends JPanel {
     /** изображение, которое рисуется в предпросмотре */
     protected BufferedImage image = null;
     /** режим растяжения на всю область */
-    protected boolean stretched = false;      
+    protected boolean stretched = false;   
+    /** рисовать наружнюю обводку */
+    protected boolean drawBorder = true;
     /** окно для перерисовки */
     protected Container window = null;
     
@@ -60,6 +61,14 @@ public class PanelImagePreview extends JPanel {
     public void setStretched(boolean stretched) {
         this.stretched = stretched;
     }
+
+    /**
+     * Рисовать ли обводку
+     * @param draw true - рисовать / false - нет  
+     */
+    public void setDrawBorder(boolean draw) {
+        this.drawBorder = draw;
+    }
     
     /**
      * Установить контейнер
@@ -75,6 +84,14 @@ public class PanelImagePreview extends JPanel {
      */
     public BufferedImage getImage() {
         return image;
+    }
+
+    /**
+     * Рисуется ли обводка
+     * @return true, если рисуется
+     */
+    public boolean isDrawBorder() {
+        return drawBorder;
     }
     
     /**
@@ -98,10 +115,12 @@ public class PanelImagePreview extends JPanel {
         super.paintComponent(g);            
 
         if (image != null) {
-            int imageWidth  = image.getWidth();
-            int imageHeight = image.getHeight();
-            int width  = getWidth();
-            int height = getHeight();
+            int imageWidth  = image.getWidth(),
+                imageHeight = image.getHeight();
+            int width  = getWidth(),
+                height = getHeight();
+            int x = 0, 
+                y = 0;
                                     
             // размеры превью не больше размеров панели
             if (imageWidth > width) {
@@ -133,17 +152,19 @@ public class PanelImagePreview extends JPanel {
                     imageWidth  = (int)(width  * coeffX);
                     imageHeight = (int)(height * coeffY);
                     // по середине
-                    int x = (width  >> 1) - (imageWidth  >> 1);
-                    int y = (height >> 1) - (imageHeight >> 1);
+                    x = (width  >> 1) - (imageWidth  >> 1);
+                    y = (height >> 1) - (imageHeight >> 1);
                     g.drawImage(image, x, y, imageWidth, imageHeight, null);
-                    g.drawRect(x, y, imageWidth - 1, imageHeight - 1);
                 }
             // картинки влазит и не включено растяжение
             } else {
                 // по середине
-                int x = (width  >> 1) - (imageWidth  >> 1);
-                int y = (height >> 1) - (imageHeight >> 1);
+                x = (width  >> 1) - (imageWidth  >> 1);
+                y = (height >> 1) - (imageHeight >> 1);
                 g.drawImage(image, x, y, null);
+            }
+            
+            if (drawBorder) {
                 g.drawRect(x, y, imageWidth - 1, imageHeight - 1);
             }
         }            

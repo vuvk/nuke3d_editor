@@ -68,9 +68,11 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
             if (image != null) {
                 super.setImage(image);
                 setStretched(true);
+                setDrawBorder(true);
             } else {
                 super.setImage(Const.ICONS.get("Add"));
                 setStretched(false);
+                setDrawBorder(false);
             }
         }
         
