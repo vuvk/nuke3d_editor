@@ -22,9 +22,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -63,21 +61,7 @@ public final class Const {
     /** имя папки, содержащей все ресурсы проекта */
     public static final String RESOURCES_STRING = "resources/";
     /** имя папки, в которой будут сохраняться настройки проекта */
-    public static final String CONFIG_STRING = "config/";    
-    
-    
-    /** расширение файла импортированного звука */
-    public static final String SOUND_FORMAT_EXT = "ogg";
-    /** доступные расширения звуков для загрузки */
-    public static final List<String> SOUND_EXTS = Arrays.asList("aac", "aif", "aiff", "flac", "m4a", "m4p", "mp2", "mp3", "mpga", "ogg", "opus", "wav", "wma");
-    /** Путь до сохранённых параметров звуков */
-    public static final String SOUNDS_CONFIG_STRING = CONFIG_STRING + "sounds.sav";
-    /** идентификатор конфига звуков */
-    public static final String SOUNDS_CONFIG_IDENTIFICATOR = "N3D_SOUNDS";
-    /** версия конфига звуков */
-    static final int SOUNDS_CONFIG_MAJOR = 0;
-    static final int SOUNDS_CONFIG_MINOR = 1;
-    public static final String SOUNDS_CONFIG_VERSION = SOUNDS_CONFIG_MAJOR + "." + SOUNDS_CONFIG_MINOR;
+    public static final String CONFIG_STRING = "config/";  
     
     
     /** идентификатор скайбокса */

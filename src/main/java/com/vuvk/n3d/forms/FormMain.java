@@ -1367,7 +1367,7 @@ public class FormMain extends javax.swing.JFrame {
         for (File sndFile : files) {
             if (sndFile != null) {
                 String baseName = FilenameUtils.getBaseName(sndFile.getName());     
-                String extension = "." + Const.SOUND_FORMAT_EXT;
+                String extension = "." + Sound.FORMAT_EXT;
                 Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
 
                 // файл с таким же именем существует?
@@ -1395,7 +1395,7 @@ public class FormMain extends javax.swing.JFrame {
                 }
 
                 // если исходный файл с расширением ogg, то просто его копировать. А иначе конвертировать в ogg
-                if (Const.SOUND_FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
+                if (Sound.FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
                     // создаем файл у себя
                     try {
                         FileUtils.copyFile(sndFile, newPath.toFile());

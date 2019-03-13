@@ -19,6 +19,7 @@ package com.vuvk.n3d.forms;
 
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.components.ImageFileView;
+import com.vuvk.n3d.resources.Sound;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -44,7 +45,7 @@ public class DialogOpenSound extends javax.swing.JDialog {
         
         /** фильтры доступных расширений */
         FileNameExtensionFilter[] filters = {
-            new FileNameExtensionFilter("All knowns formats",                        (String[])Const.SOUND_EXTS.toArray()),
+            new FileNameExtensionFilter("All knowns formats",                        (String[]) Sound.EXTS.toArray()),
             new FileNameExtensionFilter("MPEG-2 Advanced Audio Coding File (AAC)",   "aac"),
             new FileNameExtensionFilter("Audio Interchange File Format (AIF, AIFF)", "aif", "aiff"),
             new FileNameExtensionFilter("Free Lossless Audio Codec File (FLAC)",     "flac"),

@@ -134,7 +134,7 @@ public final class FileSystemUtils {
                 switch (ext) {
                     case Texture.FORMAT_EXT  : list = texturesForAdd;  break;
                     case Material.FORMAT_EXT : list = materialsForAdd; break;
-                    case Const.SOUND_FORMAT_EXT    : list = soundsForAdd;    break;
+                    case Sound.FORMAT_EXT    : list = soundsForAdd;    break;
                     
                     default:
                         break;
@@ -318,7 +318,7 @@ public final class FileSystemUtils {
                         switch (ext) {
                             case Texture.FORMAT_EXT  : list = texturesForRepath;  break;
                             case Material.FORMAT_EXT : list = materialsForRepath; break;
-                            case Const.SOUND_FORMAT_EXT    : list = soundsForRepath;    break;  
+                            case Sound.FORMAT_EXT    : list = soundsForRepath;    break;  
                             
                             default:
                                 break;
@@ -474,7 +474,7 @@ public final class FileSystemUtils {
                 switch (ext) {
                     case Texture.FORMAT_EXT  : list = texturesForDelete;  break;
                     case Material.FORMAT_EXT : list = materialsForDelete; break;
-                    case Const.SOUND_FORMAT_EXT    : list = soundsForDelete;    break;
+                    case Sound.FORMAT_EXT    : list = soundsForDelete;    break;
                     
                     default:
                         break;

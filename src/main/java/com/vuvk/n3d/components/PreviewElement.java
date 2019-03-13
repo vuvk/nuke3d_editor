@@ -19,6 +19,7 @@ package com.vuvk.n3d.components;
 
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
@@ -109,7 +110,7 @@ public class PreviewElement {
                     icon = Const.ICONS.get("Material");
                     break;
                     
-                case Const.SOUND_FORMAT_EXT:
+                case Sound.FORMAT_EXT:
                     type = Type.SOUND;
                     icon = Const.ICONS.get("Sound");
                     break;

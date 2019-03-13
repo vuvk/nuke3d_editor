@@ -142,8 +142,7 @@ public class PanelImagePreview extends JPanel {
                     g.drawImage(image, 0, 0, width, height, null);
                     g.drawRect(0, 0, width - 1, height - 1);
                     
-                    bX = 0;
-                    bY = 0;
+                    bX = bY = 0;
                     bW = width - 1;
                     bH = height - 1;
                 // а иначе учитывать соотношение
@@ -156,29 +155,22 @@ public class PanelImagePreview extends JPanel {
                         coeffX = (double)imageWidth / imageHeight;
                     }
                     
-                    imageWidth  = (int)(width  * coeffX);
-                    imageHeight = (int)(height * coeffY);
+                    imageWidth  = bW = (int)(width  * coeffX);
+                    imageHeight = bH = (int)(height * coeffY);
                     // по середине
-                    int x = (width  >> 1) - (imageWidth  >> 1);
-                    int y = (height >> 1) - (imageHeight >> 1);
+                    int x = bX = (width  >> 1) - (imageWidth  >> 1);
+                    int y = bY = (height >> 1) - (imageHeight >> 1);
                     g.drawImage(image, x, y, imageWidth, imageHeight, null);
-                    
-                    bX = x;
-                    bY = y;
-                    bW = imageWidth - 1;
-                    bH = imageHeight - 1;
                 }
             // картинки влазит и не включено растяжение
             } else {
                 // по середине
-                int x = (width  >> 1) - (imageWidth  >> 1);
-                int y = (height >> 1) - (imageHeight >> 1);
+                int x = bX = (width  >> 1) - (imageWidth  >> 1);
+                int y = bY = (height >> 1) - (imageHeight >> 1);
                 g.drawImage(image, x, y, null);
                     
-                bX = x;
-                bY = y;
-                bW = imageWidth - 1;
-                bH = imageHeight - 1;
+                bW = imageWidth;
+                bH = imageHeight;
             }
             
             if (drawBorder) {
