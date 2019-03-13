@@ -119,8 +119,10 @@ public class PanelImagePreview extends JPanel {
                 imageHeight = image.getHeight();
             int width  = getWidth(),
                 height = getHeight();
-            int x = 0, 
-                y = 0;
+            int bX = 0,     // border X 
+                bY = 0,     // border Y
+                bW = 0,     // border Width
+                bH = 0;     // border Height
                                     
             // размеры превью не больше размеров панели
             if (imageWidth > width) {
@@ -139,6 +141,11 @@ public class PanelImagePreview extends JPanel {
                 if (imageWidth == imageHeight) {
                     g.drawImage(image, 0, 0, width, height, null);
                     g.drawRect(0, 0, width - 1, height - 1);
+                    
+                    bX = 0;
+                    bY = 0;
+                    bW = width - 1;
+                    bH = height - 1;
                 // а иначе учитывать соотношение
                 } else {
                     double coeffX = 1.0,
@@ -152,20 +159,30 @@ public class PanelImagePreview extends JPanel {
                     imageWidth  = (int)(width  * coeffX);
                     imageHeight = (int)(height * coeffY);
                     // по середине
-                    x = (width  >> 1) - (imageWidth  >> 1);
-                    y = (height >> 1) - (imageHeight >> 1);
+                    int x = (width  >> 1) - (imageWidth  >> 1);
+                    int y = (height >> 1) - (imageHeight >> 1);
                     g.drawImage(image, x, y, imageWidth, imageHeight, null);
+                    
+                    bX = x;
+                    bY = y;
+                    bW = imageWidth - 1;
+                    bH = imageHeight - 1;
                 }
             // картинки влазит и не включено растяжение
             } else {
                 // по середине
-                x = (width  >> 1) - (imageWidth  >> 1);
-                y = (height >> 1) - (imageHeight >> 1);
+                int x = (width  >> 1) - (imageWidth  >> 1);
+                int y = (height >> 1) - (imageHeight >> 1);
                 g.drawImage(image, x, y, null);
+                    
+                bX = x;
+                bY = y;
+                bW = imageWidth - 1;
+                bH = imageHeight - 1;
             }
             
             if (drawBorder) {
-                g.drawRect(x, y, imageWidth - 1, imageHeight - 1);
+                g.drawRect(bX, bY, bW, bH);
             }
         }            
     }
