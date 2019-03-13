@@ -80,6 +80,8 @@ public class FormMain extends javax.swing.JFrame {
     public static FormMaterialEditor formMaterialEditor = null;
     /** ссылка на форму редактора звуков */
     public static FormSoundEditor formSoundEditor = null;
+    /** ссылка на форму редактора скайбоксов */
+    public static FormSkyboxEditor formSkyboxEditor = null;
         
     /** проект открыт? */
     public static boolean isProjectOpened = false;
@@ -375,6 +377,49 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Открыть форму редактирования скайбокса
+     */
+    void openFormSkyboxEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.SKYBOX) {
+                
+                Skybox sky = (Skybox) Resource.getByPath(element.getPath(), Resource.Type.SKYBOX);
+                if (sky != null) {
+                    boolean firstRun = false;
+                    if (formSkyboxEditor == null) {
+                        formSkyboxEditor = new FormSkyboxEditor();
+                        Desktop.add(formSkyboxEditor);
+                        firstRun = true;
+                    }
+
+                    formSkyboxEditor.selectedSkybox = sky;
+                    // свернуто?
+                    if (formSkyboxEditor.isIcon()) {
+                        try {
+                            formSkyboxEditor.setIcon(false);
+                        } catch (PropertyVetoException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
+                        }
+                    // невидимое?
+                    } else {
+                        formSkyboxEditor.setVisible(true); 
+                        formSkyboxEditor.prepareForm(firstRun);
+                    }
+                    Desktop.moveToFront(formSkyboxEditor);
+                } else {
+                    // если не нашёл, а файл есть, значит проект битый 
+                    // или файл был "подброшен"
+                    MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                            "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+                }
+            }
+        }       
+    }
+    
+    /**
      * Закрыть окно редактирования текстур
      */
     public static void closeFormTextureEditor() {
@@ -420,6 +465,21 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Закрыть окно редактирования звуков
+     */
+    public static void closeFormSkyboxEditor() {  
+        if (formSkyboxEditor != null) {
+            try {
+                formSkyboxEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
+            formSkyboxEditor = null;
+        }
+    }
+    
+    /**
      * Перезагрузить открытые окна
      */
     public static void reloadChildWindows() {
@@ -432,6 +492,9 @@ public class FormMain extends javax.swing.JFrame {
         if (formSoundEditor != null) {
             formSoundEditor.prepareForm(false);
         }
+        if (formSkyboxEditor != null) {
+            formSkyboxEditor.prepareForm(false);
+        }
     }
     /** 
      * Закрыть все вызванные ранее дочерние окна
@@ -440,6 +503,7 @@ public class FormMain extends javax.swing.JFrame {
         closeFormTextureEditor();
         closeFormMaterialEditor();
         closeFormSoundEditor();
+        closeFormSkyboxEditor();
     }
         
     /**
