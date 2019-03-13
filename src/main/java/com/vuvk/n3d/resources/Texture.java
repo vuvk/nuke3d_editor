@@ -57,7 +57,19 @@ public final class Texture extends Resource {
     //public static final Texture TEXTURE_EMPTY = new Texture();
     /** Список всех текстур (контейнер) */
     public static final ArrayList<Texture> TEXTURES = new ArrayList<>();
+    private static final Logger LOG = Logger.getLogger(Texture.class.getName());
     
+    /**
+     * Проверка является ли указанный путь текстурой
+     * @param path путь для проверки
+     * @return true, если по указанному пути текстура
+     */
+    public static boolean pathIsTexture(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT));
+    }
     
     /**
      * Загрузить конфиг текстур и сами текстуры
@@ -79,7 +91,7 @@ public final class Texture extends Resource {
             Gson gson = new GsonBuilder().create();  
             config = gson.fromJson(reader, JsonObject.class);
         } catch (Exception ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -129,7 +141,7 @@ public final class Texture extends Resource {
             try {
                 Files.createDirectory(Global.CONFIG_PATH);
             } catch (IOException ex) {
-                Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
                 return false;
             }
@@ -153,7 +165,7 @@ public final class Texture extends Resource {
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -189,7 +201,7 @@ public final class Texture extends Resource {
             try {
                 image = ImageUtils.prepareImage(ImageIO.read(path.toFile()));
             } catch (IOException ex) {
-                Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
                 image = IMAGE_EMPTY;
                 return false;
             }
@@ -207,7 +219,7 @@ public final class Texture extends Resource {
         try {
             ImageIO.write(image, "png", new File(path));
         } catch (IOException ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -248,16 +260,5 @@ public final class Texture extends Resource {
     @Override
     protected List getContainer() {
         return TEXTURES;
-    }
-    /**
-     * Проверка является ли указанный путь текстурой
-     * @param path путь для проверки
-     * @return true, если по указанному пути текстура
-     */
-    public static boolean pathIsTexture(Path path) {
-        return (path != null &&
-                Files.exists(path) && 
-                !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT));
     }
 }

@@ -42,15 +42,7 @@ import java.util.logging.Logger;
  * Класс хранимого скайбокса в редакторе
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class Skybox extends Resource {
-
-    private static final Logger LOG = Logger.getLogger(Skybox.class.getName());
-    
-    /**
-     * текстуры для сторон куба
-     */
-    private final Texture[] sides = new Texture[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
-    
+public class Skybox extends Resource {    
     /**
      * стороны скайбокса
      */
@@ -92,8 +84,49 @@ public class Skybox extends Resource {
         }
     }
     
+    /**
+     * текстуры для сторон куба
+     */
+    private final Texture[] sides = new Texture[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
+    
     /** Список всех скайбоксов (контейнер) */
     public static final ArrayList<Skybox> SKYBOXES = new ArrayList<>();
+
+    private static final Logger LOG = Logger.getLogger(Skybox.class.getName());
+    
+    
+    /**
+     * Проверка является ли указанный путь скайбоксом
+     * @param path путь для проверки
+     * @return true, если по указанному пути скайбокс
+     */
+    public static boolean pathIsSkybox(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(Const.SKYBOX_FORMAT_EXT));
+    }
+    
+    /**
+     * Удалить все скайбоксы из памяти
+     * @return true в случае успеха
+     */
+    public static boolean closeAll() {
+        SKYBOXES.clear();        
+        return (SKYBOXES.isEmpty());
+    }
+    
+    /**
+     * Проверка всех сторон всех скайбоксов на наличие текстуры в базе.
+     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
+     */
+    public static void checkAll() {
+        for (Skybox skybox : SKYBOXES) {
+            skybox.check();
+        }
+    }
+    
+    
 
     public Skybox(Path path) {
         super(path);     
@@ -261,36 +294,5 @@ public class Skybox extends Resource {
         }
         
         return true;
-    }
-    
-    /**
-     * Проверка является ли указанный путь скайбоксом
-     * @param path путь для проверки
-     * @return true, если по указанному пути скайбокс
-     */
-    public static boolean pathIsSkybox(Path path) {
-        return (path != null &&
-                Files.exists(path) && 
-                !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.SKYBOX_FORMAT_EXT));
-    }
-    
-    /**
-     * Удалить все скайбоксы из памяти
-     * @return true в случае успеха
-     */
-    public static boolean closeAll() {
-        SKYBOXES.clear();        
-        return (SKYBOXES.isEmpty());
-    }
-    
-    /**
-     * Проверка всех сторон всех скайбоксов на наличие текстуры в базе.
-     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
-     */
-    public static void checkAll() {
-        for (Skybox skybox : SKYBOXES) {
-            skybox.check();
-        }
     }
 }

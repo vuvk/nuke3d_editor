@@ -140,6 +140,19 @@ public class Material extends Resource {
     
     /** Список всех материалов (контейнер) */
     public static final ArrayList<Material> MATERIALS = new ArrayList<>();
+    private static final Logger LOG = Logger.getLogger(Material.class.getName());
+    
+    /**
+     * Проверка является ли указанный путь материалом
+     * @param path путь для проверки
+     * @return true, если по указанному пути материал
+     */
+    public static boolean pathIsMaterial(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(Const.MATERIAL_FORMAT_EXT));
+    }
     
     /**
      * Загрузить конфиг материалов и сами материалы
@@ -161,7 +174,7 @@ public class Material extends Resource {
             Gson gson = new GsonBuilder().create();  
             config = gson.fromJson(reader, JsonObject.class);
         } catch (Exception ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -229,7 +242,7 @@ public class Material extends Resource {
             try {
                 Files.createDirectory(Global.CONFIG_PATH);
             } catch (IOException ex) {
-                Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
                 return false;
             }
@@ -253,7 +266,7 @@ public class Material extends Resource {
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -313,7 +326,7 @@ public class Material extends Resource {
                 Gson gson = new GsonBuilder().create();  
                 config = gson.fromJson(reader, JsonObject.class);
             } catch (Exception ex) {
-                Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
                 return false;
             }
@@ -404,7 +417,7 @@ public class Material extends Resource {
             Gson gson = new GsonBuilder().create();   
             gson.toJson(object, writer);             
         } catch (IOException ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -531,17 +544,6 @@ public class Material extends Resource {
     @Override
     protected List getContainer() {
         return MATERIALS;
-    }
-    /**
-     * Проверка является ли указанный путь материалом
-     * @param path путь для проверки
-     * @return true, если по указанному пути материал
-     */
-    public static boolean pathIsMaterial(Path path) {
-        return (path != null &&
-                Files.exists(path) && 
-                !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.MATERIAL_FORMAT_EXT));
     }
     
     /**
