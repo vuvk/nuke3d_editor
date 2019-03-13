@@ -132,7 +132,7 @@ public final class FileSystemUtils {
 
                 // по расширению файла определяем что это
                 switch (ext) {
-                    case Const.TEXTURE_FORMAT_EXT  : list = texturesForAdd;  break;
+                    case Texture.FORMAT_EXT  : list = texturesForAdd;  break;
                     case Const.MATERIAL_FORMAT_EXT : list = materialsForAdd; break;
                     case Const.SOUND_FORMAT_EXT    : list = soundsForAdd;    break;
                     
@@ -316,7 +316,7 @@ public final class FileSystemUtils {
                         
                         // по расширению файла определяем что это
                         switch (ext) {
-                            case Const.TEXTURE_FORMAT_EXT  : list = texturesForRepath;  break;
+                            case Texture.FORMAT_EXT  : list = texturesForRepath;  break;
                             case Const.MATERIAL_FORMAT_EXT : list = materialsForRepath; break;
                             case Const.SOUND_FORMAT_EXT    : list = soundsForRepath;    break;  
                             
@@ -472,7 +472,7 @@ public final class FileSystemUtils {
 
                 // по расширению файла определяем что это
                 switch (ext) {
-                    case Const.TEXTURE_FORMAT_EXT  : list = texturesForDelete;  break;
+                    case Texture.FORMAT_EXT  : list = texturesForDelete;  break;
                     case Const.MATERIAL_FORMAT_EXT : list = materialsForDelete; break;
                     case Const.SOUND_FORMAT_EXT    : list = soundsForDelete;    break;
                     

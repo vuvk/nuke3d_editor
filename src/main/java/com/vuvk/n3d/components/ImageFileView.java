@@ -18,6 +18,7 @@
 package com.vuvk.n3d.components;
 
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import java.io.File;
 import javax.swing.Icon;
@@ -51,7 +52,7 @@ public class ImageFileView extends FileView {
         String ext = FileSystemUtils.getFileExtension(f);
         
         // изображение?
-        if (Const.TEXTURE_EXTS.contains(ext)) {
+        if (Texture.EXTS.contains(ext)) {
             return textureIcon;
         } else if (Const.SOUND_EXTS.contains(ext)) {
             return soundIcon;

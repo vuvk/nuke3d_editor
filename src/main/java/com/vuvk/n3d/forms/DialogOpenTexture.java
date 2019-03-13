@@ -21,6 +21,7 @@ import com.vuvk.n3d.Const;
 import com.vuvk.n3d.components.ImageFileView;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.components.PanelImagePreview;
+import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.io.File;
@@ -54,7 +55,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         
         /** фильтры доступных расширений */
         FileNameExtensionFilter[] filters = {
-            new FileNameExtensionFilter("All knowns formats",                (String[]) Const.TEXTURE_EXTS.toArray()),
+            new FileNameExtensionFilter("All knowns formats",                (String[]) Texture.EXTS.toArray()),
             new FileNameExtensionFilter("JPEG format",                       "jpg", "jpeg"),
             new FileNameExtensionFilter("Portable Network Graphics (PNG)",   "png"),
             new FileNameExtensionFilter("Microsoft Windows bitmap (BMP)",    "bmp"),
@@ -204,7 +205,7 @@ public class DialogOpenTexture extends javax.swing.JDialog {
                 File file = FileChooser.getSelectedFile();
                 if (file != null && file.isFile()) {
                     // если файл является текстурой, то попробовать его загрузить в предпросмотр
-                    if (Const.TEXTURE_EXTS.contains(FileSystemUtils.getFileExtension(file))) {
+                    if (Texture.EXTS.contains(FileSystemUtils.getFileExtension(file))) {
                         try {
                             panelImagePreview.setImage(ImageUtils.prepareImage(ImageIO.read(file)));
                         } catch (IOException ex) {

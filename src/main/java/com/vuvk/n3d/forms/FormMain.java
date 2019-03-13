@@ -1246,7 +1246,7 @@ public class FormMain extends javax.swing.JFrame {
             if (txrFile != null) {
                 // копируем текстуру к себе в папку ресурсов
                 String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-                String extension = "." + Const.TEXTURE_FORMAT_EXT;
+                String extension = "." + Texture.FORMAT_EXT;
                 Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
 
                 // файл с таким же именем существует?

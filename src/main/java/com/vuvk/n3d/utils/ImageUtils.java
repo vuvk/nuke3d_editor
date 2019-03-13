@@ -70,14 +70,14 @@ public final class ImageUtils {
             
         if (width <= 0) {
             width  = 1;
-        } else if (width > Const.TEXTURE_MAX_WIDTH) {
-            width  = Const.TEXTURE_MAX_WIDTH;
+        } else if (width > Texture.MAX_WIDTH) {
+            width  = Texture.MAX_WIDTH;
         }
         
         if (height <= 0) {
             height  = 1;
-        } else if (height > Const.TEXTURE_MAX_HEIGHT) {
-            height  = Const.TEXTURE_MAX_HEIGHT;
+        } else if (height > Texture.MAX_HEIGHT) {
+            height  = Texture.MAX_HEIGHT;
         }
                 
         return resizeImage(image, width, height);

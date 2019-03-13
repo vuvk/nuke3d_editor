@@ -18,6 +18,7 @@
 package com.vuvk.n3d.components;
 
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
@@ -92,7 +93,7 @@ public class PreviewElement {
         } else {
             extension = FileSystemUtils.getFileExtension(path.toFile());
             switch (extension) {
-                case Const.TEXTURE_FORMAT_EXT:
+                case Texture.FORMAT_EXT:
                     try {
                         icon = ImageUtils.resizeImage(ImageIO.read(path.toFile()), Const.ICON_PREVIEW_WIDTH, Const.ICON_PREVIEW_HEIGHT);
                     } catch (IOException ex) {

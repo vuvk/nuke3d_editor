@@ -63,26 +63,8 @@ public final class Const {
     /** имя папки, содержащей все ресурсы проекта */
     public static final String RESOURCES_STRING = "resources/";
     /** имя папки, в которой будут сохраняться настройки проекта */
-    public static final String CONFIG_STRING = "config/";
-    
-    
-    /** максимальная ширина текстуры */
-    public static final int TEXTURE_MAX_WIDTH  = 512;
-    /** максимальная высота текстуры */
-    public static final int TEXTURE_MAX_HEIGHT = 512;    
-    /** расширение файла импортированной текстуры */
-    public static final String TEXTURE_FORMAT_EXT = "png";
-    /** доступные расширения текстур для загрузки */
-    public static final List<String> TEXTURE_EXTS = Arrays.asList("jpg", "jpeg", "png", "bmp", "gif");
-    /** Путь до сохранённых параметров текстур */
-    public static final String TEXTURES_CONFIG_STRING = CONFIG_STRING + "textures.sav";
-    /** идентификатор конфига текстур */
-    public static final String TEXTURES_CONFIG_IDENTIFICATOR = "N3D_TEXTURES";
-    /** версия конфига текстур */
-    static final int TEXTURES_CONFIG_MAJOR = 0;
-    static final int TEXTURES_CONFIG_MINOR = 1;
-    public static final String TEXTURES_CONFIG_VERSION = TEXTURES_CONFIG_MAJOR + "." + TEXTURES_CONFIG_MINOR;
-    
+    public static final String CONFIG_STRING = "config/";    
+       
     
     /** идентификатор материала */
     public static final String MATERIAL_IDENTIFICATOR = "N3D_MATERIAL";
