@@ -19,6 +19,7 @@ package com.vuvk.n3d.components;
 
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
@@ -44,6 +45,7 @@ public class PreviewElement {
         TEXTURE,    // текстура
         MATERIAL,   // материал
         SOUND,      // звуковой файл
+        SKYBOX,     // скайбокс
         UNKNOWN     // неизвестная фигня
     }   
 
@@ -115,6 +117,11 @@ public class PreviewElement {
                     icon = Const.ICONS.get("Sound");
                     break;
                     
+                case Skybox.FORMAT_EXT:
+                    type = Type.SOUND;
+                    icon = Const.ICONS.get("Skybox");
+                    break;
+                    
                 default :
                     type = Type.UNKNOWN;
                     name = fileName;
@@ -128,6 +135,7 @@ public class PreviewElement {
             case TEXTURE:
             case MATERIAL:
             case SOUND:
+            case SKYBOX:
                 name = FilenameUtils.getBaseName(fileName);
                 break;
         }
