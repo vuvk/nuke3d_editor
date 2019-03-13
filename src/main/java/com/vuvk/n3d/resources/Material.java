@@ -23,6 +23,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.MessageDialog;
@@ -48,6 +49,23 @@ import org.apache.commons.io.FilenameUtils;
  * @author Anton "Vuvk" Shcherbatykh
  */
 public class Material extends Resource {
+    
+    /** идентификатор материала */
+    public static final String IDENTIFICATOR = "N3D_MATERIAL";
+    /** версия материала */
+    static final int MAJOR = 0;
+    static final int MINOR = 1;
+    public static final String VERSION = MAJOR + "." + MINOR;
+    /** расширение файла импортированного материала */
+    public static final String FORMAT_EXT = "mat";
+    /** Путь до сохранённых параметров материалов */
+    public static final String CONFIG_STRING = Const.CONFIG_STRING + "materials.sav";
+    /** идентификатор конфига материалов */
+    public static final String CONFIG_IDENTIFICATOR = "N3D_MATERIALS";
+    /** версия конфига материалов */
+    static final int CONFIG_MAJOR = 0;
+    static final int CONFIG_MINOR = 1;
+    public static final String CONFIG_VERSION = CONFIG_MAJOR + "." + CONFIG_MINOR;
     
     /** енумератор типа материала */
     public static enum Type {
@@ -151,7 +169,7 @@ public class Material extends Resource {
         return (path != null &&
                 Files.exists(path) && 
                 !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.MATERIAL_FORMAT_EXT));
+                FileSystemUtils.getFileExtension(path).equals(FORMAT_EXT));
     }
     
     /**
@@ -161,7 +179,7 @@ public class Material extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File materialConfig = new File(Const.MATERIALS_CONFIG_STRING);
+        File materialConfig = new File(CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !materialConfig.exists()) {
@@ -181,8 +199,8 @@ public class Material extends Resource {
         
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.MATERIALS_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.MATERIALS_CONFIG_VERSION))
+                                  CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(CONFIG_VERSION))
            ) {
             return false;
         }
@@ -257,12 +275,12 @@ public class Material extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.MATERIALS_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.MATERIALS_CONFIG_VERSION);
+        config.addProperty("identificator", CONFIG_IDENTIFICATOR);
+        config.addProperty("version", CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг
-        try (Writer writer = new FileWriter(Const.MATERIALS_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
@@ -335,7 +353,7 @@ public class Material extends Resource {
             // идентификатор
             JsonElement jsonIdentificator = config.get("identificator");
             if (jsonIdentificator == null || 
-                !jsonIdentificator.getAsString().equals(Const.MATERIAL_IDENTIFICATOR)
+                !jsonIdentificator.getAsString().equals(IDENTIFICATOR)
                ) {
                 return false;
             }
@@ -345,7 +363,7 @@ public class Material extends Resource {
                 return false;
             }
             double configVersion = jsonVersion.getAsDouble();
-            double editorVersion = Double.parseDouble(Const.MATERIAL_VERSION);
+            double editorVersion = Double.parseDouble(VERSION);
             if (editorVersion < configVersion) {
                 return false;
             }            
@@ -406,8 +424,8 @@ public class Material extends Resource {
         
         // общая информация об объекте
         JsonObject object = new JsonObject();
-        object.addProperty("identificator", Const.MATERIAL_IDENTIFICATOR);
-        object.addProperty("version", Const.MATERIAL_VERSION);
+        object.addProperty("identificator", IDENTIFICATOR);
+        object.addProperty("version", VERSION);
         //object.addProperty("id", getId());
         object.addProperty("type",  type.toString());
         object.add("frames", jsonFrames);

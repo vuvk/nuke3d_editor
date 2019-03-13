@@ -18,6 +18,7 @@
 package com.vuvk.n3d.components;
 
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
@@ -103,7 +104,7 @@ public class PreviewElement {
                     type = Type.TEXTURE;
                     break;
                 
-                case Const.MATERIAL_FORMAT_EXT:
+                case Material.FORMAT_EXT:
                     type = Type.MATERIAL;
                     icon = Const.ICONS.get("Material");
                     break;

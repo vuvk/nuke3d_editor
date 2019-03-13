@@ -1311,7 +1311,7 @@ public class FormMain extends javax.swing.JFrame {
         if (name == null) {
             return;    // отмена?
         } else {
-            Path matPath = Paths.get(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
+            Path matPath = Paths.get(currentPath.toString() + "/" + name + "." + Material.FORMAT_EXT);
             
             // файл с таким же именем существует?
             if (Files.exists(matPath)) {
@@ -1328,7 +1328,7 @@ public class FormMain extends javax.swing.JFrame {
                             return;    // отмена?
                         } else {
                             name = newName;
-                            matPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
+                            matPath = Paths.get(currentPath.toString() + "/" + newName + "." + Material.FORMAT_EXT);
                         }
                     }
                 // YES

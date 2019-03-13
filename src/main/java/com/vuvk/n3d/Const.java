@@ -64,24 +64,6 @@ public final class Const {
     public static final String RESOURCES_STRING = "resources/";
     /** имя папки, в которой будут сохраняться настройки проекта */
     public static final String CONFIG_STRING = "config/";    
-       
-    
-    /** идентификатор материала */
-    public static final String MATERIAL_IDENTIFICATOR = "N3D_MATERIAL";
-    /** версия материала */
-    static final int MATERIAL_MAJOR = 0;
-    static final int MATERIAL_MINOR = 1;
-    public static final String MATERIAL_VERSION = MATERIAL_MAJOR + "." + MATERIAL_MINOR;
-    /** расширение файла импортированного материала */
-    public static final String MATERIAL_FORMAT_EXT = "mat";
-    /** Путь до сохранённых параметров материалов */
-    public static final String MATERIALS_CONFIG_STRING = CONFIG_STRING + "materials.sav";
-    /** идентификатор конфига материалов */
-    public static final String MATERIALS_CONFIG_IDENTIFICATOR = "N3D_MATERIALS";
-    /** версия конфига материалов */
-    static final int MATERIALS_CONFIG_MAJOR = 0;
-    static final int MATERIALS_CONFIG_MINOR = 1;
-    public static final String MATERIALS_CONFIG_VERSION = MATERIALS_CONFIG_MAJOR + "." + MATERIALS_CONFIG_MINOR;
     
     
     /** расширение файла импортированного звука */
