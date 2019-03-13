@@ -218,7 +218,7 @@ public class Material extends Resource {
     }
     
     /** 
-     * Сохранить все материалы и конфиг
+     * Сохранить все материалы
      * @return true в случае успеха
      */
     public static boolean saveAll() {
@@ -428,6 +428,7 @@ public class Material extends Resource {
     /**
      * Деструктор
      */
+    @Override
     public void dispose() {
         super.dispose();
         frames.clear();

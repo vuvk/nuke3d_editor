@@ -23,8 +23,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.Global;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.MessageDialog;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,6 +111,127 @@ public class Skybox extends Resource {
     }
     
     /**
+     * Загрузить конфиг и сами скайбоксы
+     * @return true в случае успеха
+     */
+    public static boolean loadAll() {
+        closeAll();
+        
+        File skyboxConfig = new File(Const.SKYBOXES_CONFIG_STRING);
+        
+        if (!Files.exists(Global.CONFIG_PATH) || 
+            !skyboxConfig.exists()) {
+            return false;
+        }
+        
+        // читаем конфиг
+        JsonObject config = new JsonObject();        
+        try (Reader reader = new FileReader(skyboxConfig)){
+            Gson gson = new GsonBuilder().create();  
+            config = gson.fromJson(reader, JsonObject.class);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }
+        
+        // проверяем правильность конфига
+        if (!Resource.checkConfig(config, 
+                                  Const.SKYBOXES_CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(Const.SKYBOXES_CONFIG_VERSION))
+           ) {
+            return false;
+        }
+        
+        // данные
+        JsonElement jsonData = config.get("data");
+        if (jsonData == null) {
+            return false;
+        }
+        
+        // создаем небеса по данным из конфига
+        for (JsonElement element : jsonData.getAsJsonArray()) {
+            JsonElement jsonId   = ((JsonObject)element).get("id");
+            JsonElement jsonPath = ((JsonObject)element).get("path");
+            
+            if (jsonId == null || jsonPath == null) {
+                continue;
+            }
+            
+            // если существует
+            Path path = Paths.get(jsonPath.getAsString());
+            if (pathIsSkybox(path)) {
+                // добавляем в базу
+                new Skybox(path)
+                    .setId(jsonId.getAsInt());
+            }
+        }
+        
+        // на всякий случай проверим валидность всех небес
+        checkAll();
+        
+        return true;
+    }
+    
+    /** 
+     * Сохранить все небеса
+     * @return true в случае успеха
+     */
+    public static boolean saveAll() {
+        boolean allOk = true;
+        
+        for (Skybox sky : SKYBOXES) {
+            if (!sky.save()) {
+                allOk = false;
+            }
+        }
+        
+        return allOk;
+    }
+    
+    /** 
+     * Сохранить конфиг всех небес 
+     * @return true в случае успеха
+     */
+    public static boolean saveConfig() {        
+        // создадим папку с конфигами, если нужно
+        if (!Files.exists(Global.CONFIG_PATH)) {
+            try {
+                Files.createDirectory(Global.CONFIG_PATH);
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return false;
+            }
+        }
+        
+        // формируем конфиг с описанием
+        JsonArray array = new JsonArray(SKYBOXES.size());
+        for (Skybox sky : SKYBOXES) {
+            JsonObject object = new JsonObject();
+            object.addProperty("id", sky.getId());
+            object.addProperty("path", sky.getPath());
+            array.add(object);
+        }
+        JsonObject config = new JsonObject();
+        config.addProperty("identificator", Const.SKYBOXES_CONFIG_IDENTIFICATOR);
+        config.addProperty("version", Const.SKYBOXES_CONFIG_VERSION);
+        config.add("data", array);
+        
+        // сохраняем конфиг
+        try (Writer writer = new FileWriter(Const.SKYBOXES_CONFIG_STRING)) { 
+            Gson gson = new GsonBuilder().create();   
+            gson.toJson(config, writer);             
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
      * Удалить все скайбоксы из памяти
      * @return true в случае успеха
      */
@@ -161,6 +285,15 @@ public class Skybox extends Resource {
      */
     public void clear() {
         Arrays.fill(sides, null);
+    }
+    
+    /**
+     * Деструктор
+     */
+    @Override
+    public void dispose() {
+        super.dispose();
+        clear();
     }
     
     /**

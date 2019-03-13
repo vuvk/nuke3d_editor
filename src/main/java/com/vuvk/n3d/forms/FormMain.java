@@ -23,6 +23,7 @@ import com.vuvk.n3d.Global;
 import com.vuvk.n3d.components.PreviewElement;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Resource;
+import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
@@ -160,6 +161,7 @@ public class FormMain extends javax.swing.JFrame {
         Texture.loadAll();
         Material.loadAll();
         Sound.loadAll();
+        Skybox.loadAll();
 
         MenuItemOpenProject.setEnabled (false);
         MenuItemSaveProject.setEnabled (true );
@@ -194,6 +196,10 @@ public class FormMain extends javax.swing.JFrame {
             MessageDialog.showError("Не удалось сохранить звуки проекта! Повторите попытку.");
         }
         
+        if (!Skybox.saveAll() || !Skybox.saveConfig()) {
+            MessageDialog.showError("Не удалось сохранить скайбоксы проекта! Повторите попытку.");
+        }
+        
         MessageDialog.showInformation("Процедура сохранения проекта завершена.");   
     }
     
@@ -219,6 +225,7 @@ public class FormMain extends javax.swing.JFrame {
         Texture.closeAll();
         Material.closeAll();
         Sound.closeAll();
+        Skybox.closeAll();
 
         MenuItemOpenProject.setEnabled (true );
         MenuItemSaveProject.setEnabled (false);
