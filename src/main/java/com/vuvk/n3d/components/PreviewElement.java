@@ -118,7 +118,7 @@ public class PreviewElement {
                     break;
                     
                 case Skybox.FORMAT_EXT:
-                    type = Type.SOUND;
+                    type = Type.SKYBOX;
                     icon = Const.ICONS.get("Skybox");
                     break;
                     

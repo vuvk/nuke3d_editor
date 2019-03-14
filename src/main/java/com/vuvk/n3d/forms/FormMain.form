@@ -53,8 +53,11 @@
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="popupPVMISkybox">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="jMenuItem1"/>
+                    <Property name="text" type="java.lang.String" value="&#x421;&#x43a;&#x430;&#x439;&#x431;&#x43e;&#x43a;&#x441;"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="popupPVMISkyboxActionPerformed"/>
+                  </Events>
                 </MenuItem>
               </SubComponents>
             </Menu>

@@ -830,7 +830,12 @@ public class FormMain extends javax.swing.JFrame {
         });
         popupPVResource.add(popupPVMISound);
 
-        popupPVMISkybox.setText("jMenuItem1");
+        popupPVMISkybox.setText("Скайбокс");
+        popupPVMISkybox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMISkyboxActionPerformed(evt);
+            }
+        });
         popupPVResource.add(popupPVMISkybox);
 
         popupPVMenuAdd.add(popupPVResource);
@@ -1501,6 +1506,56 @@ public class FormMain extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_popupPVMISoundActionPerformed
+
+    private void popupPVMISkyboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISkyboxActionPerformed
+        String name = MessageDialog.showInput("Введите имя для нового скайбокса");
+        if (name == null) {
+            return;    // отмена?
+        } else {
+            Path skyPath = Paths.get(currentPath.toString() + "/" + name + "." + Skybox.FORMAT_EXT);
+            
+            // файл с таким же именем существует?
+            if (Files.exists(skyPath)) {
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + name + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return;
+                // NO
+                } else if (!answer.booleanValue()) {
+                    // решил переименовать
+                    while (Files.exists(skyPath)) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + name + "\":", name);
+                        if (newName == null) {
+                            return;    // отмена?
+                        } else {
+                            name = newName;
+                            skyPath = Paths.get(currentPath.toString() + "/" + newName + "." + Skybox.FORMAT_EXT);
+                        }
+                    }
+                // YES
+                } else {
+                    FileSystemUtils.remove(skyPath);
+                }
+            }
+            
+            new Skybox(skyPath);
+            
+            fillListProjectView(); 
+            
+            // открываем окно редактирования
+            DefaultListModel model = (DefaultListModel) listProjectView.getModel();
+            for (Object obj : model.toArray()) {
+                PreviewElement element = (PreviewElement)obj;
+                if (element.getType() == PreviewElement.Type.SKYBOX && 
+                    element.getName().equals(name)
+                   ) {                    
+                    listProjectView.setSelectedValue(element, true);
+                    openFormSkyboxEditor();
+                    break;
+                }
+            }
+        }
+    }//GEN-LAST:event_popupPVMISkyboxActionPerformed
 
     /**
      * @param args the command line arguments
