@@ -22,9 +22,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 
 /**
@@ -63,75 +61,7 @@ public final class Const {
     /** имя папки, содержащей все ресурсы проекта */
     public static final String RESOURCES_STRING = "resources/";
     /** имя папки, в которой будут сохраняться настройки проекта */
-    public static final String CONFIG_STRING = "config/";
-    
-    
-    /** максимальная ширина текстуры */
-    public static final int TEXTURE_MAX_WIDTH  = 512;
-    /** максимальная высота текстуры */
-    public static final int TEXTURE_MAX_HEIGHT = 512;    
-    /** расширение файла импортированной текстуры */
-    public static final String TEXTURE_FORMAT_EXT = "png";
-    /** доступные расширения текстур для загрузки */
-    public static final List<String> TEXTURE_EXTS = Arrays.asList("jpg", "jpeg", "png", "bmp", "gif");
-    /** Путь до сохранённых параметров текстур */
-    public static final String TEXTURES_CONFIG_STRING = CONFIG_STRING + "textures.sav";
-    /** идентификатор конфига текстур */
-    public static final String TEXTURES_CONFIG_IDENTIFICATOR = "N3D_TEXTURES";
-    /** версия конфига текстур */
-    static final int TEXTURES_CONFIG_MAJOR = 0;
-    static final int TEXTURES_CONFIG_MINOR = 1;
-    public static final String TEXTURES_CONFIG_VERSION = TEXTURES_CONFIG_MAJOR + "." + TEXTURES_CONFIG_MINOR;
-    
-    
-    /** идентификатор материала */
-    public static final String MATERIAL_IDENTIFICATOR = "N3D_MATERIAL";
-    /** версия материала */
-    static final int MATERIAL_MAJOR = 0;
-    static final int MATERIAL_MINOR = 1;
-    public static final String MATERIAL_VERSION = MATERIAL_MAJOR + "." + MATERIAL_MINOR;
-    /** расширение файла импортированного материала */
-    public static final String MATERIAL_FORMAT_EXT = "mat";
-    /** Путь до сохранённых параметров материалов */
-    public static final String MATERIALS_CONFIG_STRING = CONFIG_STRING + "materials.sav";
-    /** идентификатор конфига материалов */
-    public static final String MATERIALS_CONFIG_IDENTIFICATOR = "N3D_MATERIALS";
-    /** версия конфига материалов */
-    static final int MATERIALS_CONFIG_MAJOR = 0;
-    static final int MATERIALS_CONFIG_MINOR = 1;
-    public static final String MATERIALS_CONFIG_VERSION = MATERIALS_CONFIG_MAJOR + "." + MATERIALS_CONFIG_MINOR;
-    
-    
-    /** расширение файла импортированного звука */
-    public static final String SOUND_FORMAT_EXT = "ogg";
-    /** доступные расширения звуков для загрузки */
-    public static final List<String> SOUND_EXTS = Arrays.asList("aac", "aif", "aiff", "flac", "m4a", "m4p", "mp2", "mp3", "mpga", "ogg", "opus", "wav", "wma");
-    /** Путь до сохранённых параметров звуков */
-    public static final String SOUNDS_CONFIG_STRING = CONFIG_STRING + "sounds.sav";
-    /** идентификатор конфига звуков */
-    public static final String SOUNDS_CONFIG_IDENTIFICATOR = "N3D_SOUNDS";
-    /** версия конфига звуков */
-    static final int SOUNDS_CONFIG_MAJOR = 0;
-    static final int SOUNDS_CONFIG_MINOR = 1;
-    public static final String SOUNDS_CONFIG_VERSION = SOUNDS_CONFIG_MAJOR + "." + SOUNDS_CONFIG_MINOR;
-    
-    
-    /** идентификатор скайбокса */
-    public static final String SKYBOX_IDENTIFICATOR = "N3D_SKYBOX";
-    /** версия скайбокса */
-    static final int SKYBOX_MAJOR = 0;
-    static final int SKYBOX_MINOR = 1;
-    public static final String SKYBOX_VERSION = SKYBOX_MAJOR + "." + SKYBOX_MINOR;
-    /** расширение файла импортированного скайбокса */
-    public static final String SKYBOX_FORMAT_EXT = "sky";
-    /** Путь до сохранённых параметров скайбоксов */
-    public static final String SKYBOXES_CONFIG_STRING = CONFIG_STRING + "skyboxes.sav";
-    /** идентификатор конфига скайбоксов */
-    public static final String SKYBOXES_CONFIG_IDENTIFICATOR = "N3D_SKYBOXES";
-    /** версия конфига скайбоксов */
-    static final int SKYBOXES_CONFIG_MAJOR = 0;
-    static final int SKYBOXES_CONFIG_MINOR = 1;
-    public static final String SKYBOXES_CONFIG_VERSION = SKYBOXES_CONFIG_MAJOR + "." + SKYBOXES_CONFIG_MINOR;
+    public static final String CONFIG_STRING = "config/";  
     
     
     /** Размер иконок превью */

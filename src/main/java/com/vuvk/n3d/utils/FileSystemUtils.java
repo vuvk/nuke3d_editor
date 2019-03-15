@@ -21,10 +21,12 @@ import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.forms.FormMain;
 import com.vuvk.n3d.forms.FormMaterialEditor;
+import com.vuvk.n3d.forms.FormSkyboxEditor;
 import com.vuvk.n3d.forms.FormSoundEditor;
 import com.vuvk.n3d.forms.FormTextureEditor;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Resource;
+import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import java.io.File;
@@ -117,6 +119,7 @@ public final class FileSystemUtils {
         final List<Path> texturesForAdd  = new LinkedList<>();
         final List<Path> materialsForAdd = new LinkedList<>();
         final List<Path> soundsForAdd    = new LinkedList<>();
+        final List<Path> skyboxesForAdd  = new LinkedList<>();
         
         /**
          * класс для обработки обнаруженных файлов и папок    
@@ -132,9 +135,10 @@ public final class FileSystemUtils {
 
                 // по расширению файла определяем что это
                 switch (ext) {
-                    case Const.TEXTURE_FORMAT_EXT  : list = texturesForAdd;  break;
-                    case Const.MATERIAL_FORMAT_EXT : list = materialsForAdd; break;
-                    case Const.SOUND_FORMAT_EXT    : list = soundsForAdd;    break;
+                    case Texture.FORMAT_EXT  : list = texturesForAdd;  break;
+                    case Material.FORMAT_EXT : list = materialsForAdd; break;
+                    case Sound.FORMAT_EXT    : list = soundsForAdd;    break;
+                    case Skybox.FORMAT_EXT   : list = skyboxesForAdd;  break;
                     
                     default:
                         break;
@@ -185,10 +189,16 @@ public final class FileSystemUtils {
                 new Sound(forAdd);
             }
         }
+        for (Path forAdd : skyboxesForAdd) {
+            if ((Skybox.getByPath(forAdd)) == null) {
+                new Skybox(forAdd);
+            }
+        }
         
         texturesForAdd.clear();
         materialsForAdd.clear();
         soundsForAdd.clear();
+        skyboxesForAdd.clear();
     }
     
     /**
@@ -230,6 +240,7 @@ public final class FileSystemUtils {
         final List<Pair<String, String>> texturesForRepath  = new LinkedList<>();
         final List<Pair<String, String>> materialsForRepath = new LinkedList<>(); 
         final List<Pair<String, String>> soundsForRepath    = new LinkedList<>(); 
+        final List<Pair<String, String>> skyboxesForRepath  = new LinkedList<>(); 
         
         // список переносимых путей (откуда - куда)
         final List<Pair<Path, Path>> pathsForMove = new LinkedList();        
@@ -316,9 +327,10 @@ public final class FileSystemUtils {
                         
                         // по расширению файла определяем что это
                         switch (ext) {
-                            case Const.TEXTURE_FORMAT_EXT  : list = texturesForRepath;  break;
-                            case Const.MATERIAL_FORMAT_EXT : list = materialsForRepath; break;
-                            case Const.SOUND_FORMAT_EXT    : list = soundsForRepath;    break;  
+                            case Texture.FORMAT_EXT  : list = texturesForRepath;  break;
+                            case Material.FORMAT_EXT : list = materialsForRepath; break;
+                            case Sound.FORMAT_EXT    : list = soundsForRepath;    break;  
+                            case Skybox.FORMAT_EXT   : list = skyboxesForRepath;  break;  
                             
                             default:
                                 break;
@@ -424,6 +436,12 @@ public final class FileSystemUtils {
                     snd.setPath(paths.getRight());
                 }
             } 
+            for (Pair<String, String> paths : skyboxesForRepath) {
+                Skybox sky = (Skybox) Resource.getByPath(paths.getLeft(), Resource.Type.SKYBOX); 
+                if (sky != null) {
+                    sky.setPath(paths.getRight());
+                }
+            } 
             
             // если исходный путь был папкой и нет пропущенных файлов, то смело удалить её
             if (Files.exists(src)      && 
@@ -442,7 +460,9 @@ public final class FileSystemUtils {
         texturesForRepath.clear();
         materialsForRepath.clear();
         soundsForRepath.clear();
+        skyboxesForRepath.clear();
         pathsForMove.clear();
+        pathsForSkip.clear();
 
         return true;
     }
@@ -457,6 +477,7 @@ public final class FileSystemUtils {
         final List<String> texturesForDelete  = new LinkedList<>();
         final List<String> materialsForDelete = new LinkedList<>();
         final List<String> soundsForDelete    = new LinkedList<>();
+        final List<String> skyboxesForDelete  = new LinkedList<>();
         
         /**
          * класс для обработки обнаруженных файлов и папок    
@@ -472,9 +493,10 @@ public final class FileSystemUtils {
 
                 // по расширению файла определяем что это
                 switch (ext) {
-                    case Const.TEXTURE_FORMAT_EXT  : list = texturesForDelete;  break;
-                    case Const.MATERIAL_FORMAT_EXT : list = materialsForDelete; break;
-                    case Const.SOUND_FORMAT_EXT    : list = soundsForDelete;    break;
+                    case Texture.FORMAT_EXT  : list = texturesForDelete;  break;
+                    case Material.FORMAT_EXT : list = materialsForDelete; break;
+                    case Sound.FORMAT_EXT    : list = soundsForDelete;    break;
+                    case Skybox.FORMAT_EXT   : list = skyboxesForDelete;  break;
                     
                     default:
                         break;
@@ -567,10 +589,26 @@ public final class FileSystemUtils {
                 Sound.SOUNDS.remove(snd);
             }
         }
+        // скайбоксы
+        for (String filePath : skyboxesForDelete) {
+            Skybox sky = (Skybox) Resource.getByPath(filePath, Resource.Type.SKYBOX); 
+            if (sky != null) {
+                // закрыть окно с открытым удаляемым скайбоксом
+                if (FormMain.formSkyboxEditor != null && 
+                    FormSkyboxEditor.selectedSkybox != null &&
+                    FormSkyboxEditor.selectedSkybox.equals(sky)
+                   ) {
+                    FormMain.closeFormSoundEditor();
+                }
+                
+                Skybox.SKYBOXES.remove(sky);
+            }
+        }
         
         texturesForDelete.clear();
         materialsForDelete.clear();
         soundsForDelete.clear();
+        skyboxesForDelete.clear();
  
         // всё успешно удалено?
         return !Files.exists(path);

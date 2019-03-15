@@ -55,131 +55,7 @@ public abstract class Resource {
     /** Путь до ресурса */
     protected String path;
     
-    
-    protected Resource(Path path) {        
-        List<Resource> container = getContainer();
-        
-        // ищем максимальный id и инкрементируем его
-        long newId = 0;
-        for (Resource res : container) {
-            if (res.getId() > newId) {
-                newId = res.getId();
-            }
-        }
-        ++newId;
-        
-        setId(newId);
-        setPath(path);   
-        container.add(this);        
-    }
-    
-    /**
-     * Присвоить id 
-     * @param id новый идентификатор
-     */
-    protected void setId(long id) {
-        this.id = id;
-    }
-    
-    /**
-     * Присвоить имя
-     * @param name Новое имя
-     */
-    protected void setName(String name) {
-        this.name = name;
-    }
-    
-    /**
-     * Установить путь расположения ресурса
-     * @param path Новый путь
-     */
-    public void setPath(Path path) {
-        if (path != null) {
-            this.path = FileSystemUtils.getProjectPath(path);   
-            setName(FilenameUtils.getBaseName(this.path));
-        } else {
-            this.path = "";
-            setName("");
-        }
-    }
-    
-    /**
-     * Установить путь расположения ресурса
-     * @param path Новый путь
-     */
-    public void setPath(File path) {
-        if (path != null) {
-            setPath(path.toPath());
-        } else {
-            setPath((Path)null);
-        }
-    }
-    
-    /**
-     * Установить путь расположения ресурса
-     * @param path Новый путь
-     */
-    public void setPath(String path) {
-        if (path != null) {
-            setPath(Paths.get(path));
-        }
-    }
-    
-    /**
-     * Получить идентификатор
-     * @return long идентификатор ресурса
-     */
-    public long getId() {
-        return id;
-    }
-    
-    /**
-     * Получить имя
-     * @return name имя ресурса
-     */
-    public String getName() {
-        return name;
-    }
-    
-    /**
-     * Получить путь ресурса
-     * @return path путь ресурса
-     */
-    public String getPath() {
-        return path;
-    }
-    
-    /**
-     * Загрузить из файла
-     * @param path Путь до файла
-     * @return true в случае успеха
-     */
-    public boolean load(File path) {
-        if (path != null) {
-            return load(path.toPath());
-        } else {
-            return false;
-        }        
-    }
-    
-    /**
-     * Получить хранилище всех ресурсов данного типа
-     * @return Список ресурсов
-     */
-    protected abstract List getContainer();
-    
-    /**
-     * Загрузить из файла
-     * @param path Путь до файла
-     * @return true в случае успеха
-     */
-    protected abstract boolean load(Path path);
-
-    /**
-     * Сохранить ресурс в файл, к которому он привязан
-     * @return true в случае успеха
-     */
-    protected abstract boolean save();
+    private static final Logger LOG = Logger.getLogger(Resource.class.getName());
     
     /**
      * Проверить конфиг ресурса на валидность
@@ -329,6 +205,132 @@ public abstract class Resource {
         
         return null;
     }
+        
+    
+    protected Resource(Path path) {        
+        List<Resource> container = getContainer();
+        
+        // ищем максимальный id и инкрементируем его
+        long newId = 0;
+        for (Resource res : container) {
+            if (res.getId() > newId) {
+                newId = res.getId();
+            }
+        }
+        ++newId;
+        
+        setId(newId);
+        setPath(path);   
+        container.add(this);        
+    }
+    
+    /**
+     * Присвоить id 
+     * @param id новый идентификатор
+     */
+    protected void setId(long id) {
+        this.id = id;
+    }
+    
+    /**
+     * Присвоить имя
+     * @param name Новое имя
+     */
+    protected void setName(String name) {
+        this.name = name;
+    }
+    
+    /**
+     * Установить путь расположения ресурса
+     * @param path Новый путь
+     */
+    public void setPath(Path path) {
+        if (path != null) {
+            this.path = FileSystemUtils.getProjectPath(path);   
+            setName(FilenameUtils.getBaseName(this.path));
+        } else {
+            this.path = "";
+            setName("");
+        }
+    }
+    
+    /**
+     * Установить путь расположения ресурса
+     * @param path Новый путь
+     */
+    public void setPath(File path) {
+        if (path != null) {
+            setPath(path.toPath());
+        } else {
+            setPath((Path)null);
+        }
+    }
+    
+    /**
+     * Установить путь расположения ресурса
+     * @param path Новый путь
+     */
+    public void setPath(String path) {
+        if (path != null) {
+            setPath(Paths.get(path));
+        }
+    }
+    
+    /**
+     * Получить идентификатор
+     * @return long идентификатор ресурса
+     */
+    public long getId() {
+        return id;
+    }
+    
+    /**
+     * Получить имя
+     * @return name имя ресурса
+     */
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * Получить путь ресурса
+     * @return path путь ресурса
+     */
+    public String getPath() {
+        return path;
+    }
+    
+    /**
+     * Загрузить из файла
+     * @param path Путь до файла
+     * @return true в случае успеха
+     */
+    public boolean load(File path) {
+        if (path != null) {
+            return load(path.toPath());
+        } else {
+            return false;
+        }        
+    }
+    
+    /**
+     * Получить хранилище всех ресурсов данного типа
+     * @return Список ресурсов
+     */
+    protected abstract List getContainer();
+    
+    /**
+     * Загрузить из файла
+     * @param path Путь до файла
+     * @return true в случае успеха
+     */
+    protected abstract boolean load(Path path);
+
+    /**
+     * Сохранить ресурс в файл, к которому он привязан
+     * @return true в случае успеха
+     */
+    protected abstract boolean save();
     
     /**
      * Деструктор
@@ -345,7 +347,7 @@ public abstract class Resource {
         try {
             super.finalize();
         } catch (Throwable ex) {
-            Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
         }      
     }

@@ -23,6 +23,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.vuvk.n3d.Const;
+import static com.vuvk.n3d.Const.CONFIG_STRING;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.MessageDialog;
@@ -36,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,9 +48,40 @@ import java.util.logging.Logger;
  */
 public class Sound extends Resource {
     
+    /** расширение файла импортированного звука */
+    public static final String FORMAT_EXT = "ogg";
+    /** доступные расширения звуков для загрузки */
+    public static final List<String> EXTS = Arrays.asList("aac", "aif", "aiff", "flac", "m4a", "m4p", "mp2", "mp3", "mpga", "ogg", "opus", "wav", "wma");
+    /** Путь до сохранённых параметров звуков */
+    public static final String CONFIG_STRING = Const.CONFIG_STRING + "sounds.sav";
+    /** идентификатор конфига звуков */
+    public static final String CONFIG_IDENTIFICATOR = "N3D_SOUNDS";
+    /** версия конфига звуков */
+    static final int CONFIG_MAJOR = 0;
+    static final int CONFIG_MINOR = 1;
+    public static final String CONFIG_VERSION = CONFIG_MAJOR + "." + CONFIG_MINOR;
+
+    /** Является ли файл музыкой */
+    private boolean isMusic = false;
+    
     /** Список всех звуков (контейнер) */
     public static final ArrayList<Sound> SOUNDS = new ArrayList<>();
+    
+    private static final Logger LOG = Logger.getLogger(Sound.class.getName());   
+    
 
+    /**
+     * Проверка является ли указанный путь звуком
+     * @param path путь для проверки
+     * @return true, если по указанному пути звук
+     */
+    public static boolean pathIsSound(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(FORMAT_EXT));
+    }
+    
     /**
      * Загрузить конфиг звуков
      * @return true в случае успеха
@@ -56,7 +89,7 @@ public class Sound extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File soundConfig = new File(Const.SOUNDS_CONFIG_STRING);
+        File soundConfig = new File(CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !soundConfig.exists()) {
@@ -69,15 +102,15 @@ public class Sound extends Resource {
             Gson gson = new GsonBuilder().create();  
             config = gson.fromJson(reader, JsonObject.class);
         } catch (Exception ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
               
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.SOUNDS_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.SOUNDS_CONFIG_VERSION))
+                                  CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(CONFIG_VERSION))
            ) {
             return false;
         }
@@ -123,7 +156,7 @@ public class Sound extends Resource {
             try {
                 Files.createDirectory(Global.CONFIG_PATH);
             } catch (IOException ex) {
-                Logger.getLogger(Sound.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
                 return false;
             }
@@ -139,16 +172,16 @@ public class Sound extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.SOUNDS_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.SOUNDS_CONFIG_VERSION);
+        config.addProperty("identificator", CONFIG_IDENTIFICATOR);
+        config.addProperty("version", CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг текстур
-        try (Writer writer = new FileWriter(Const.SOUNDS_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -164,9 +197,7 @@ public class Sound extends Resource {
         SOUNDS.clear();        
         return (SOUNDS.isEmpty());
     }
-
-    /** Является ли файл музыкой */
-    private boolean isMusic = false;
+    
     
     public Sound(File path) {
         this(path.toPath());
@@ -204,17 +235,5 @@ public class Sound extends Resource {
     @Override
     protected List getContainer() {
         return SOUNDS;
-    }
-    /**
-     * Проверка является ли указанный путь звуком
-     * @param path путь для проверки
-     * @return true, если по указанному пути звук
-     */
-    public static boolean pathIsSound(Path path) {
-        return (path != null &&
-                Files.exists(path) && 
-                !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.SOUND_FORMAT_EXT));
-    }
-    
+    }    
 }

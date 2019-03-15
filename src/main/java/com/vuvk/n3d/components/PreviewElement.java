@@ -18,6 +18,10 @@
 package com.vuvk.n3d.components;
 
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Skybox;
+import com.vuvk.n3d.resources.Sound;
+import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
 import com.vuvk.n3d.utils.ImageUtils;
 import com.vuvk.n3d.utils.MessageDialog;
@@ -41,6 +45,7 @@ public class PreviewElement {
         TEXTURE,    // текстура
         MATERIAL,   // материал
         SOUND,      // звуковой файл
+        SKYBOX,     // скайбокс
         UNKNOWN     // неизвестная фигня
     }   
 
@@ -92,7 +97,7 @@ public class PreviewElement {
         } else {
             extension = FileSystemUtils.getFileExtension(path.toFile());
             switch (extension) {
-                case Const.TEXTURE_FORMAT_EXT:
+                case Texture.FORMAT_EXT:
                     try {
                         icon = ImageUtils.resizeImage(ImageIO.read(path.toFile()), Const.ICON_PREVIEW_WIDTH, Const.ICON_PREVIEW_HEIGHT);
                     } catch (IOException ex) {
@@ -102,14 +107,19 @@ public class PreviewElement {
                     type = Type.TEXTURE;
                     break;
                 
-                case Const.MATERIAL_FORMAT_EXT:
+                case Material.FORMAT_EXT:
                     type = Type.MATERIAL;
                     icon = Const.ICONS.get("Material");
                     break;
                     
-                case Const.SOUND_FORMAT_EXT:
+                case Sound.FORMAT_EXT:
                     type = Type.SOUND;
                     icon = Const.ICONS.get("Sound");
+                    break;
+                    
+                case Skybox.FORMAT_EXT:
+                    type = Type.SKYBOX;
+                    icon = Const.ICONS.get("Skybox");
                     break;
                     
                 default :
@@ -125,6 +135,7 @@ public class PreviewElement {
             case TEXTURE:
             case MATERIAL:
             case SOUND:
+            case SKYBOX:
                 name = FilenameUtils.getBaseName(fileName);
                 break;
         }

@@ -17,22 +17,52 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.vuvk.n3d.Const;
+import com.vuvk.n3d.Global;
+import com.vuvk.n3d.utils.FileSystemUtils;
+import com.vuvk.n3d.utils.MessageDialog;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Класс хранимого скайбокса в редакторе
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class Skybox extends Resource {
+public class Skybox extends Resource {  
     
-    /**
-     * текстуры для сторон куба
-     */
-    private final Texture[] sides = new Texture[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
+    /** идентификатор скайбокса */
+    public static final String IDENTIFICATOR = "N3D_SKYBOX";
+    /** версия скайбокса */
+    static final int MAJOR = 0;
+    static final int MINOR = 1;
+    public static final String VERSION = MAJOR + "." + MINOR;
+    /** расширение файла импортированного скайбокса */
+    public static final String FORMAT_EXT = "sky";
+    /** Путь до сохранённых параметров скайбоксов */
+    public static final String CONFIG_STRING = Const.CONFIG_STRING + "skyboxes.sav";
+    /** идентификатор конфига скайбоксов */
+    public static final String CONFIG_IDENTIFICATOR = "N3D_SKYBOXES";
+    /** версия конфига скайбоксов */
+    static final int CONFIG_MAJOR = 0;
+    static final int CONFIG_MINOR = 1;
+    public static final String CONFIG_VERSION = CONFIG_MAJOR + "." + CONFIG_MINOR;
     
     /**
      * стороны скайбокса
@@ -44,17 +74,201 @@ public class Skybox extends Resource {
         
         // номер стороны в массиве сторон
         private int num;
-        int getNum() {
+        public int getNum() {
             return num;
         }
         
         Side(int num) {
             this.num = num;
         }        
+        
+        /** 
+         * Получить сторону по номеру
+         * @param num номер стороны в промежутке [0-5]
+         * @return Константа енумератора: 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
+         */
+        public static Side getByNum(int num) {
+            if (num < 0) {
+                num = 0;
+            } else if (num >= 6) {
+                num = 5;
+            }
+            
+            switch (num) {
+                case 0 : return FRONT;
+                case 1 : return BACK;
+                case 2 : return LEFT;
+                case 3 : return RIGHT;
+                case 4 : return TOP;
+                default: return BOTTOM;
+            }
+        }
     }
+    
+    /**
+     * текстуры для сторон куба
+     */
+    private final Texture[] sides = new Texture[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
     
     /** Список всех скайбоксов (контейнер) */
     public static final ArrayList<Skybox> SKYBOXES = new ArrayList<>();
+
+    private static final Logger LOG = Logger.getLogger(Skybox.class.getName());
+    
+    
+    /**
+     * Проверка является ли указанный путь скайбоксом
+     * @param path путь для проверки
+     * @return true, если по указанному пути скайбокс
+     */
+    public static boolean pathIsSkybox(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(FORMAT_EXT));
+    }
+    
+    /**
+     * Загрузить конфиг и сами скайбоксы
+     * @return true в случае успеха
+     */
+    public static boolean loadAll() {
+        closeAll();
+        
+        File skyboxConfig = new File(CONFIG_STRING);
+        
+        if (!Files.exists(Global.CONFIG_PATH) || 
+            !skyboxConfig.exists()) {
+            return false;
+        }
+        
+        // читаем конфиг
+        JsonObject config = new JsonObject();        
+        try (Reader reader = new FileReader(skyboxConfig)){
+            Gson gson = new GsonBuilder().create();  
+            config = gson.fromJson(reader, JsonObject.class);
+        } catch (Exception ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }
+        
+        // проверяем правильность конфига
+        if (!Resource.checkConfig(config, 
+                                  CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(CONFIG_VERSION))
+           ) {
+            return false;
+        }
+        
+        // данные
+        JsonElement jsonData = config.get("data");
+        if (jsonData == null) {
+            return false;
+        }
+        
+        // создаем небеса по данным из конфига
+        for (JsonElement element : jsonData.getAsJsonArray()) {
+            JsonElement jsonId   = ((JsonObject)element).get("id");
+            JsonElement jsonPath = ((JsonObject)element).get("path");
+            
+            if (jsonId == null || jsonPath == null) {
+                continue;
+            }
+            
+            // если существует
+            Path path = Paths.get(jsonPath.getAsString());
+            if (pathIsSkybox(path)) {
+                // добавляем в базу
+                new Skybox(path)
+                    .setId(jsonId.getAsInt());
+            }
+        }
+        
+        // на всякий случай проверим валидность всех небес
+        checkAll();
+        
+        return true;
+    }
+    
+    /** 
+     * Сохранить все небеса
+     * @return true в случае успеха
+     */
+    public static boolean saveAll() {
+        boolean allOk = true;
+        
+        for (Skybox sky : SKYBOXES) {
+            if (!sky.save()) {
+                allOk = false;
+            }
+        }
+        
+        return allOk;
+    }
+    
+    /** 
+     * Сохранить конфиг всех небес 
+     * @return true в случае успеха
+     */
+    public static boolean saveConfig() {        
+        // создадим папку с конфигами, если нужно
+        if (!Files.exists(Global.CONFIG_PATH)) {
+            try {
+                Files.createDirectory(Global.CONFIG_PATH);
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return false;
+            }
+        }
+        
+        // формируем конфиг с описанием
+        JsonArray array = new JsonArray(SKYBOXES.size());
+        for (Skybox sky : SKYBOXES) {
+            JsonObject object = new JsonObject();
+            object.addProperty("id", sky.getId());
+            object.addProperty("path", sky.getPath());
+            array.add(object);
+        }
+        JsonObject config = new JsonObject();
+        config.addProperty("identificator", CONFIG_IDENTIFICATOR);
+        config.addProperty("version", CONFIG_VERSION);
+        config.add("data", array);
+        
+        // сохраняем конфиг
+        try (Writer writer = new FileWriter(CONFIG_STRING)) { 
+            Gson gson = new GsonBuilder().create();   
+            gson.toJson(config, writer);             
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    /**
+     * Удалить все скайбоксы из памяти
+     * @return true в случае успеха
+     */
+    public static boolean closeAll() {
+        SKYBOXES.clear();        
+        return (SKYBOXES.isEmpty());
+    }
+    
+    /**
+     * Проверка всех сторон всех скайбоксов на наличие текстуры в базе.
+     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
+     */
+    public static void checkAll() {
+        for (Skybox skybox : SKYBOXES) {
+            skybox.check();
+        }
+    }
+    
+    
 
     public Skybox(Path path) {
         super(path);     
@@ -92,6 +306,15 @@ public class Skybox extends Resource {
     }
     
     /**
+     * Деструктор
+     */
+    @Override
+    public void dispose() {
+        super.dispose();
+        clear();
+    }
+    
+    /**
      * Проверить существуют ли текстуры, использующиеся для сторон куба.
      * Несуществующие будут ОБНУЛЕНЫ.
      * @return true, если все существуют
@@ -121,7 +344,66 @@ public class Skybox extends Resource {
      */
     @Override
     protected boolean load(Path path) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        clear();
+        
+        /** если файл существует и он является текстурой */
+        if (pathIsSkybox(path)) {            
+            // читаем конфиг
+            JsonObject config = new JsonObject();        
+            try (Reader reader = new FileReader(path.toFile())) {
+                Gson gson = new GsonBuilder().create();  
+                config = gson.fromJson(reader, JsonObject.class);
+            } catch (Exception ex) {
+                LOG.log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+                return false;
+            }
+
+            // проверяем правильность конфига
+            // идентификатор
+            JsonElement jsonIdentificator = config.get("identificator");
+            if (jsonIdentificator == null || 
+                !jsonIdentificator.getAsString().equals(IDENTIFICATOR)
+               ) {
+                return false;
+            }
+            // версия
+            JsonElement jsonVersion = config.get("version");
+            if (jsonVersion == null) {
+                return false;
+            }
+            double configVersion = jsonVersion.getAsDouble();
+            double editorVersion = Double.parseDouble(VERSION);
+            if (editorVersion < configVersion) {
+                return false;
+            }   
+            // стороны
+            JsonElement jsonSides = config.get("sides");
+            if (jsonSides == null) {
+                return false;
+            }
+            JsonArray jsonSidesArray = jsonSides.getAsJsonArray();
+            // получаем текстуры по данным из конфига
+            for (int i = 0; i < 6; ++i) {
+                JsonElement element = jsonSidesArray.get(i);
+                if (element == null) {
+                    continue;
+                }
+                
+                JsonElement jsonTxrId = ((JsonObject)element).get("texture_id");
+                if (jsonTxrId == null) {
+                    continue;
+                }
+
+                // добавить
+                long id = jsonTxrId.getAsLong();
+                sides[i] = (Texture) Resource.getById(id, Resource.Type.TEXTURE);
+            }
+            
+            return true;
+        }
+        
+        return false;
     }
 
     /**
@@ -130,25 +412,38 @@ public class Skybox extends Resource {
      */
     @Override
     protected boolean save() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    /**
-     * Удалить все скайбоксы из памяти
-     * @return true в случае успеха
-     */
-    public static boolean closeAll() {
-        SKYBOXES.clear();        
-        return (SKYBOXES.isEmpty());
-    }
-    
-    /**
-     * Проверка всех сторон всех скайбоксов на наличие текстуры в базе.
-     * Если текстуры нет в базе, то она будет ОБНУЛЕНА.
-     */
-    public static void checkAll() {
-        for (Skybox skybox : SKYBOXES) {
-            skybox.check();
+        check();
+        
+        // информация о сторонах
+        JsonArray jsonSides = new JsonArray();
+        for (int i = 0; i < 6; ++i) {
+            JsonObject jsonSide = new JsonObject();
+            Texture txr = sides[i];
+            if (txr != null) {
+                jsonSide.addProperty("texture_id", txr.getId());
+            } else {
+                jsonSide.addProperty("texture_id", -1);                
+            }
+            
+            jsonSides.add(jsonSide);
         }
+        
+        // общая информация об объекте
+        JsonObject object = new JsonObject();
+        object.addProperty("identificator", IDENTIFICATOR);
+        object.addProperty("version", VERSION);
+        object.add("sides", jsonSides);
+        
+        // сохраняем в привязанный файл
+        try (Writer writer = new FileWriter(getPath())) { 
+            Gson gson = new GsonBuilder().create();   
+            gson.toJson(object, writer);             
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            MessageDialog.showException(ex);
+            return false;
+        }
+        
+        return true;
     }
 }

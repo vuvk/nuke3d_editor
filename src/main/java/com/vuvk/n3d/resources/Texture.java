@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +48,24 @@ import javax.imageio.ImageIO;
  * Класс хранимой текстуры в редакторе
  * @author Anton "Vuvk" Shcherbatykh
  */
-public final class Texture extends Resource {        
+public final class Texture extends Resource {   
+    /** максимальная ширина текстуры */
+    public static final int MAX_WIDTH  = 512;
+    /** максимальная высота текстуры */
+    public static final int MAX_HEIGHT = 512;    
+    /** расширение файла импортированной текстуры */
+    public static final String FORMAT_EXT = "png";
+    /** доступные расширения текстур для загрузки */
+    public static final List<String> EXTS = Arrays.asList("jpg", "jpeg", "png", "bmp", "gif");
+    /** Путь до сохранённых параметров текстур */
+    public static final String CONFIG_STRING = Const.CONFIG_STRING + "textures.sav";
+    /** идентификатор конфига текстур */
+    public static final String CONFIG_IDENTIFICATOR = "N3D_TEXTURES";
+    /** версия конфига текстур */
+    static final int CONFIG_MAJOR = 0;
+    static final int CONFIG_MINOR = 1;
+    public static final String CONFIG_VERSION = CONFIG_MAJOR + "." + CONFIG_MINOR;
+    
     /** изображение текстуры */
     private BufferedImage image;
     
@@ -57,7 +75,19 @@ public final class Texture extends Resource {
     //public static final Texture TEXTURE_EMPTY = new Texture();
     /** Список всех текстур (контейнер) */
     public static final ArrayList<Texture> TEXTURES = new ArrayList<>();
+    private static final Logger LOG = Logger.getLogger(Texture.class.getName());
     
+    /**
+     * Проверка является ли указанный путь текстурой
+     * @param path путь для проверки
+     * @return true, если по указанному пути текстура
+     */
+    public static boolean pathIsTexture(Path path) {
+        return (path != null &&
+                Files.exists(path) && 
+                !Files.isDirectory(path) && 
+                FileSystemUtils.getFileExtension(path).equals(FORMAT_EXT));
+    }
     
     /**
      * Загрузить конфиг текстур и сами текстуры
@@ -66,7 +96,7 @@ public final class Texture extends Resource {
     public static boolean loadAll() {
         closeAll();
         
-        File textureConfig = new File(Const.TEXTURES_CONFIG_STRING);
+        File textureConfig = new File(CONFIG_STRING);
         
         if (!Files.exists(Global.CONFIG_PATH) || 
             !textureConfig.exists()) {
@@ -79,15 +109,15 @@ public final class Texture extends Resource {
             Gson gson = new GsonBuilder().create();  
             config = gson.fromJson(reader, JsonObject.class);
         } catch (Exception ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
               
         // проверяем правильность конфига
         if (!Resource.checkConfig(config, 
-                                  Const.TEXTURES_CONFIG_IDENTIFICATOR, 
-                                  Double.parseDouble(Const.TEXTURES_CONFIG_VERSION))
+                                  CONFIG_IDENTIFICATOR, 
+                                  Double.parseDouble(CONFIG_VERSION))
            ) {
             return false;
         }
@@ -129,7 +159,7 @@ public final class Texture extends Resource {
             try {
                 Files.createDirectory(Global.CONFIG_PATH);
             } catch (IOException ex) {
-                Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
                 MessageDialog.showException(ex);
                 return false;
             }
@@ -144,16 +174,16 @@ public final class Texture extends Resource {
             array.add(object);
         }
         JsonObject config = new JsonObject();
-        config.addProperty("identificator", Const.TEXTURES_CONFIG_IDENTIFICATOR);
-        config.addProperty("version", Const.TEXTURES_CONFIG_VERSION);
+        config.addProperty("identificator", CONFIG_IDENTIFICATOR);
+        config.addProperty("version", CONFIG_VERSION);
         config.add("data", array);
         
         // сохраняем конфиг текстур
-        try (Writer writer = new FileWriter(Const.TEXTURES_CONFIG_STRING)) { 
+        try (Writer writer = new FileWriter(CONFIG_STRING)) { 
             Gson gson = new GsonBuilder().create();   
             gson.toJson(config, writer);             
         } catch (IOException ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -189,7 +219,7 @@ public final class Texture extends Resource {
             try {
                 image = ImageUtils.prepareImage(ImageIO.read(path.toFile()));
             } catch (IOException ex) {
-                Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.log(Level.SEVERE, null, ex);
                 image = IMAGE_EMPTY;
                 return false;
             }
@@ -207,7 +237,7 @@ public final class Texture extends Resource {
         try {
             ImageIO.write(image, "png", new File(path));
         } catch (IOException ex) {
-            Logger.getLogger(Texture.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
             MessageDialog.showException(ex);
             return false;
         }
@@ -248,16 +278,5 @@ public final class Texture extends Resource {
     @Override
     protected List getContainer() {
         return TEXTURES;
-    }
-    /**
-     * Проверка является ли указанный путь текстурой
-     * @param path путь для проверки
-     * @return true, если по указанному пути текстура
-     */
-    public static boolean pathIsTexture(Path path) {
-        return (path != null &&
-                Files.exists(path) && 
-                !Files.isDirectory(path) && 
-                FileSystemUtils.getFileExtension(path).equals(Const.TEXTURE_FORMAT_EXT));
     }
 }

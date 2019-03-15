@@ -23,6 +23,7 @@ import com.vuvk.n3d.Global;
 import com.vuvk.n3d.components.PreviewElement;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Resource;
+import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Sound;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.FileSystemUtils;
@@ -79,6 +80,8 @@ public class FormMain extends javax.swing.JFrame {
     public static FormMaterialEditor formMaterialEditor = null;
     /** ссылка на форму редактора звуков */
     public static FormSoundEditor formSoundEditor = null;
+    /** ссылка на форму редактора скайбоксов */
+    public static FormSkyboxEditor formSkyboxEditor = null;
         
     /** проект открыт? */
     public static boolean isProjectOpened = false;
@@ -160,6 +163,7 @@ public class FormMain extends javax.swing.JFrame {
         Texture.loadAll();
         Material.loadAll();
         Sound.loadAll();
+        Skybox.loadAll();
 
         MenuItemOpenProject.setEnabled (false);
         MenuItemSaveProject.setEnabled (true );
@@ -194,6 +198,10 @@ public class FormMain extends javax.swing.JFrame {
             MessageDialog.showError("Не удалось сохранить звуки проекта! Повторите попытку.");
         }
         
+        if (!Skybox.saveAll() || !Skybox.saveConfig()) {
+            MessageDialog.showError("Не удалось сохранить скайбоксы проекта! Повторите попытку.");
+        }
+        
         MessageDialog.showInformation("Процедура сохранения проекта завершена.");   
     }
     
@@ -219,6 +227,7 @@ public class FormMain extends javax.swing.JFrame {
         Texture.closeAll();
         Material.closeAll();
         Sound.closeAll();
+        Skybox.closeAll();
 
         MenuItemOpenProject.setEnabled (true );
         MenuItemSaveProject.setEnabled (false);
@@ -368,6 +377,49 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Открыть форму редактирования скайбокса
+     */
+    void openFormSkyboxEditor() {
+        List list = listProjectView.getSelectedValuesList();
+        if (list.size() > 0) {
+            PreviewElement element = (PreviewElement)list.get(0);
+            if (element.getType() == PreviewElement.Type.SKYBOX) {
+                
+                Skybox sky = (Skybox) Resource.getByPath(element.getPath(), Resource.Type.SKYBOX);
+                if (sky != null) {
+                    boolean firstRun = false;
+                    if (formSkyboxEditor == null) {
+                        formSkyboxEditor = new FormSkyboxEditor();
+                        Desktop.add(formSkyboxEditor);
+                        firstRun = true;
+                    }
+
+                    formSkyboxEditor.selectedSkybox = sky;
+                    // свернуто?
+                    if (formSkyboxEditor.isIcon()) {
+                        try {
+                            formSkyboxEditor.setIcon(false);
+                        } catch (PropertyVetoException ex) {
+                            Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                            MessageDialog.showException(ex);
+                        }
+                    // невидимое?
+                    } else {
+                        formSkyboxEditor.setVisible(true); 
+                        formSkyboxEditor.prepareForm(firstRun);
+                    }
+                    Desktop.moveToFront(formSkyboxEditor);
+                } else {
+                    // если не нашёл, а файл есть, значит проект битый 
+                    // или файл был "подброшен"
+                    MessageDialog.showError("Не удалось найти файл \"" + element.getFileName() + "\" в настройках проекта.\n" +
+                                            "Возможно, нарушились связи проекта или файл был подброшен. Импортируйте его заново." );
+                }
+            }
+        }       
+    }
+    
+    /**
      * Закрыть окно редактирования текстур
      */
     public static void closeFormTextureEditor() {
@@ -413,6 +465,21 @@ public class FormMain extends javax.swing.JFrame {
     }
     
     /**
+     * Закрыть окно редактирования звуков
+     */
+    public static void closeFormSkyboxEditor() {  
+        if (formSkyboxEditor != null) {
+            try {
+                formSkyboxEditor.setClosed(true);
+            } catch (PropertyVetoException ex) {
+                Logger.getLogger(FormMain.class.getName()).log(Level.SEVERE, null, ex);
+                MessageDialog.showException(ex);
+            }
+            formSkyboxEditor = null;
+        }
+    }
+    
+    /**
      * Перезагрузить открытые окна
      */
     public static void reloadChildWindows() {
@@ -425,6 +492,9 @@ public class FormMain extends javax.swing.JFrame {
         if (formSoundEditor != null) {
             formSoundEditor.prepareForm(false);
         }
+        if (formSkyboxEditor != null) {
+            formSkyboxEditor.prepareForm(false);
+        }
     }
     /** 
      * Закрыть все вызванные ранее дочерние окна
@@ -433,6 +503,7 @@ public class FormMain extends javax.swing.JFrame {
         closeFormTextureEditor();
         closeFormMaterialEditor();
         closeFormSoundEditor();
+        closeFormSkyboxEditor();
     }
         
     /**
@@ -700,6 +771,7 @@ public class FormMain extends javax.swing.JFrame {
         popupPVMITexture = new javax.swing.JMenuItem();
         popupPVMIMaterial = new javax.swing.JMenuItem();
         popupPVMISound = new javax.swing.JMenuItem();
+        popupPVMISkybox = new javax.swing.JMenuItem();
         popupPVMICopy = new javax.swing.JMenuItem();
         popupPVMICut = new javax.swing.JMenuItem();
         popuvPVMIPaste = new javax.swing.JMenuItem();
@@ -757,6 +829,14 @@ public class FormMain extends javax.swing.JFrame {
             }
         });
         popupPVResource.add(popupPVMISound);
+
+        popupPVMISkybox.setText("Скайбокс");
+        popupPVMISkybox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                popupPVMISkyboxActionPerformed(evt);
+            }
+        });
+        popupPVResource.add(popupPVMISkybox);
 
         popupPVMenuAdd.add(popupPVResource);
 
@@ -1004,6 +1084,10 @@ public class FormMain extends javax.swing.JFrame {
                         openFormSoundEditor();
                         break;
                         
+                    case SKYBOX:                        
+                        openFormSkyboxEditor();
+                        break;
+                        
                     default:
                         break;
                 }
@@ -1235,7 +1319,7 @@ public class FormMain extends javax.swing.JFrame {
             if (txrFile != null) {
                 // копируем текстуру к себе в папку ресурсов
                 String baseName = FilenameUtils.getBaseName(txrFile.getName());     
-                String extension = "." + Const.TEXTURE_FORMAT_EXT;
+                String extension = "." + Texture.FORMAT_EXT;
                 Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
 
                 // файл с таким же именем существует?
@@ -1300,7 +1384,7 @@ public class FormMain extends javax.swing.JFrame {
         if (name == null) {
             return;    // отмена?
         } else {
-            Path matPath = Paths.get(currentPath.toString() + "/" + name + "." + Const.MATERIAL_FORMAT_EXT);
+            Path matPath = Paths.get(currentPath.toString() + "/" + name + "." + Material.FORMAT_EXT);
             
             // файл с таким же именем существует?
             if (Files.exists(matPath)) {
@@ -1317,7 +1401,7 @@ public class FormMain extends javax.swing.JFrame {
                             return;    // отмена?
                         } else {
                             name = newName;
-                            matPath = Paths.get(currentPath.toString() + "/" + newName + "." + Const.MATERIAL_FORMAT_EXT);
+                            matPath = Paths.get(currentPath.toString() + "/" + newName + "." + Material.FORMAT_EXT);
                         }
                     }
                 // YES
@@ -1356,7 +1440,7 @@ public class FormMain extends javax.swing.JFrame {
         for (File sndFile : files) {
             if (sndFile != null) {
                 String baseName = FilenameUtils.getBaseName(sndFile.getName());     
-                String extension = "." + Const.SOUND_FORMAT_EXT;
+                String extension = "." + Sound.FORMAT_EXT;
                 Path newPath = Paths.get(currentPath.toString() + "/" + baseName + extension);
 
                 // файл с таким же именем существует?
@@ -1384,7 +1468,7 @@ public class FormMain extends javax.swing.JFrame {
                 }
 
                 // если исходный файл с расширением ogg, то просто его копировать. А иначе конвертировать в ogg
-                if (Const.SOUND_FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
+                if (Sound.FORMAT_EXT.equals(FileSystemUtils.getFileExtension(sndFile))) {
                     // создаем файл у себя
                     try {
                         FileUtils.copyFile(sndFile, newPath.toFile());
@@ -1426,6 +1510,56 @@ public class FormMain extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_popupPVMISoundActionPerformed
+
+    private void popupPVMISkyboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_popupPVMISkyboxActionPerformed
+        String name = MessageDialog.showInput("Введите имя для нового скайбокса");
+        if (name == null) {
+            return;    // отмена?
+        } else {
+            Path skyPath = Paths.get(currentPath.toString() + "/" + name + "." + Skybox.FORMAT_EXT);
+            
+            // файл с таким же именем существует?
+            if (Files.exists(skyPath)) {
+                Boolean answer = MessageDialog.showConfirmationYesNoCancel("\"" + name + "\"\nуже существует! Перезаписать?");
+                // CANCEL
+                if (answer == null) {
+                    return;
+                // NO
+                } else if (!answer.booleanValue()) {
+                    // решил переименовать
+                    while (Files.exists(skyPath)) {
+                        String newName = (String) MessageDialog.showInput("Введите новое имя для объекта\n\"" + name + "\":", name);
+                        if (newName == null) {
+                            return;    // отмена?
+                        } else {
+                            name = newName;
+                            skyPath = Paths.get(currentPath.toString() + "/" + newName + "." + Skybox.FORMAT_EXT);
+                        }
+                    }
+                // YES
+                } else {
+                    FileSystemUtils.remove(skyPath);
+                }
+            }
+            
+            new Skybox(skyPath);
+            
+            fillListProjectView(); 
+            
+            // открываем окно редактирования
+            DefaultListModel model = (DefaultListModel) listProjectView.getModel();
+            for (Object obj : model.toArray()) {
+                PreviewElement element = (PreviewElement)obj;
+                if (element.getType() == PreviewElement.Type.SKYBOX && 
+                    element.getName().equals(name)
+                   ) {                    
+                    listProjectView.setSelectedValue(element, true);
+                    openFormSkyboxEditor();
+                    break;
+                }
+            }
+        }
+    }//GEN-LAST:event_popupPVMISkyboxActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1539,6 +1673,7 @@ public class FormMain extends javax.swing.JFrame {
     private javax.swing.JMenuItem popupPVMIMaterial;
     private javax.swing.JMenuItem popupPVMIRemove;
     private javax.swing.JMenuItem popupPVMIRename;
+    private javax.swing.JMenuItem popupPVMISkybox;
     private javax.swing.JMenuItem popupPVMISound;
     private javax.swing.JMenuItem popupPVMITexture;
     private javax.swing.JMenu popupPVMenuAdd;
