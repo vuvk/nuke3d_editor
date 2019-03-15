@@ -35,10 +35,10 @@
                   </Group>
                   <Group type="102" attributes="0">
                       <Component id="pnlSides" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="btnPreview" min="-2" max="-2" attributes="0"/>
                           <Component id="btnClose" min="-2" max="-2" attributes="0"/>
+                          <Component id="btnPreview" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
@@ -56,7 +56,7 @@
                   <Component id="lblName" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="pnlSides" min="-2" max="-2" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="btnPreview" min="-2" max="-2" attributes="0"/>
@@ -128,15 +128,17 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
-                          <Component id="pnlTop" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace max="-2" attributes="0"/>
-                          <Component id="pnlRight" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <Component id="pnlFront" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
                           <Component id="pnlBack" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="pnlBottom" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <Group type="102" alignment="0" attributes="0">
+                          <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                              <Component id="pnlFront" alignment="0" max="32767" attributes="0"/>
+                              <Component id="pnlTop" alignment="0" max="32767" attributes="0"/>
+                          </Group>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="pnlRight" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <EmptySpace max="32767" attributes="0"/>
@@ -172,17 +174,20 @@
                 <TitledBorder title="Left"/>
               </Border>
             </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[140, 151]"/>
+            </Property>
           </Properties>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="114" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="130" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="113" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="129" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -194,17 +199,20 @@
                 <TitledBorder title="Front"/>
               </Border>
             </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[140, 151]"/>
+            </Property>
           </Properties>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="114" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="130" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="113" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="129" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -216,17 +224,20 @@
                 <TitledBorder title="Top"/>
               </Border>
             </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[140, 151]"/>
+            </Property>
           </Properties>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="114" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="113" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="129" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -238,17 +249,20 @@
                 <TitledBorder title="Back"/>
               </Border>
             </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[140, 151]"/>
+            </Property>
           </Properties>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="114" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="130" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="113" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="129" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -260,17 +274,20 @@
                 <TitledBorder title="Bottom"/>
               </Border>
             </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[140, 151]"/>
+            </Property>
           </Properties>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="114" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="130" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="113" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="129" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
@@ -282,17 +299,20 @@
                 <TitledBorder title="Right"/>
               </Border>
             </Property>
+            <Property name="preferredSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
+              <Dimension value="[140, 151]"/>
+            </Property>
           </Properties>
 
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="114" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="130" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="113" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="129" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>

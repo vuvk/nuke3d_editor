@@ -1084,6 +1084,10 @@ public class FormMain extends javax.swing.JFrame {
                         openFormSoundEditor();
                         break;
                         
+                    case SKYBOX:                        
+                        openFormSkyboxEditor();
+                        break;
+                        
                     default:
                         break;
                 }
