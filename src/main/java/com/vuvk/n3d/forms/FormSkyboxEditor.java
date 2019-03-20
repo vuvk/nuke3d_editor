@@ -416,7 +416,8 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnPreviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviewActionPerformed
-        // TODO add your handling code here:
+        FormMain.closeFormSoundEditor();
+        new FormSkyboxPreview().execute(selectedSkybox);
     }//GEN-LAST:event_btnPreviewActionPerformed
 
     private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed
