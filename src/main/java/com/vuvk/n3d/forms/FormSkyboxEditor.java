@@ -104,7 +104,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
         public void mousePressed(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 chooseTexture();
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
                 selectedSkybox.setTexture(null, side);   
                 
                 sidePreviews[side.getNum()].setImage(null);

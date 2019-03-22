@@ -1,62 +1,163 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+/**
+    Form for preview skybox in Nuke3D Editor
+    Copyright (C) 2019 Anton "Vuvk" Shcherbatykh <vuvk69@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+*/
 package com.vuvk.n3d.forms;
 
 import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import static com.vuvk.n3d.forms.FormSoundEditor.selectedSound;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Texture;
 import java.awt.BorderLayout;
-import java.awt.Container;
 import java.awt.event.WindowEvent;
-import java.util.Arrays;
 
 /**
  *
- * @author tai-prg3
+ * @author Anton "Vuvk" Shcherbatykh
  */
 public class FormSkyboxPreview extends javax.swing.JFrame {
     /** выбранный скайбокс для редактирования */
     public static Skybox selectedSkybox = null;
-    /** стороны куба */
-    static com.badlogic.gdx.graphics.Texture[] sides = new com.badlogic.gdx.graphics.Texture[6];
-    
+    /** текстуры куба в формате libGDX */
+    com.badlogic.gdx.graphics.Texture skyTextures[] = new com.badlogic.gdx.graphics.Texture[6];
+    Model skyModel;
+    ModelInstance skyInstance;
+    ModelBatch modelBatch;
     PerspectiveCamera cam;
+    
+    Vector3 position = new Vector3(0f, 0f, -1f);
+    float angle = 0.0f;
     
     class SkyboxPlayer extends ApplicationAdapter {            
         @Override
         public void create() {
             disposeFiles();
-            
-            for (int i = 0; i < sides.length; ++i) {
+            modelBatch = new ModelBatch();
+                      
+            // грузим текстуры формата libGDX
+            for (int i = 0; i < skyTextures.length; ++i) {                
                 Texture txr = selectedSkybox.getTexture(Skybox.Side.getByNum(i));
-                if (txr != null) {
-                    sides[i] = new com.badlogic.gdx.graphics.Texture(Gdx.files.internal(txr.getPath()));
+                if (txr != null) {  
+                    skyTextures[i] = new com.badlogic.gdx.graphics.Texture(Gdx.files.internal(txr.getPath()));
                 }
             }
             
+            // создаем модель куба из 6 мешей
+            
+            ModelBuilder modelBuilder = new ModelBuilder();
+            MeshPartBuilder meshBuilder;
+            VertexInfo v1, v2, v3, v4;  
+            
+            modelBuilder.begin();
+            
+            // FRONT
+            v1 = new VertexInfo().setPos(-1, -1, -1).setUV(0.0f, 1.0f);
+            v2 = new VertexInfo().setPos( 1, -1, -1).setUV(1.0f, 1.0f);
+            v3 = new VertexInfo().setPos( 1,  1, -1).setUV(1.0f, 0.0f);
+            v4 = new VertexInfo().setPos(-1,  1, -1).setUV(0.0f, 0.0f);
+            
+            meshBuilder = modelBuilder.part("front", 
+                                            GL20.GL_TRIANGLES, 
+                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                            new Material(TextureAttribute
+                                                         .createDiffuse(skyTextures[Skybox.Side.FRONT.getNum()])));
+            meshBuilder.rect(v1, v2, v3, v4);
+            
+            // BACK
+            v1 = new VertexInfo().setPos( 1, -1,  1).setUV(0.0f, 1.0f);
+            v2 = new VertexInfo().setPos(-1, -1,  1).setUV(1.0f, 1.0f);
+            v3 = new VertexInfo().setPos(-1,  1,  1).setUV(1.0f, 0.0f);
+            v4 = new VertexInfo().setPos( 1,  1,  1).setUV(0.0f, 0.0f);
+            
+            meshBuilder = modelBuilder.part("back", 
+                                            GL20.GL_TRIANGLES, 
+                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                            new Material(TextureAttribute
+                                                    .createDiffuse(skyTextures[Skybox.Side.BACK.getNum()])));
+            meshBuilder.rect(v1, v2, v3, v4);
+            
+            // LEFT
+            v1 = new VertexInfo().setPos(-1, -1,  1).setUV(0.0f, 1.0f);
+            v2 = new VertexInfo().setPos(-1, -1, -1).setUV(1.0f, 1.0f);
+            v3 = new VertexInfo().setPos(-1,  1, -1).setUV(1.0f, 0.0f);
+            v4 = new VertexInfo().setPos(-1,  1,  1).setUV(0.0f, 0.0f);
+            
+            meshBuilder = modelBuilder.part("left", 
+                                            GL20.GL_TRIANGLES, 
+                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                            new Material(TextureAttribute
+                                                    .createDiffuse(skyTextures[Skybox.Side.LEFT.getNum()])));
+            meshBuilder.rect(v1, v2, v3, v4);
+            
+            // RIGHT
+            v1 = new VertexInfo().setPos( 1, -1, -1).setUV(0.0f, 1.0f);
+            v2 = new VertexInfo().setPos( 1, -1,  1).setUV(1.0f, 1.0f);
+            v3 = new VertexInfo().setPos( 1,  1,  1).setUV(1.0f, 0.0f);
+            v4 = new VertexInfo().setPos( 1,  1, -1).setUV(0.0f, 0.0f);
+            
+            meshBuilder = modelBuilder.part("right", 
+                                            GL20.GL_TRIANGLES, 
+                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                            new Material(TextureAttribute
+                                                    .createDiffuse(skyTextures[Skybox.Side.RIGHT.getNum()])));
+            meshBuilder.rect(v1, v2, v3, v4);
+            
+            skyModel = modelBuilder.end();
+            skyInstance = new ModelInstance(skyModel);
+            
             cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            cam.position.set(0, 0, 0);
-            cam.lookAt(0, 0, 0);
-            cam.near = 1f;
+            cam.position.setZero();
+            cam.lookAt(position);
+            cam.near = 0.0001f;
             cam.far = 300f;
             cam.update();
         }
         
         @Override
-        public void render() {            
+        public void render() {              
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+                        
+            angle += 45 * Gdx.graphics.getDeltaTime();
+            if (angle >  360.0f)
+                angle -= 360.0f;
+            position.x = (float)  Math.cos(Math.toRadians(angle));
+            position.z = (float) -Math.sin(Math.toRadians(angle));
+            cam.lookAt(position);
+            cam.update();
+            
+            modelBatch.begin(cam);
+            modelBatch.render(skyInstance);
+            modelBatch.end();
         }
         
         @Override
@@ -70,6 +171,7 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
         @Override
         public void dispose() {
             disposeFiles();
+            modelBatch.dispose();
         }    
     }
     
@@ -80,10 +182,14 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
      * Освободить память от загруженных ранее файлов
      */
     void disposeFiles() {  
-        for (int i = 0; i < sides.length; ++i) {
-            if (sides[i] != null) {
-                sides[i].dispose();
-                sides[i] = null;
+        for (int i = 0; i < skyTextures.length; ++i) {            
+            if (skyModel != null) {
+                skyModel.dispose();
+            }
+            
+            if (skyTextures[i] != null) {
+                skyTextures[i].dispose();
+                skyTextures[i] = null;
             }
         }
     }
