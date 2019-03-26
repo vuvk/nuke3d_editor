@@ -29,6 +29,7 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
@@ -88,7 +89,7 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
             meshBuilder = modelBuilder.part("front", 
                                             GL20.GL_TRIANGLES, 
                                             VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material(TextureAttribute
+                                            new Material("front", TextureAttribute
                                                          .createDiffuse(skyTextures[Skybox.Side.FRONT.getNum()])));
             meshBuilder.rect(v1, v2, v3, v4);
             
@@ -101,8 +102,8 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
             meshBuilder = modelBuilder.part("back", 
                                             GL20.GL_TRIANGLES, 
                                             VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material(TextureAttribute
-                                                    .createDiffuse(skyTextures[Skybox.Side.BACK.getNum()])));
+                                            new Material("back", TextureAttribute
+                                                         .createDiffuse(skyTextures[Skybox.Side.BACK.getNum()])));
             meshBuilder.rect(v1, v2, v3, v4);
             
             // LEFT
@@ -114,8 +115,8 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
             meshBuilder = modelBuilder.part("left", 
                                             GL20.GL_TRIANGLES, 
                                             VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material(TextureAttribute
-                                                    .createDiffuse(skyTextures[Skybox.Side.LEFT.getNum()])));
+                                            new Material("left", TextureAttribute
+                                                         .createDiffuse(skyTextures[Skybox.Side.LEFT.getNum()])));
             meshBuilder.rect(v1, v2, v3, v4);
             
             // RIGHT
@@ -127,8 +128,8 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
             meshBuilder = modelBuilder.part("right", 
                                             GL20.GL_TRIANGLES, 
                                             VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material(TextureAttribute
-                                                    .createDiffuse(skyTextures[Skybox.Side.RIGHT.getNum()])));
+                                            new Material("right", TextureAttribute
+                                                         .createDiffuse(skyTextures[Skybox.Side.RIGHT.getNum()])));
             meshBuilder.rect(v1, v2, v3, v4);
             
             skyModel = modelBuilder.end();
@@ -183,9 +184,9 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
      */
     void disposeFiles() {  
         for (int i = 0; i < skyTextures.length; ++i) {            
-            if (skyModel != null) {
+            /*if (skyModel != null) {
                 skyModel.dispose();
-            }
+            }*/
             
             if (skyTextures[i] != null) {
                 skyTextures[i].dispose();
@@ -374,6 +375,11 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
         );
 
         chkShowSides.setText("Отобразить");
+        chkShowSides.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                chkShowSidesStateChanged(evt);
+            }
+        });
 
         jLabel1.setText("Front");
 
@@ -492,6 +498,25 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
         gdxEngine.stop();        
         gdxEngine.exit();
     }//GEN-LAST:event_formWindowClosing
+
+    private void chkShowSidesStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_chkShowSidesStateChanged
+        Material front = skyInstance.getMaterial("front");                                 
+        Material back  = skyInstance.getMaterial("back" );                            
+        Material left  = skyInstance.getMaterial("left" );                            
+        Material right = skyInstance.getMaterial("right");
+            
+        if (chkShowSides.isSelected()) {
+            if (front != null) { front.set(ColorAttribute.createDiffuse(Color.RED    )); }
+            if (back  != null) { back .set(ColorAttribute.createDiffuse(Color.GREEN  )); }
+            if (left  != null) { left .set(ColorAttribute.createDiffuse(Color.BLUE   )); }
+            if (right != null) { right.set(ColorAttribute.createDiffuse(Color.MAGENTA)); }
+        } else {
+            if (front != null) { front.remove(ColorAttribute.Diffuse); }
+            if (back  != null) { back .remove(ColorAttribute.Diffuse); }
+            if (left  != null) { left .remove(ColorAttribute.Diffuse); }
+            if (right != null) { right.remove(ColorAttribute.Diffuse); }
+        }
+    }//GEN-LAST:event_chkShowSidesStateChanged
 
     /**
      * @param args the command line arguments
