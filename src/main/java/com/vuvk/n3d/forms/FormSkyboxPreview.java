@@ -29,12 +29,12 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Texture;
@@ -55,7 +55,9 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
     ModelBatch modelBatch;
     PerspectiveCamera cam;
     
-    Vector3 position = new Vector3(0f, 0f, -1f);
+    Vector2 lastMousePos = new Vector2(), 
+            curMousePos  = new Vector2();
+    Vector2 camLook = new Vector2();
     float angle = 0.0f;
     
     class SkyboxPlayer extends ApplicationAdapter {            
@@ -81,65 +83,75 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
             modelBuilder.begin();
             
             // FRONT
-            v1 = new VertexInfo().setPos(-1, -1, -1).setUV(0.0f, 1.0f);
-            v2 = new VertexInfo().setPos( 1, -1, -1).setUV(1.0f, 1.0f);
-            v3 = new VertexInfo().setPos( 1,  1, -1).setUV(1.0f, 0.0f);
-            v4 = new VertexInfo().setPos(-1,  1, -1).setUV(0.0f, 0.0f);
-            
-            meshBuilder = modelBuilder.part("front", 
-                                            GL20.GL_TRIANGLES, 
-                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material("front", TextureAttribute
-                                                         .createDiffuse(skyTextures[Skybox.Side.FRONT.getNum()])));
-            meshBuilder.rect(v1, v2, v3, v4);
+            if (skyTextures[Skybox.Side.FRONT.getNum()] != null) {
+                v1 = new VertexInfo().setPos(-1, -1, -1).setUV(0.0f, 1.0f);
+                v2 = new VertexInfo().setPos( 1, -1, -1).setUV(1.0f, 1.0f);
+                v3 = new VertexInfo().setPos( 1,  1, -1).setUV(1.0f, 0.0f);
+                v4 = new VertexInfo().setPos(-1,  1, -1).setUV(0.0f, 0.0f);
+
+                meshBuilder = modelBuilder.part("front", 
+                                                GL20.GL_TRIANGLES, 
+                                                VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                                new Material("front", TextureAttribute
+                                                             .createDiffuse(skyTextures[Skybox.Side.FRONT.getNum()])));
+                meshBuilder.rect(v1, v2, v3, v4);
+            }
             
             // BACK
-            v1 = new VertexInfo().setPos( 1, -1,  1).setUV(0.0f, 1.0f);
-            v2 = new VertexInfo().setPos(-1, -1,  1).setUV(1.0f, 1.0f);
-            v3 = new VertexInfo().setPos(-1,  1,  1).setUV(1.0f, 0.0f);
-            v4 = new VertexInfo().setPos( 1,  1,  1).setUV(0.0f, 0.0f);
-            
-            meshBuilder = modelBuilder.part("back", 
-                                            GL20.GL_TRIANGLES, 
-                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material("back", TextureAttribute
-                                                         .createDiffuse(skyTextures[Skybox.Side.BACK.getNum()])));
-            meshBuilder.rect(v1, v2, v3, v4);
+            if (skyTextures[Skybox.Side.BACK.getNum()] != null) {
+                v1 = new VertexInfo().setPos( 1, -1,  1).setUV(0.0f, 1.0f);
+                v2 = new VertexInfo().setPos(-1, -1,  1).setUV(1.0f, 1.0f);
+                v3 = new VertexInfo().setPos(-1,  1,  1).setUV(1.0f, 0.0f);
+                v4 = new VertexInfo().setPos( 1,  1,  1).setUV(0.0f, 0.0f);
+
+                meshBuilder = modelBuilder.part("back", 
+                                                GL20.GL_TRIANGLES, 
+                                                VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                                new Material("back", TextureAttribute
+                                                             .createDiffuse(skyTextures[Skybox.Side.BACK.getNum()])));
+                meshBuilder.rect(v1, v2, v3, v4);
+            }
             
             // LEFT
-            v1 = new VertexInfo().setPos(-1, -1,  1).setUV(0.0f, 1.0f);
-            v2 = new VertexInfo().setPos(-1, -1, -1).setUV(1.0f, 1.0f);
-            v3 = new VertexInfo().setPos(-1,  1, -1).setUV(1.0f, 0.0f);
-            v4 = new VertexInfo().setPos(-1,  1,  1).setUV(0.0f, 0.0f);
-            
-            meshBuilder = modelBuilder.part("left", 
-                                            GL20.GL_TRIANGLES, 
-                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material("left", TextureAttribute
-                                                         .createDiffuse(skyTextures[Skybox.Side.LEFT.getNum()])));
-            meshBuilder.rect(v1, v2, v3, v4);
+            if (skyTextures[Skybox.Side.LEFT.getNum()] != null) {
+                v1 = new VertexInfo().setPos(-1, -1,  1).setUV(0.0f, 1.0f);
+                v2 = new VertexInfo().setPos(-1, -1, -1).setUV(1.0f, 1.0f);
+                v3 = new VertexInfo().setPos(-1,  1, -1).setUV(1.0f, 0.0f);
+                v4 = new VertexInfo().setPos(-1,  1,  1).setUV(0.0f, 0.0f);
+
+                meshBuilder = modelBuilder.part("left", 
+                                                GL20.GL_TRIANGLES, 
+                                                VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                                new Material("left", TextureAttribute
+                                                             .createDiffuse(skyTextures[Skybox.Side.LEFT.getNum()])));
+                meshBuilder.rect(v1, v2, v3, v4);
+            }
             
             // RIGHT
-            v1 = new VertexInfo().setPos( 1, -1, -1).setUV(0.0f, 1.0f);
-            v2 = new VertexInfo().setPos( 1, -1,  1).setUV(1.0f, 1.0f);
-            v3 = new VertexInfo().setPos( 1,  1,  1).setUV(1.0f, 0.0f);
-            v4 = new VertexInfo().setPos( 1,  1, -1).setUV(0.0f, 0.0f);
-            
-            meshBuilder = modelBuilder.part("right", 
-                                            GL20.GL_TRIANGLES, 
-                                            VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
-                                            new Material("right", TextureAttribute
-                                                         .createDiffuse(skyTextures[Skybox.Side.RIGHT.getNum()])));
-            meshBuilder.rect(v1, v2, v3, v4);
+            if (skyTextures[Skybox.Side.RIGHT.getNum()] != null) {
+                v1 = new VertexInfo().setPos( 1, -1, -1).setUV(0.0f, 1.0f);
+                v2 = new VertexInfo().setPos( 1, -1,  1).setUV(1.0f, 1.0f);
+                v3 = new VertexInfo().setPos( 1,  1,  1).setUV(1.0f, 0.0f);
+                v4 = new VertexInfo().setPos( 1,  1, -1).setUV(0.0f, 0.0f);
+
+                meshBuilder = modelBuilder.part("right", 
+                                                GL20.GL_TRIANGLES, 
+                                                VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                                new Material("right", TextureAttribute
+                                                             .createDiffuse(skyTextures[Skybox.Side.RIGHT.getNum()])));
+                meshBuilder.rect(v1, v2, v3, v4);
+            }
             
             skyModel = modelBuilder.end();
             skyInstance = new ModelInstance(skyModel);
             
+            Gdx.gl.glClearColor(0.9f, 0.7f, 0.25f, 1.0f);
+            
             cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             cam.position.setZero();
-            cam.lookAt(position);
+            cam.lookAt(0, 0, -1);
             cam.near = 0.0001f;
-            cam.far = 300f;
+            cam.far  = 3;
             cam.update();
         }
         
@@ -147,13 +159,34 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
         public void render() {              
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-                        
-            angle += 45 * Gdx.graphics.getDeltaTime();
-            if (angle >  360.0f)
-                angle -= 360.0f;
-            position.x = (float)  Math.cos(Math.toRadians(angle));
-            position.z = (float) -Math.sin(Math.toRadians(angle));
-            cam.lookAt(position);
+            
+            if (Gdx.input.justTouched()) {
+                lastMousePos.set(Gdx.input.getX(), Gdx.input.getY());
+            }
+            
+            if (Gdx.input.isTouched()) {
+                curMousePos.set(Gdx.input.getX(), Gdx.input.getY()); 
+                
+                float dX = lastMousePos.x - curMousePos.x;
+                float dY = lastMousePos.y - curMousePos.y;
+                
+                camLook.x += dX;
+                camLook.y += dY;
+                
+                if (camLook.x <    0) { camLook.x += 360; }
+                if (camLook.x >= 360) { camLook.x -= 360; }
+
+                if (camLook.y < -89) { camLook.y = -89; }
+                if (camLook.y >  89) { camLook.y =  89; }
+                
+                cam.lookAt((float) -Math.sin(Math.toRadians(camLook.x)), 
+                           (float)  Math.tan(Math.toRadians(camLook.y)), 
+                           (float) -Math.cos(Math.toRadians(camLook.x)));   
+                cam.up.set(0, 1, 0);
+                
+                lastMousePos.set(curMousePos);
+            }
+            
             cam.update();
             
             modelBatch.begin(cam);
