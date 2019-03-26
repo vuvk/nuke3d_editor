@@ -142,6 +142,36 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
                 meshBuilder.rect(v1, v2, v3, v4);
             }
             
+            // TOP
+            if (skyTextures[Skybox.Side.TOP.getNum()] != null) {
+                v1 = new VertexInfo().setPos(-1,  1, -1).setUV(1.0f, 1.0f);
+                v2 = new VertexInfo().setPos( 1,  1, -1).setUV(1.0f, 0.0f);
+                v3 = new VertexInfo().setPos( 1,  1,  1).setUV(0.0f, 0.0f);
+                v4 = new VertexInfo().setPos(-1,  1,  1).setUV(0.0f, 1.0f);
+                
+                meshBuilder = modelBuilder.part("top", 
+                                                GL20.GL_TRIANGLES, 
+                                                VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                                new Material("top", TextureAttribute
+                                                             .createDiffuse(skyTextures[Skybox.Side.TOP.getNum()])));
+                meshBuilder.rect(v1, v2, v3, v4);
+            }
+            
+            // BOTTOM
+            if (skyTextures[Skybox.Side.BOTTOM.getNum()] != null) {
+                v1 = new VertexInfo().setPos( 1, -1,  1).setUV(0.0f, 1.0f);
+                v2 = new VertexInfo().setPos( 1, -1, -1).setUV(1.0f, 1.0f);
+                v3 = new VertexInfo().setPos(-1, -1, -1).setUV(1.0f, 0.0f);
+                v4 = new VertexInfo().setPos(-1, -1,  1).setUV(0.0f, 0.0f);
+                
+                meshBuilder = modelBuilder.part("bottom", 
+                                                GL20.GL_TRIANGLES, 
+                                                VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
+                                                new Material("bottom", TextureAttribute
+                                                             .createDiffuse(skyTextures[Skybox.Side.BOTTOM.getNum()])));
+                meshBuilder.rect(v1, v2, v3, v4);
+            }
+            
             skyModel = modelBuilder.end();
             skyInstance = new ModelInstance(skyModel);
             
@@ -533,21 +563,27 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void chkShowSidesStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_chkShowSidesStateChanged
-        Material front = skyInstance.getMaterial("front");                                 
-        Material back  = skyInstance.getMaterial("back" );                            
-        Material left  = skyInstance.getMaterial("left" );                            
-        Material right = skyInstance.getMaterial("right");
+        Material front  = skyInstance.getMaterial("front" );                                 
+        Material back   = skyInstance.getMaterial("back"  );                            
+        Material left   = skyInstance.getMaterial("left"  );                            
+        Material right  = skyInstance.getMaterial("right" );                         
+        Material top    = skyInstance.getMaterial("top"   );                            
+        Material bottom = skyInstance.getMaterial("bottom");
             
         if (chkShowSides.isSelected()) {
-            if (front != null) { front.set(ColorAttribute.createDiffuse(Color.RED    )); }
-            if (back  != null) { back .set(ColorAttribute.createDiffuse(Color.GREEN  )); }
-            if (left  != null) { left .set(ColorAttribute.createDiffuse(Color.BLUE   )); }
-            if (right != null) { right.set(ColorAttribute.createDiffuse(Color.MAGENTA)); }
+            if (front  != null) { front .set(ColorAttribute.createDiffuse(Color.RED    )); }
+            if (back   != null) { back  .set(ColorAttribute.createDiffuse(Color.GREEN  )); }
+            if (left   != null) { left  .set(ColorAttribute.createDiffuse(Color.BLUE   )); }
+            if (right  != null) { right .set(ColorAttribute.createDiffuse(Color.MAGENTA)); }
+            if (top    != null) { top   .set(ColorAttribute.createDiffuse(Color.YELLOW )); }
+            if (bottom != null) { bottom.set(ColorAttribute.createDiffuse(Color.CYAN   )); }
         } else {
-            if (front != null) { front.remove(ColorAttribute.Diffuse); }
-            if (back  != null) { back .remove(ColorAttribute.Diffuse); }
-            if (left  != null) { left .remove(ColorAttribute.Diffuse); }
-            if (right != null) { right.remove(ColorAttribute.Diffuse); }
+            if (front  != null) { front .remove(ColorAttribute.Diffuse); }
+            if (back   != null) { back  .remove(ColorAttribute.Diffuse); }
+            if (left   != null) { left  .remove(ColorAttribute.Diffuse); }
+            if (right  != null) { right .remove(ColorAttribute.Diffuse); }
+            if (top    != null) { top   .remove(ColorAttribute.Diffuse); }
+            if (bottom != null) { bottom.remove(ColorAttribute.Diffuse); }
         }
     }//GEN-LAST:event_chkShowSidesStateChanged
 
