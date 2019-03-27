@@ -104,7 +104,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
         public void mousePressed(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1) {
                 chooseTexture();
-            } else if (e.getButton() == MouseEvent.BUTTON2) {
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
                 selectedSkybox.setTexture(null, side);   
                 
                 sidePreviews[side.getNum()].setImage(null);
@@ -193,6 +193,8 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
         pnlRight = new javax.swing.JPanel();
         btnPreview = new javax.swing.JButton();
 
+        setClosable(true);
+        setIconifiable(true);
         setTitle("Редактор скайбокса");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
@@ -416,7 +418,8 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnPreviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviewActionPerformed
-        // TODO add your handling code here:
+        FormMain.closeFormSoundEditor();
+        new FormSkyboxPreview(FormMain.formMain, true).execute(selectedSkybox);
     }//GEN-LAST:event_btnPreviewActionPerformed
 
     private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed
