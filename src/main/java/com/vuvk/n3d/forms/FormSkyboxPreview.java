@@ -39,13 +39,14 @@ import com.badlogic.gdx.math.Vector3;
 import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Texture;
 import java.awt.BorderLayout;
+import java.awt.Frame;
 import java.awt.event.WindowEvent;
 
 /**
  *
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class FormSkyboxPreview extends javax.swing.JFrame {
+public class FormSkyboxPreview extends javax.swing.JDialog {
     /** выбранный скайбокс для редактирования */
     public static Skybox selectedSkybox = null;
     /** текстуры куба в формате libGDX */
@@ -58,7 +59,6 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
     Vector2 lastMousePos = new Vector2(), 
             curMousePos  = new Vector2();
     Vector2 camLook = new Vector2();
-    float angle = 0.0f;
     
     class SkyboxPlayer extends ApplicationAdapter {            
         @Override
@@ -261,7 +261,9 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
     /**
      * Creates new form FormSkyboxPreview
      */
-    public FormSkyboxPreview() {
+    public FormSkyboxPreview(Frame owner, boolean modal) {
+        super(owner, modal);
+        
         initComponents();
         
         setLocationRelativeTo(null);        
@@ -277,8 +279,6 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
             return;
         } 
         
-        setVisible(true);
-        
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.allowSoftwareMode = true;
         config.resizable = false;
@@ -292,6 +292,8 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
         gdxEngine.getCanvas().setLocation(5, 16); 
 
         pack();
+        
+        setVisible(true);
     }
 
     /**
@@ -319,8 +321,12 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
+        pnlHint = new javax.swing.JPanel();
+        jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Предпросмотр скайбокса");
+        setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -488,7 +494,7 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
                         .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel6)))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlLegendLayout.setVerticalGroup(
             pnlLegendLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -522,6 +528,33 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        pnlHint.setBorder(javax.swing.BorderFactory.createTitledBorder("Подсказка"));
+
+        jTextArea1.setEditable(false);
+        jTextArea1.setBackground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
+        jTextArea1.setColumns(20);
+        jTextArea1.setLineWrap(true);
+        jTextArea1.setRows(5);
+        jTextArea1.setText("Нажать и удерживать кнопку мыши для вращения камеры");
+        jTextArea1.setWrapStyleWord(true);
+
+        javax.swing.GroupLayout pnlHintLayout = new javax.swing.GroupLayout(pnlHint);
+        pnlHint.setLayout(pnlHintLayout);
+        pnlHintLayout.setHorizontalGroup(
+            pnlHintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlHintLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jTextArea1, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        pnlHintLayout.setVerticalGroup(
+            pnlHintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlHintLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jTextArea1, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -530,12 +563,11 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(pnlView3D, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pnlLegend, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlHint, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlLegend, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -544,6 +576,8 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(pnlLegend, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(pnlHint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(pnlView3D, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -563,64 +597,31 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void chkShowSidesStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_chkShowSidesStateChanged
-        Material front  = skyInstance.getMaterial("front" );                                 
-        Material back   = skyInstance.getMaterial("back"  );                            
-        Material left   = skyInstance.getMaterial("left"  );                            
-        Material right  = skyInstance.getMaterial("right" );                         
-        Material top    = skyInstance.getMaterial("top"   );                            
-        Material bottom = skyInstance.getMaterial("bottom");
-            
-        if (chkShowSides.isSelected()) {
-            if (front  != null) { front .set(ColorAttribute.createDiffuse(Color.RED    )); }
-            if (back   != null) { back  .set(ColorAttribute.createDiffuse(Color.GREEN  )); }
-            if (left   != null) { left  .set(ColorAttribute.createDiffuse(Color.BLUE   )); }
-            if (right  != null) { right .set(ColorAttribute.createDiffuse(Color.MAGENTA)); }
-            if (top    != null) { top   .set(ColorAttribute.createDiffuse(Color.YELLOW )); }
-            if (bottom != null) { bottom.set(ColorAttribute.createDiffuse(Color.CYAN   )); }
-        } else {
-            if (front  != null) { front .remove(ColorAttribute.Diffuse); }
-            if (back   != null) { back  .remove(ColorAttribute.Diffuse); }
-            if (left   != null) { left  .remove(ColorAttribute.Diffuse); }
-            if (right  != null) { right .remove(ColorAttribute.Diffuse); }
-            if (top    != null) { top   .remove(ColorAttribute.Diffuse); }
-            if (bottom != null) { bottom.remove(ColorAttribute.Diffuse); }
+        if (skyInstance != null) {
+            Material front  = skyInstance.getMaterial("front" );                                 
+            Material back   = skyInstance.getMaterial("back"  );                            
+            Material left   = skyInstance.getMaterial("left"  );                            
+            Material right  = skyInstance.getMaterial("right" );                         
+            Material top    = skyInstance.getMaterial("top"   );                            
+            Material bottom = skyInstance.getMaterial("bottom");
+
+            if (chkShowSides.isSelected()) {
+                if (front  != null) { front .set(ColorAttribute.createDiffuse(Color.RED    )); }
+                if (back   != null) { back  .set(ColorAttribute.createDiffuse(Color.GREEN  )); }
+                if (left   != null) { left  .set(ColorAttribute.createDiffuse(Color.BLUE   )); }
+                if (right  != null) { right .set(ColorAttribute.createDiffuse(Color.MAGENTA)); }
+                if (top    != null) { top   .set(ColorAttribute.createDiffuse(Color.YELLOW )); }
+                if (bottom != null) { bottom.set(ColorAttribute.createDiffuse(Color.CYAN   )); }
+            } else {
+                if (front  != null) { front .remove(ColorAttribute.Diffuse); }
+                if (back   != null) { back  .remove(ColorAttribute.Diffuse); }
+                if (left   != null) { left  .remove(ColorAttribute.Diffuse); }
+                if (right  != null) { right .remove(ColorAttribute.Diffuse); }
+                if (top    != null) { top   .remove(ColorAttribute.Diffuse); }
+                if (bottom != null) { bottom.remove(ColorAttribute.Diffuse); }
+            }
         }
     }//GEN-LAST:event_chkShowSidesStateChanged
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(FormSkyboxPreview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(FormSkyboxPreview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(FormSkyboxPreview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(FormSkyboxPreview.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FormSkyboxPreview().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
@@ -632,8 +633,10 @@ public class FormSkyboxPreview extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JPanel pnlBack;
     private javax.swing.JPanel pnlFront;
+    private javax.swing.JPanel pnlHint;
     private javax.swing.JPanel pnlLeft;
     private javax.swing.JPanel pnlLegend;
     private javax.swing.JPanel pnlRight;

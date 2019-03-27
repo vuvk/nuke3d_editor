@@ -193,6 +193,8 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
         pnlRight = new javax.swing.JPanel();
         btnPreview = new javax.swing.JButton();
 
+        setClosable(true);
+        setIconifiable(true);
         setTitle("Редактор скайбокса");
         addInternalFrameListener(new javax.swing.event.InternalFrameListener() {
             public void internalFrameOpened(javax.swing.event.InternalFrameEvent evt) {
@@ -417,7 +419,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
 
     private void btnPreviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviewActionPerformed
         FormMain.closeFormSoundEditor();
-        new FormSkyboxPreview().execute(selectedSkybox);
+        new FormSkyboxPreview(FormMain.formMain, true).execute(selectedSkybox);
     }//GEN-LAST:event_btnPreviewActionPerformed
 
     private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed
