@@ -49,7 +49,10 @@ public final class Const {
             ICONS.put("Add",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_add_circle_white.png")));   
 
             // for jFrames
-            ICONS.put("FormMainIcon", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/jframes/n3d.png")));              
+            ICONS.put("FormMainIcon", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/jframes/n3d.png")));             
+            
+            // figures
+            ICONS.put("Cube",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/isometric_cube.png")));            
 
         } catch (IOException ex) {
             Logger.getLogger(Const.class.getName()).log(Level.SEVERE, null, ex);

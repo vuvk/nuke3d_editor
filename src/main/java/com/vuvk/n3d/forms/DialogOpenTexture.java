@@ -136,6 +136,11 @@ public class DialogOpenTexture extends javax.swing.JDialog {
                 CheckStretchedStateChanged(evt);
             }
         });
+        CheckStretched.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CheckStretchedActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -230,6 +235,10 @@ public class DialogOpenTexture extends javax.swing.JDialog {
         selectedFiles = null;
         FileChooser.setCurrentDirectory(currentPath);
     }//GEN-LAST:event_formWindowOpened
+
+    private void CheckStretchedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CheckStretchedActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CheckStretchedActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox CheckStretched;
