@@ -22,6 +22,7 @@ import com.vuvk.n3d.utils.ImageUtils;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -45,7 +46,7 @@ public class FormTextureSelector extends javax.swing.JDialog {
     /**
      * кастомный рендерер для ячеек списка
      */
-    class TextureCellRenderer extends JLabel implements ListCellRenderer {
+    class TextureCellRenderer extends DefaultListCellRenderer {
         public TextureCellRenderer() {        
             setOpaque(true);
             setHorizontalAlignment(CENTER);
@@ -55,7 +56,8 @@ public class FormTextureSelector extends javax.swing.JDialog {
         }
         
         @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {        
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, 
+                                                      boolean isSelected, boolean cellHasFocus) {        
             if (isSelected) {
                 setBackground(list.getSelectionBackground());
                 setForeground(list.getSelectionForeground());
@@ -105,17 +107,17 @@ public class FormTextureSelector extends javax.swing.JDialog {
         for (Texture txr : Texture.TEXTURES) {
             listModel.addElement(txr);
         }
-        ListTextures.setModel(listModel);       
+        lstTextures.setModel(listModel);       
         
         // задаем кастомный рендерер
-        ListTextures.setCellRenderer(new TextureCellRenderer());
+        lstTextures.setCellRenderer(new TextureCellRenderer());
         
         // кастомное событие выбора ячейки        
-        ListSelectionModel selModel = ListTextures.getSelectionModel();
+        ListSelectionModel selModel = lstTextures.getSelectionModel();
         selModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int index = ListTextures.getSelectedIndex();
+                int index = lstTextures.getSelectedIndex();
                 if (index > -1 && index < Texture.TEXTURES.size()) {
                     selectedTexture = Texture.TEXTURES.get(index);
                 } else {
@@ -134,10 +136,10 @@ public class FormTextureSelector extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        ButtonClose = new javax.swing.JButton();
-        ButtonApply = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        ListTextures = new javax.swing.JList<>();
+        btnClose = new javax.swing.JButton();
+        btnApply = new javax.swing.JButton();
+        scrlPane = new javax.swing.JScrollPane();
+        lstTextures = new javax.swing.JList<>();
 
         setTitle("Просмотр текстур");
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -146,46 +148,46 @@ public class FormTextureSelector extends javax.swing.JDialog {
             }
         });
 
-        ButtonClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_close_white_24dp.png"))); // NOI18N
-        ButtonClose.setToolTipText("Закрыть");
-        ButtonClose.setMaximumSize(new java.awt.Dimension(64, 64));
-        ButtonClose.setMinimumSize(new java.awt.Dimension(64, 64));
-        ButtonClose.setPreferredSize(new java.awt.Dimension(64, 64));
-        ButtonClose.addActionListener(new java.awt.event.ActionListener() {
+        btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_close_white_24dp.png"))); // NOI18N
+        btnClose.setToolTipText("Закрыть");
+        btnClose.setMaximumSize(new java.awt.Dimension(64, 64));
+        btnClose.setMinimumSize(new java.awt.Dimension(64, 64));
+        btnClose.setPreferredSize(new java.awt.Dimension(64, 64));
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonCloseActionPerformed(evt);
+                btnCloseActionPerformed(evt);
             }
         });
 
-        ButtonApply.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_check_white_24dp.png"))); // NOI18N
-        ButtonApply.setToolTipText("Выбрать");
-        ButtonApply.setMaximumSize(new java.awt.Dimension(64, 64));
-        ButtonApply.setMinimumSize(new java.awt.Dimension(64, 64));
-        ButtonApply.setPreferredSize(new java.awt.Dimension(64, 64));
-        ButtonApply.addActionListener(new java.awt.event.ActionListener() {
+        btnApply.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_check_white_24dp.png"))); // NOI18N
+        btnApply.setToolTipText("Выбрать");
+        btnApply.setMaximumSize(new java.awt.Dimension(64, 64));
+        btnApply.setMinimumSize(new java.awt.Dimension(64, 64));
+        btnApply.setPreferredSize(new java.awt.Dimension(64, 64));
+        btnApply.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ButtonApplyActionPerformed(evt);
+                btnApplyActionPerformed(evt);
             }
         });
 
-        ListTextures.setModel(new javax.swing.AbstractListModel<String>() {
+        lstTextures.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10", "Item 11", "Item 12", "Item 13", "Item 14", "Item 15", "Item 16", "Item 17", "Item 18", "Item 19", "Item 20", "Item 21", "Item 22", "Item 23", "Item 24", "Item 25", "Item 26", "Item 27", "Item 28", "Item 29" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        ListTextures.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        ListTextures.setAutoscrolls(false);
-        ListTextures.setDoubleBuffered(true);
-        ListTextures.setFixedCellHeight(128);
-        ListTextures.setFixedCellWidth(128);
-        ListTextures.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
-        ListTextures.setVisibleRowCount(-1);
-        ListTextures.addMouseListener(new java.awt.event.MouseAdapter() {
+        lstTextures.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        lstTextures.setAutoscrolls(false);
+        lstTextures.setDoubleBuffered(true);
+        lstTextures.setFixedCellHeight(128);
+        lstTextures.setFixedCellWidth(128);
+        lstTextures.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
+        lstTextures.setVisibleRowCount(-1);
+        lstTextures.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ListTexturesMouseClicked(evt);
+                lstTexturesMouseClicked(evt);
             }
         });
-        jScrollPane1.setViewportView(ListTextures);
+        scrlPane.setViewportView(lstTextures);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -194,23 +196,23 @@ public class FormTextureSelector extends javax.swing.JDialog {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 822, Short.MAX_VALUE)
+                    .addComponent(scrlPane, javax.swing.GroupLayout.DEFAULT_SIZE, 822, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(ButtonApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(ButtonClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
+                .addComponent(scrlPane, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ButtonApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ButtonClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -218,33 +220,33 @@ public class FormTextureSelector extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        ButtonApply.setVisible(isApplyButtonVisible);
+        btnApply.setVisible(isApplyButtonVisible);
     }//GEN-LAST:event_formWindowActivated
 
-    private void ButtonCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonCloseActionPerformed
+    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         selectedTexture = null;
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-    }//GEN-LAST:event_ButtonCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
-    private void ButtonApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ButtonApplyActionPerformed
+    private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-    }//GEN-LAST:event_ButtonApplyActionPerformed
+    }//GEN-LAST:event_btnApplyActionPerformed
 
-    private void ListTexturesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ListTexturesMouseClicked
+    private void lstTexturesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstTexturesMouseClicked
         // если режим выбора текстуры, то на двойной клик закрыть окно
         if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
-            if (ListTextures.getSelectedIndex() != -1) {
+            if (lstTextures.getSelectedIndex() != -1) {
                 if (isApplyButtonVisible) {
                     dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                 }
             }
         }
-    }//GEN-LAST:event_ListTexturesMouseClicked
+    }//GEN-LAST:event_lstTexturesMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton ButtonApply;
-    private javax.swing.JButton ButtonClose;
-    private javax.swing.JList<String> ListTextures;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton btnApply;
+    private javax.swing.JButton btnClose;
+    private javax.swing.JList<String> lstTextures;
+    private javax.swing.JScrollPane scrlPane;
     // End of variables declaration//GEN-END:variables
 }
