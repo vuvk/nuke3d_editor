@@ -19,8 +19,8 @@ package com.vuvk.n3d.forms;
 
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.components.PanelImagePreview;
+import com.vuvk.n3d.resources.Side;
 import com.vuvk.n3d.resources.Skybox;
-import com.vuvk.n3d.resources.Skybox.Side;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.MessageDialog;
 import java.awt.Container;
@@ -48,9 +48,9 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
 
     class SkyboxPreview extends PanelImagePreview implements MouseListener {
         /** сторона скайбокса, за которую отвечает этот элемент */
-        Skybox.Side side;
+        Side side;
 
-        public SkyboxPreview(Container window, Skybox.Side side) {
+        public SkyboxPreview(Container window, Side side) {
             super(window);
             setImage(null);
             this.side = side;
@@ -62,7 +62,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
          * Получить сторону куба, которая рисуется в превью
          * @return значение енумератора Side
          */
-        public Skybox.Side getSide() {
+        public Side getSide() {
             return side;
         }        
         
@@ -129,7 +129,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
         initComponents();
                 
         for (int i = 0; i < 6; ++i) {
-            sidePreviews[i] = new SkyboxPreview(this, Skybox.Side.getByNum(i));
+            sidePreviews[i] = new SkyboxPreview(this, Side.getByNum(i));
         }
         
         pnlFront .add(sidePreviews[0]);        

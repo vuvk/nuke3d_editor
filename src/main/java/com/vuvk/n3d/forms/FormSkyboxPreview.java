@@ -36,6 +36,7 @@ import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder.VertexInfo;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.vuvk.n3d.resources.Side;
 import com.vuvk.n3d.resources.Skybox;
 import com.vuvk.n3d.resources.Texture;
 import java.awt.BorderLayout;
@@ -68,7 +69,7 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
                       
             // грузим текстуры формата libGDX
             for (int i = 0; i < skyTextures.length; ++i) {                
-                Texture txr = selectedSkybox.getTexture(Skybox.Side.getByNum(i));
+                Texture txr = selectedSkybox.getTexture(Side.getByNum(i));
                 if (txr != null) {  
                     skyTextures[i] = new com.badlogic.gdx.graphics.Texture(Gdx.files.internal(txr.getPath()));
                 }
@@ -83,7 +84,7 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
             modelBuilder.begin();
             
             // FRONT
-            if (skyTextures[Skybox.Side.FRONT.getNum()] != null) {
+            if (skyTextures[Side.FRONT.getNum()] != null) {
                 v1 = new VertexInfo().setPos(-1, -1, -1).setUV(0.0f, 1.0f);
                 v2 = new VertexInfo().setPos( 1, -1, -1).setUV(1.0f, 1.0f);
                 v3 = new VertexInfo().setPos( 1,  1, -1).setUV(1.0f, 0.0f);
@@ -93,12 +94,12 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
                                                 GL20.GL_TRIANGLES, 
                                                 VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
                                                 new Material("front", TextureAttribute
-                                                             .createDiffuse(skyTextures[Skybox.Side.FRONT.getNum()])));
+                                                             .createDiffuse(skyTextures[Side.FRONT.getNum()])));
                 meshBuilder.rect(v1, v2, v3, v4);
             }
             
             // BACK
-            if (skyTextures[Skybox.Side.BACK.getNum()] != null) {
+            if (skyTextures[Side.BACK.getNum()] != null) {
                 v1 = new VertexInfo().setPos( 1, -1,  1).setUV(0.0f, 1.0f);
                 v2 = new VertexInfo().setPos(-1, -1,  1).setUV(1.0f, 1.0f);
                 v3 = new VertexInfo().setPos(-1,  1,  1).setUV(1.0f, 0.0f);
@@ -108,12 +109,12 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
                                                 GL20.GL_TRIANGLES, 
                                                 VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
                                                 new Material("back", TextureAttribute
-                                                             .createDiffuse(skyTextures[Skybox.Side.BACK.getNum()])));
+                                                             .createDiffuse(skyTextures[Side.BACK.getNum()])));
                 meshBuilder.rect(v1, v2, v3, v4);
             }
             
             // LEFT
-            if (skyTextures[Skybox.Side.LEFT.getNum()] != null) {
+            if (skyTextures[Side.LEFT.getNum()] != null) {
                 v1 = new VertexInfo().setPos(-1, -1,  1).setUV(0.0f, 1.0f);
                 v2 = new VertexInfo().setPos(-1, -1, -1).setUV(1.0f, 1.0f);
                 v3 = new VertexInfo().setPos(-1,  1, -1).setUV(1.0f, 0.0f);
@@ -123,12 +124,12 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
                                                 GL20.GL_TRIANGLES, 
                                                 VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
                                                 new Material("left", TextureAttribute
-                                                             .createDiffuse(skyTextures[Skybox.Side.LEFT.getNum()])));
+                                                             .createDiffuse(skyTextures[Side.LEFT.getNum()])));
                 meshBuilder.rect(v1, v2, v3, v4);
             }
             
             // RIGHT
-            if (skyTextures[Skybox.Side.RIGHT.getNum()] != null) {
+            if (skyTextures[Side.RIGHT.getNum()] != null) {
                 v1 = new VertexInfo().setPos( 1, -1, -1).setUV(0.0f, 1.0f);
                 v2 = new VertexInfo().setPos( 1, -1,  1).setUV(1.0f, 1.0f);
                 v3 = new VertexInfo().setPos( 1,  1,  1).setUV(1.0f, 0.0f);
@@ -138,12 +139,12 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
                                                 GL20.GL_TRIANGLES, 
                                                 VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
                                                 new Material("right", TextureAttribute
-                                                             .createDiffuse(skyTextures[Skybox.Side.RIGHT.getNum()])));
+                                                             .createDiffuse(skyTextures[Side.RIGHT.getNum()])));
                 meshBuilder.rect(v1, v2, v3, v4);
             }
             
             // TOP
-            if (skyTextures[Skybox.Side.TOP.getNum()] != null) {
+            if (skyTextures[Side.TOP.getNum()] != null) {
                 v1 = new VertexInfo().setPos(-1,  1, -1).setUV(1.0f, 1.0f);
                 v2 = new VertexInfo().setPos( 1,  1, -1).setUV(1.0f, 0.0f);
                 v3 = new VertexInfo().setPos( 1,  1,  1).setUV(0.0f, 0.0f);
@@ -153,12 +154,12 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
                                                 GL20.GL_TRIANGLES, 
                                                 VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
                                                 new Material("top", TextureAttribute
-                                                             .createDiffuse(skyTextures[Skybox.Side.TOP.getNum()])));
+                                                             .createDiffuse(skyTextures[Side.TOP.getNum()])));
                 meshBuilder.rect(v1, v2, v3, v4);
             }
             
             // BOTTOM
-            if (skyTextures[Skybox.Side.BOTTOM.getNum()] != null) {
+            if (skyTextures[Side.BOTTOM.getNum()] != null) {
                 v1 = new VertexInfo().setPos( 1, -1,  1).setUV(0.0f, 1.0f);
                 v2 = new VertexInfo().setPos( 1, -1, -1).setUV(1.0f, 1.0f);
                 v3 = new VertexInfo().setPos(-1, -1, -1).setUV(1.0f, 0.0f);
@@ -168,7 +169,7 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
                                                 GL20.GL_TRIANGLES, 
                                                 VertexAttributes.Usage.Position | VertexAttributes.Usage.TextureCoordinates, 
                                                 new Material("bottom", TextureAttribute
-                                                             .createDiffuse(skyTextures[Skybox.Side.BOTTOM.getNum()])));
+                                                             .createDiffuse(skyTextures[Side.BOTTOM.getNum()])));
                 meshBuilder.rect(v1, v2, v3, v4);
             }
             

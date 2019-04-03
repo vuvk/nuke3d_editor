@@ -63,48 +63,7 @@ public class Skybox extends Resource {
     static final int CONFIG_MAJOR = 0;
     static final int CONFIG_MINOR = 1;
     public static final String CONFIG_VERSION = CONFIG_MAJOR + "." + CONFIG_MINOR;
-    
-    /**
-     * стороны скайбокса
-     */
-    public static enum Side {        
-        FRONT(0), BACK  (1),
-        LEFT (2), RIGHT (3),
-        TOP  (4), BOTTOM(5);
         
-        // номер стороны в массиве сторон
-        private int num;
-        public int getNum() {
-            return num;
-        }
-        
-        Side(int num) {
-            this.num = num;
-        }        
-        
-        /** 
-         * Получить сторону по номеру
-         * @param num номер стороны в промежутке [0-5]
-         * @return Константа енумератора: 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
-         */
-        public static Side getByNum(int num) {
-            if (num < 0) {
-                num = 0;
-            } else if (num >= 6) {
-                num = 5;
-            }
-            
-            switch (num) {
-                case 0 : return FRONT;
-                case 1 : return BACK;
-                case 2 : return LEFT;
-                case 3 : return RIGHT;
-                case 4 : return TOP;
-                default: return BOTTOM;
-            }
-        }
-    }
-    
     /**
      * текстуры для сторон куба
      */
