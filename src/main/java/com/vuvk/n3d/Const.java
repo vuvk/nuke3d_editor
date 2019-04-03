@@ -46,13 +46,15 @@ public final class Const {
             ICONS.put("Skybox",   ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_language_white_24dp.png")));               
             ICONS.put("Unknown",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_insert_drive_file_white_48dp.png")));  
             
-            ICONS.put("Add",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_add_circle_white.png")));   
+            ICONS.put("Add", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/ic_add_circle_white.png")));   
 
             // for jFrames
             ICONS.put("FormMainIcon", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/jframes/n3d.png")));             
             
             // figures
-            ICONS.put("Cube",  ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/isometric_cube.png")));            
+            ICONS.put("Cube", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/isometric_cube.png")));     
+            ICONS.put("Pyramid", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/isometric_pyramid.png")));           
+            ICONS.put("Parallelepiped_1", ImageIO.read(Const.class.getResource("/com/vuvk/n3d/ico/isometric_parallelepiped_1.png")));   
 
         } catch (IOException ex) {
             Logger.getLogger(Const.class.getName()).log(Level.SEVERE, null, ex);

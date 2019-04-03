@@ -31,12 +31,14 @@ import javax.swing.JList;
  * @author Anton "Vuvk" Shcherbatykh
  */
 public class FormMapEditor extends javax.swing.JDialog {
-
+    
     class ComboBoxFiguresRenderer extends DefaultListCellRenderer {
-        private Map<String, ImageIcon> iconMap = new HashMap<>();
+        Map<String, ImageIcon> iconMap = new HashMap<>();
         
         public ComboBoxFiguresRenderer() {
             iconMap.put("Куб", new ImageIcon(Const.ICONS.get("Cube")));
+            iconMap.put("Пирамида", new ImageIcon(Const.ICONS.get("Pyramid")));
+            iconMap.put("Параллелепипед 1", new ImageIcon(Const.ICONS.get("Parallelepiped_1")));            
         }
 
         @Override
@@ -67,14 +69,21 @@ public class FormMapEditor extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         
+        ComboBoxFiguresRenderer renderer = new ComboBoxFiguresRenderer();
+        cmbFigures.setRenderer(renderer);
+        
+        // все наименования фигур
         DefaultComboBoxModel model = new DefaultComboBoxModel();
         model.addElement("Куб");
+        model.addElement("Пирамида");
+        model.addElement("Параллелепипед 1");
         cmbFigures.setModel(model);
-        cmbFigures.setRenderer(new ComboBoxFiguresRenderer());
                 
         tabPane.setTitleAt(0, "");
         tabPane.setIconAt(0, new ImageIcon(Const.ICONS.get("Cube")));
         tabPane.setToolTipTextAt(0, "Создание сцены из примитивов");
+        
+        setLocationRelativeTo(null);
     }
 
     /**
@@ -98,6 +107,7 @@ public class FormMapEditor extends javax.swing.JDialog {
         pnlBottom = new javax.swing.JPanel();
         pnlRight = new javax.swing.JPanel();
         pnlTools = new javax.swing.JPanel();
+        tglSelect = new javax.swing.JToggleButton();
         pnlMap = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -241,10 +251,9 @@ public class FormMapEditor extends javax.swing.JDialog {
                 .addGroup(pnlLevelElementsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cmbFigures, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(pnlLevelElementsLayout.createSequentialGroup()
-                        .addGroup(pnlLevelElementsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblFigures)
-                            .addComponent(pnlSides, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(lblFigures)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(pnlSides, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         pnlLevelElementsLayout.setVerticalGroup(
@@ -253,23 +262,42 @@ public class FormMapEditor extends javax.swing.JDialog {
                 .addContainerGap(58, Short.MAX_VALUE)
                 .addComponent(lblFigures)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cmbFigures, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(cmbFigures, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(pnlSides, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(77, 77, 77))
+                .addGap(89, 89, 89))
         );
 
         tabPane.addTab("tab1", pnlLevelElements);
+
+        tglSelect.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/cursor.png"))); // NOI18N
+        tglSelect.setToolTipText("Выделить");
+        tglSelect.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tglSelect.setMaximumSize(new java.awt.Dimension(64, 64));
+        tglSelect.setMinimumSize(new java.awt.Dimension(64, 64));
+        tglSelect.setPreferredSize(new java.awt.Dimension(64, 64));
+        tglSelect.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/cursor_filled.png"))); // NOI18N
+        tglSelect.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tglSelectStateChanged(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlToolsLayout = new javax.swing.GroupLayout(pnlTools);
         pnlTools.setLayout(pnlToolsLayout);
         pnlToolsLayout.setHorizontalGroup(
             pnlToolsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGroup(pnlToolsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tglSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         pnlToolsLayout.setVerticalGroup(
             pnlToolsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 80, Short.MAX_VALUE)
+            .addGroup(pnlToolsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(tglSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pnlMap.setBorder(javax.swing.BorderFactory.createTitledBorder("Уровень"));
@@ -308,6 +336,9 @@ public class FormMapEditor extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void tglSelectStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglSelectStateChanged
+    }//GEN-LAST:event_tglSelectStateChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cmbFigures;
     private javax.swing.JLabel lblFigures;
@@ -322,5 +353,6 @@ public class FormMapEditor extends javax.swing.JDialog {
     private javax.swing.JPanel pnlTools;
     private javax.swing.JPanel pnlTop;
     private javax.swing.JTabbedPane tabPane;
+    private javax.swing.JToggleButton tglSelect;
     // End of variables declaration//GEN-END:variables
 }
