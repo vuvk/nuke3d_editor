@@ -23,11 +23,11 @@ import java.util.Arrays;
  * Класс фигур примитивов, из которых построена сцена
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class MapFigure {    
+public abstract class MapFigure extends MapElement {    
     /**
      * материалы для сторон
      */
-    private final Material[] sides = new Material[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
+    protected final Material[] sides = new Material[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
     
     
     /**
