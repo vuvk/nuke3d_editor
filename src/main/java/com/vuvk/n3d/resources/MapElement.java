@@ -17,11 +17,74 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.badlogic.gdx.math.Vector3;
+
 /**
  * Класс элементов хранимой карты
  * @author Anton "Vuvk" Shcherbatykh
  */
-public abstract class MapElement {
+public abstract class MapElement {    
+    /** Позиция в 3Д-пространстве */
+    protected Vector3 pos;
+
+    /** 
+     * Получить вектор позиции
+     * @return Позиция в формате вектора
+     */
+    public Vector3 getPos() {
+        return pos;
+    }
+    
+    /**
+     * Получить компоненту X позиции
+     * @return Компонента X
+     */
+    public float getPosX() { return pos.x; }
+    /**
+     * Получить компоненту Y позиции
+     * @return Компонента Y
+     */
+    public float getPosY() { return pos.y; }
+    /**
+     * Получить компоненту Z позиции
+     * @return Компонента Z
+     */
+    public float getPosZ() { return pos.z; }
+
+    /**
+     * Установить вектор позиции
+     * @param pos Вектор позиции
+     */
+    public void setPos(Vector3 pos) {
+        pos = pos;
+    }
+    
+    /**
+     * Установить вектор позиции
+     * @param x Компонента X
+     * @param y Компонента Y
+     * @param z Компонента Z 
+     */
+    public void setPos(float x, float y, float z) {
+        pos.set(x, y, z);
+    }
+    
+    /**
+     * Задать компоненту X позиции
+     * @param x Компонента X
+     */
+    public void setPosX(float x) { pos.x = x; }
+    /**
+     * Задать компоненту Y позиции
+     * @param y Компонента Y
+     */
+    public void setPosY(float y) { pos.y = y; }
+    /**
+     * Задать компоненту Z позиции
+     * @param z Компонента Z
+     */
+    public void setPosZ(float z) { pos.z = z; }
+    
     /**
      * Рисование в 3D-режиме
      */
