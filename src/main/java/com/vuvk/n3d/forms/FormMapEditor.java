@@ -18,9 +18,15 @@
 package com.vuvk.n3d.forms;
 
 import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
+import com.badlogic.gdx.math.Vector3;
 import com.vuvk.n3d.Const;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -41,17 +47,140 @@ public class FormMapEditor extends javax.swing.JDialog {
     static Map selectedMap = null;    
     LwjglAWTCanvas gdxEngine;
     PerspectiveCamera cam;
+    ImmediateModeRenderer20 lineRenderer;
+    
+    float levelDraw = 0;
+    
+    class InputCore implements InputProcessor {   
+        @Override
+        public boolean keyDown(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyUp(int keycode) {
+            return false;
+        }
+
+        @Override
+        public boolean keyTyped(char character) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            return false;
+        }
+
+        @Override
+        public boolean touchDragged(int screenX, int screenY, int pointer) {
+            return false;
+        }
+
+        @Override
+        public boolean mouseMoved(int screenX, int screenY) {
+            return false;
+        }
+
+        @Override
+        public boolean scrolled(int amount) {
+            // движение камеры и уровня рисования вверх/вниз с помощью колесика            
+            if (amount > 0) {
+                if (levelDraw < 64) {
+                    ++levelDraw;
+                }
+                return true;
+            } else if (amount < 0) {
+                if (levelDraw > 0) {
+                    --levelDraw;
+                }
+                return true;
+            }
+            
+            return false;
+        }
+    }
     
     /**
      * Класс плеера окна предпросмотра и редактирования карт
      */
-    class MapPlayer extends ApplicationAdapter {       
+    class MapPlayer extends ApplicationAdapter {    
+        /** draw line immediately */
+        public void line(float x1, float y1, float z1,
+                         float x2, float y2, float z2,
+                         float r, float g, float b, float a) {
+            lineRenderer.color(r, g, b, a);
+            lineRenderer.vertex(x1, y1, z1);
+            lineRenderer.color(r, g, b, a);
+            lineRenderer.vertex(x2, y2, z2);
+        }
+        public void line(float x1, float y1, float z1,
+                         float x2, float y2, float z2,
+                         Color color) {
+            line(x1, y1, z1,
+                 x2, y2, z2,
+                 color.r, color.g, color.b, color.a);
+        }
+        public void line(Vector3 a, Vector3 b, Color color) {
+            line(a.x, a.y, a.z,
+                 b.x, b.y, b.z,
+                 color.r, color.g, color.b, color.a);
+        }
+        
+        /** draw grid */
+        public void grid(float x, float y, float z, int width, int height, Color color) {
+            for (int i = 0; i <= width; ++i) {
+                // draw vertical
+                line(x + i, y, z,
+                     x + i, y, z - height,
+                     color);
+            }
+
+            for (int i = 0; i <= height; ++i) {
+                // draw horizontal
+                line(x,         y, z - i,
+                     x + width, y, z - i,
+                     color);
+            }
+        }
+
         @Override
-        public void create() {
+        public void create() {            
+            Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            
+            lineRenderer = new ImmediateModeRenderer20(false, true, 0);
+            
+            Gdx.input.setInputProcessor(new InputCore());
+            
+            cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            cam.position.set(5, 10, 0);
+            cam.lookAt(5, 0, -5);
+            cam.up.set(Vector3.Y);
+            cam.near = 0.0001f;
+            cam.far  = 100;
+            cam.update();
         }
         
         @Override
-        public void render() {
+        public void render() {         
+            Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);    
+                        
+            cam.position.set(5, 10 + levelDraw, 0);
+            cam.viewportWidth  = Gdx.graphics.getWidth();
+            cam.viewportHeight = Gdx.graphics.getHeight();        
+            
+            Gdx.gl.glLineWidth(2);
+            lineRenderer.begin(cam.combined, GL20.GL_LINES);
+            grid(0, 0, 0, 10, 10, Color.LIGHT_GRAY);
+            lineRenderer.end();
+            
+            cam.update();
         }
         
         @Override
