@@ -110,8 +110,7 @@ public class FormMapEditor extends javax.swing.JDialog {
      * Класс плеера окна предпросмотра и редактирования карт
      */
     class MapPlayer extends ApplicationAdapter {    
-        /** draw line immediately */
-        public void line(float x1, float y1, float z1,
+        public void drawLine(float x1, float y1, float z1,
                          float x2, float y2, float z2,
                          float r, float g, float b, float a) {
             lineRenderer.color(r, g, b, a);
@@ -119,45 +118,45 @@ public class FormMapEditor extends javax.swing.JDialog {
             lineRenderer.color(r, g, b, a);
             lineRenderer.vertex(x2, y2, z2);
         }
-        public void line(float x1, float y1, float z1,
+        public void drawLine(float x1, float y1, float z1,
                          float x2, float y2, float z2,
                          Color color) {
-            line(x1, y1, z1,
-                 x2, y2, z2,
-                 color.r, color.g, color.b, color.a);
+            drawLine(x1, y1, z1,
+                     x2, y2, z2,
+                     color.r, color.g, color.b, color.a);
         }
-        public void line(Vector3 a, Vector3 b, Color color) {
-            line(a.x, a.y, a.z,
-                 b.x, b.y, b.z,
-                 color.r, color.g, color.b, color.a);
+        public void drawLine(Vector3 a, Vector3 b, Color color) {
+            drawLine(a.x, a.y, a.z,
+                     b.x, b.y, b.z,
+                     color.r, color.g, color.b, color.a);
         }
         
-        /** draw grid */
-        public void grid(float x, float y, float z, 
+        
+        public void drawGrid(float x, float y, float z, 
                          int horCount, int verCount, 
                          float stepWidth, float stepHeight,
                          Color color) {
             for (int i = 0; i <= horCount; ++i) {
                 // draw vertical
-                line(x + i * stepWidth, y, z,
-                     x + i * stepWidth, y, z - verCount * stepHeight,
-                     color);
+                drawLine(x + i * stepWidth, y, z,
+                         x + i * stepWidth, y, z - verCount * stepHeight,
+                         color);
             }
 
             for (int i = 0; i <= verCount; ++i) {
                 // draw horizontal
-                line(x,         y, z - i * stepHeight,
-                     x + verCount * stepWidth, y, z - i * stepHeight,
-                     color);
+                drawLine(x,         y, z - i * stepHeight,
+                         x + verCount * stepWidth, y, z - i * stepHeight,
+                         color);
             }
         }
-        public void grid(float x, float y, float z, 
+        public void drawGrid(float x, float y, float z, 
                          int horCount, int verCount,  
                          Color color) {
-            grid(x, y, z, horCount, verCount, 1f, 1f, color);
+            drawGrid(x, y, z, horCount, verCount, 1f, 1f, color);
         }
-        public void grid(int horCount, int verCount, Color color) {
-            grid(0, 0, 0, horCount, verCount, 1f, 1f, color);
+        public void drawGrid(int horCount, int verCount, Color color) {
+            drawGrid(0, 0, 0, horCount, verCount, 1f, 1f, color);
         }
 
         @Override
@@ -186,14 +185,14 @@ public class FormMapEditor extends javax.swing.JDialog {
             if (levelDraw > 0) { 
                 Gdx.gl.glLineWidth(1);
                 lineRenderer.begin(cam.combined, GL20.GL_LINES);  
-                grid(10, 10, Color.DARK_GRAY);
+                drawGrid(10, 10, Color.DARK_GRAY);
                 lineRenderer.end();
             }
             
             // сетка позиции
             Gdx.gl.glLineWidth(3);
             lineRenderer.begin(cam.combined, GL20.GL_LINES);   
-            grid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
+            drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
             lineRenderer.end();            
                         
             cam.position.set(5, 10 + levelDraw, 0);
