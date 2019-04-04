@@ -1646,7 +1646,7 @@ public class FormMain extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FormMapEditor(null, true).setVisible(true);
+                new FormMapEditor(null, true).execute(null);
                 
                 formMain = new FormMain();
                 formMain.setVisible(true);
