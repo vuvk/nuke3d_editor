@@ -133,20 +133,31 @@ public class FormMapEditor extends javax.swing.JDialog {
         }
         
         /** draw grid */
-        public void grid(float x, float y, float z, int width, int height, Color color) {
-            for (int i = 0; i <= width; ++i) {
+        public void grid(float x, float y, float z, 
+                         int horCount, int verCount, 
+                         float stepWidth, float stepHeight,
+                         Color color) {
+            for (int i = 0; i <= horCount; ++i) {
                 // draw vertical
-                line(x + i, y, z,
-                     x + i, y, z - height,
+                line(x + i * stepWidth, y, z,
+                     x + i * stepWidth, y, z - verCount * stepHeight,
                      color);
             }
 
-            for (int i = 0; i <= height; ++i) {
+            for (int i = 0; i <= verCount; ++i) {
                 // draw horizontal
-                line(x,         y, z - i,
-                     x + width, y, z - i,
+                line(x,         y, z - i * stepHeight,
+                     x + verCount * stepWidth, y, z - i * stepHeight,
                      color);
             }
+        }
+        public void grid(float x, float y, float z, 
+                         int horCount, int verCount,  
+                         Color color) {
+            grid(x, y, z, horCount, verCount, 1f, 1f, color);
+        }
+        public void grid(int horCount, int verCount, Color color) {
+            grid(0, 0, 0, horCount, verCount, 1f, 1f, color);
         }
 
         @Override
@@ -169,17 +180,25 @@ public class FormMapEditor extends javax.swing.JDialog {
         @Override
         public void render() {         
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);    
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);         
+                                             
+            // сетка основания
+            if (levelDraw > 0) { 
+                Gdx.gl.glLineWidth(1);
+                lineRenderer.begin(cam.combined, GL20.GL_LINES);  
+                grid(10, 10, Color.DARK_GRAY);
+                lineRenderer.end();
+            }
+            
+            // сетка позиции
+            Gdx.gl.glLineWidth(3);
+            lineRenderer.begin(cam.combined, GL20.GL_LINES);   
+            grid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
+            lineRenderer.end();            
                         
             cam.position.set(5, 10 + levelDraw, 0);
             cam.viewportWidth  = Gdx.graphics.getWidth();
-            cam.viewportHeight = Gdx.graphics.getHeight();        
-            
-            Gdx.gl.glLineWidth(2);
-            lineRenderer.begin(cam.combined, GL20.GL_LINES);
-            grid(0, 0, 0, 10, 10, Color.LIGHT_GRAY);
-            lineRenderer.end();
-            
+            cam.viewportHeight = Gdx.graphics.getHeight();   
             cam.update();
         }
         
