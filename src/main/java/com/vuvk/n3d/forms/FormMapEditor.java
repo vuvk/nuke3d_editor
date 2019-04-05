@@ -26,7 +26,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.Ray;
 import com.vuvk.n3d.Const;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
@@ -48,6 +51,9 @@ public class FormMapEditor extends javax.swing.JDialog {
     LwjglAWTCanvas gdxEngine;
     PerspectiveCamera cam;
     ImmediateModeRenderer20 lineRenderer;
+    Vector3 camPosPoint  = new Vector3(5, 8, -2.5f);
+    Vector3 camViewPoint = new Vector3(5, 0, -4.5f);
+    Vector3 worldPos;
     
     float levelDraw = 0;
     
@@ -84,7 +90,37 @@ public class FormMapEditor extends javax.swing.JDialog {
 
         @Override
         public boolean mouseMoved(int screenX, int screenY) {
-            return false;
+            /*Vector3 pos = new Vector3(screenX, screenY, 0);
+            cam.unproject(pos);
+            System.out.println(screenX + ";" + screenY);
+            System.out.println(pos);
+            if (pos.x >= 0 && pos.x <=  10 &&
+                pos.z <= 0 && pos.z >= -10
+               ) {
+                worldPos = new Vector3(pos.x, levelDraw, pos.z);
+                return true;
+            } else {
+                worldPos = null;
+                return false;
+            }*/
+            
+            Ray ray = cam.getPickRay(screenX,screenY);
+
+            Plane plane=new Plane();
+            plane.set(0,1,0,-levelDraw);// the xy plane with direction z facing screen
+
+            Vector3 pos=new Vector3();
+            Intersector.intersectRayPlane(ray, plane, pos);
+            
+            if (pos.x >= 0 && pos.x <=  10 &&
+                pos.z <= 0 && pos.z >= -10
+               ) {
+                worldPos = new Vector3((int)pos.x, levelDraw, (int)pos.z);
+                return true;
+            } else {
+                worldPos = null;
+                return false;
+            }
         }
 
         @Override
@@ -111,16 +147,16 @@ public class FormMapEditor extends javax.swing.JDialog {
      */
     class MapPlayer extends ApplicationAdapter {    
         public void drawLine(float x1, float y1, float z1,
-                         float x2, float y2, float z2,
-                         float r, float g, float b, float a) {
+                             float x2, float y2, float z2,
+                             float r, float g, float b, float a) {
             lineRenderer.color(r, g, b, a);
             lineRenderer.vertex(x1, y1, z1);
             lineRenderer.color(r, g, b, a);
             lineRenderer.vertex(x2, y2, z2);
         }
         public void drawLine(float x1, float y1, float z1,
-                         float x2, float y2, float z2,
-                         Color color) {
+                             float x2, float y2, float z2,
+                             Color color) {
             drawLine(x1, y1, z1,
                      x2, y2, z2,
                      color.r, color.g, color.b, color.a);
@@ -133,9 +169,9 @@ public class FormMapEditor extends javax.swing.JDialog {
         
         
         public void drawGrid(float x, float y, float z, 
-                         int horCount, int verCount, 
-                         float stepWidth, float stepHeight,
-                         Color color) {
+                             int horCount, int verCount, 
+                             float stepWidth, float stepHeight,
+                             Color color) {
             for (int i = 0; i <= horCount; ++i) {
                 // draw vertical
                 drawLine(x + i * stepWidth, y, z,
@@ -151,12 +187,41 @@ public class FormMapEditor extends javax.swing.JDialog {
             }
         }
         public void drawGrid(float x, float y, float z, 
-                         int horCount, int verCount,  
-                         Color color) {
+                             int horCount, int verCount,  
+                             Color color) {
             drawGrid(x, y, z, horCount, verCount, 1f, 1f, color);
         }
         public void drawGrid(int horCount, int verCount, Color color) {
             drawGrid(0, 0, 0, horCount, verCount, 1f, 1f, color);
+        }
+        
+        public void drawBox(Vector3 pos, Color color) {
+            drawLine(pos.x,     pos.y,     pos.z,
+                     pos.x,     pos.y + 1, pos.z,
+                     color);
+            drawLine(pos.x,     pos.y,     pos.z,
+                     pos.x + 1, pos.y,     pos.z,
+                     color);
+            drawLine(pos.x,     pos.y,     pos.z,
+                     pos.x,     pos.y,     pos.z - 1,
+                     color); 
+            
+            drawLine(pos.x,     pos.y,     pos.z - 1,
+                     pos.x,     pos.y + 1, pos.z - 1,
+                     color);
+            drawLine(pos.x,     pos.y,     pos.z - 1,
+                     pos.x + 1, pos.y,     pos.z - 1,
+                     color);  
+            
+            drawLine(pos.x + 1, pos.y,     pos.z,
+                     pos.x + 1, pos.y + 1, pos.z,
+                     color);       
+            drawLine(pos.x + 1, pos.y,     pos.z - 1,
+                     pos.x + 1, pos.y + 1, pos.z - 1,
+                     color);      
+            drawLine(pos.x + 1, pos.y + 1, pos.z,
+                     pos.x + 1, pos.y + 1, pos.z - 1,
+                     color);         
         }
 
         @Override
@@ -168,8 +233,8 @@ public class FormMapEditor extends javax.swing.JDialog {
             Gdx.input.setInputProcessor(new InputCore());
             
             cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            cam.position.set(5, 10, 0);
-            cam.lookAt(5, 0, -5);
+            cam.position.set(camPosPoint);
+            cam.lookAt(camViewPoint);
             cam.up.set(Vector3.Y);
             cam.near = 0.0001f;
             cam.far  = 100;
@@ -193,9 +258,20 @@ public class FormMapEditor extends javax.swing.JDialog {
             Gdx.gl.glLineWidth(3);
             lineRenderer.begin(cam.combined, GL20.GL_LINES);   
             drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
-            lineRenderer.end();            
+            /*drawLine(Vector3.Zero, Vector3.X, Color.RED);
+            drawLine(Vector3.Zero, Vector3.Y, Color.YELLOW);
+            drawLine(Vector3.Zero, new Vector3(0, 0, -1), Color.BLUE);*/
+            lineRenderer.end();
+            
+            // позиция курсора
+            if (worldPos != null) {
+                Gdx.gl.glLineWidth(3);
+                lineRenderer.begin(cam.combined, GL20.GL_LINES);   
+                drawBox(worldPos, Color.RED);
+                lineRenderer.end();
+            }            
                         
-            cam.position.set(5, 10 + levelDraw, 0);
+            cam.position.set(camPosPoint.x, camPosPoint.y + levelDraw, camPosPoint.z);
             cam.viewportWidth  = Gdx.graphics.getWidth();
             cam.viewportHeight = Gdx.graphics.getHeight();   
             cam.update();
