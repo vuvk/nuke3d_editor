@@ -204,24 +204,34 @@ public class FormMapEditor extends javax.swing.JDialog {
                      color);
             drawLine(pos.x,     pos.y,     pos.z,
                      pos.x,     pos.y,     pos.z - 1,
-                     color); 
-            
+                     color);             
             drawLine(pos.x,     pos.y,     pos.z - 1,
                      pos.x,     pos.y + 1, pos.z - 1,
                      color);
             drawLine(pos.x,     pos.y,     pos.z - 1,
                      pos.x + 1, pos.y,     pos.z - 1,
-                     color);  
-            
+                     color);              
             drawLine(pos.x + 1, pos.y,     pos.z,
                      pos.x + 1, pos.y + 1, pos.z,
                      color);       
             drawLine(pos.x + 1, pos.y,     pos.z - 1,
                      pos.x + 1, pos.y + 1, pos.z - 1,
+                     color);   
+            drawLine(pos.x + 1, pos.y,     pos.z,
+                     pos.x + 1, pos.y,     pos.z - 1,
+                     color);        
+            drawLine(pos.x,     pos.y + 1, pos.z,
+                     pos.x,     pos.y + 1, pos.z - 1,
                      color);      
             drawLine(pos.x + 1, pos.y + 1, pos.z,
                      pos.x + 1, pos.y + 1, pos.z - 1,
-                     color);         
+                     color);     
+            drawLine(pos.x,     pos.y + 1, pos.z,
+                     pos.x + 1, pos.y + 1, pos.z,
+                     color);      
+            drawLine(pos.x,     pos.y + 1, pos.z - 1,
+                     pos.x + 1, pos.y + 1, pos.z - 1,
+                     color);        
         }
 
         @Override
