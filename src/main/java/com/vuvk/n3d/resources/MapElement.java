@@ -17,6 +17,8 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -26,7 +28,10 @@ import com.badlogic.gdx.math.Vector3;
 public abstract class MapElement {    
     /** Позиция в 3Д-пространстве */
     protected Vector3 pos;
-
+    /** рендерер */
+    protected ImmediateModeRenderer20 renderer;
+    
+    
     /** 
      * Получить вектор позиции
      * @return Позиция в формате вектора
@@ -88,5 +93,5 @@ public abstract class MapElement {
     /**
      * Рисование в 3D-режиме
      */
-    abstract void render();
+    public abstract void render(Matrix4 projModelView);
 }

@@ -17,6 +17,11 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
+import com.badlogic.gdx.math.Matrix4;
+import com.vuvk.n3d.forms.FormMapEditor;
+
 /**
  * Класс примитива - куб, из которых построена сцена
  * @author Anton "Vuvk" Shcherbatykh
@@ -24,11 +29,36 @@ package com.vuvk.n3d.resources;
 public class MapCube extends MapFigure {
     
     public MapCube() {
-        
+        renderer = new ImmediateModeRenderer20(false, false, 4);
     }
 
     @Override
-    void render() {
+    public void render(Matrix4 projModelView) {
+        com.badlogic.gdx.graphics.Texture txr;
+        Material mat;
+        
+        float x = pos.x,
+              y = pos.y,
+              z = pos.z;
+        
+        // back
+        mat = sides[Side.BACK.getNum()];
+        if (mat != null) {
+            txr = FormMapEditor.TEXTURES.get(mat);
+            if (txr != null) {
+                txr.bind();
+                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.vertex(x, y, z);
+                renderer.texCoord(0, 1);
+                renderer.vertex(x + 1, y, z);
+                renderer.texCoord(1, 1);
+                renderer.vertex(x + 1, y + 1, z);
+                renderer.texCoord(1, 0);
+                renderer.vertex(x, y + 1, z);
+                renderer.texCoord(0, 0);
+                renderer.end();
+            }
+        }
     }
     
 }
