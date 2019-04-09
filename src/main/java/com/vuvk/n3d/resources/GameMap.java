@@ -17,14 +17,15 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.badlogic.gdx.math.Vector3;
 import com.vuvk.n3d.Const;
 
 /**
  * Класс хранимой карты в редакторе
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class Map {
-    
+public class GameMap {
+
     /** идентификатор */
     public static final String IDENTIFICATOR = "N3D_MAP";
     /** версия */
@@ -41,5 +42,43 @@ public class Map {
     static final int CONFIG_MAJOR = 0;
     static final int CONFIG_MINOR = 1;
     public static final String CONFIG_VERSION = CONFIG_MAJOR + "." + CONFIG_MINOR;
-    
+    /** максимальные размеры */
+    public static final int MAX_X = 64;
+    public static final int MAX_Y = 64;
+    public static final int MAX_Z = 64;
+
+    /** элементы карты, хранимые в карте */
+    private final MapElement[][][] elements;
+
+    public GameMap() {
+        elements = new MapElement[MAX_X][MAX_Y][MAX_Z];
+    }
+
+    /**
+     * Получить элемент по позиции в массиве элементов
+     * @param pos Позиция элемента в формате Vector3. Компоненты будут усечены до int
+     * @return Элемент карты, если есть, иначе null
+     */
+    public MapElement getElement(Vector3 pos) {
+        return getElement((int)pos.x, (int)pos.y, (int)pos.z);
+    }
+
+    /**
+     * Получить элемент по позиции в массиве элементов
+     * @param x X-компонента позиции
+     * @param y Y-компонента позиции
+     * @param z Z-компонента позиции
+     * @return Элемент карты, если есть, иначе null
+     */
+    public MapElement getElement(int x, int y, int z) {
+        if (x >= 0 && x <= MAX_X &&
+            y >= 0 && y <= MAX_Y &&
+            z >= 0 && z <= MAX_Z
+           ) {
+            return elements[x][y][z];
+        }
+        
+        return null;
+    }
+
 }
