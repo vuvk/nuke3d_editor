@@ -31,6 +31,10 @@ import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.resources.GameMap;
+import com.vuvk.n3d.resources.MapElement;
+import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Texture;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Component;
@@ -47,15 +51,22 @@ import javax.swing.JList;
  */
 public class FormMapEditor extends javax.swing.JDialog {
     
-    static Map selectedMap = null;    
+    static GameMap selectedMap = null; 
+    
     LwjglAWTCanvas gdxEngine;
     PerspectiveCamera cam;
     ImmediateModeRenderer20 lineRenderer;
+//  ImmediateModeRenderer20 figureRenderer;
+    
     Vector3 camPosPoint  = new Vector3(5, 8, -2.5f);
     Vector3 camViewPoint = new Vector3(5, 0, -4.5f);
     Vector3 worldPos;
     
+    /** уровень рисования по высоте */
     float levelDraw = 0;
+    
+    /** словарь соответствия Материал Nuke3D - Текстура libGDX */
+    public static Map<Material, com.badlogic.gdx.graphics.Texture> TEXTURES = new HashMap<>();
     
     class InputCore implements InputProcessor {   
         @Override
@@ -89,27 +100,13 @@ public class FormMapEditor extends javax.swing.JDialog {
         }
 
         @Override
-        public boolean mouseMoved(int screenX, int screenY) {
-            /*Vector3 pos = new Vector3(screenX, screenY, 0);
-            cam.unproject(pos);
-            System.out.println(screenX + ";" + screenY);
-            System.out.println(pos);
-            if (pos.x >= 0 && pos.x <=  10 &&
-                pos.z <= 0 && pos.z >= -10
-               ) {
-                worldPos = new Vector3(pos.x, levelDraw, pos.z);
-                return true;
-            } else {
-                worldPos = null;
-                return false;
-            }*/
-            
+        public boolean mouseMoved(int screenX, int screenY) {            
             Ray ray = cam.getPickRay(screenX,screenY);
 
-            Plane plane=new Plane();
-            plane.set(0,1,0,-levelDraw);// the xy plane with direction z facing screen
+            Plane plane = new Plane();
+            plane.set(0, 1, 0, -levelDraw);// the xy plane with direction z facing screen
 
-            Vector3 pos=new Vector3();
+            Vector3 pos = new Vector3();
             Intersector.intersectRayPlane(ray, plane, pos);
             
             if (pos.x >= 0 && pos.x <=  10 &&
@@ -125,20 +122,24 @@ public class FormMapEditor extends javax.swing.JDialog {
 
         @Override
         public boolean scrolled(int amount) {
-            // движение камеры и уровня рисования вверх/вниз с помощью колесика            
-            if (amount > 0) {
-                if (levelDraw < 64) {
-                    ++levelDraw;
-                }
-                return true;
-            } else if (amount < 0) {
-                if (levelDraw > 0) {
-                    --levelDraw;
-                }
-                return true;
+            // движение камеры и уровня рисования вверх/вниз с помощью колесика   
+            
+            if (amount == 0) {
+                return false;
             }
             
-            return false;
+            levelDraw += amount;
+            if (levelDraw < 0) {
+                levelDraw = 0;
+            } else if (levelDraw > GameMap.MAX_Y) {
+                levelDraw = GameMap.MAX_Y;
+            }
+            
+            if (worldPos != null) {
+                worldPos.y = levelDraw;
+            }
+                
+            return true;            
         }
     }
     
@@ -239,8 +240,23 @@ public class FormMapEditor extends javax.swing.JDialog {
             Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             
             lineRenderer = new ImmediateModeRenderer20(false, true, 0);
+//          figureRenderer = new ImmediateModeRenderer20(false, false, 4);
             
             Gdx.input.setInputProcessor(new InputCore());
+            
+            // грузим все известные текстуры
+            TEXTURES.clear();
+            // пробегаемся по всем материалам и если у материала есть на первом 
+            // кадре известная текстура, то грузим её
+            for (Material mat : Material.MATERIALS) {
+                Material.Frame frm = mat.getFrame(0);
+                if (frm != null) {
+                    Texture txr = frm.getTexture();
+                    if (txr != null) {
+                        TEXTURES.put(mat, new com.badlogic.gdx.graphics.Texture(txr.getPath()));
+                    }
+                }
+            }
             
             cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             cam.position.set(camPosPoint);
@@ -262,6 +278,18 @@ public class FormMapEditor extends javax.swing.JDialog {
                 lineRenderer.begin(cam.combined, GL20.GL_LINES);  
                 drawGrid(10, 10, Color.DARK_GRAY);
                 lineRenderer.end();
+            }
+            
+            // рисуем элементы
+            for (int x = 0; x < GameMap.MAX_X; ++x) {
+                for (int y = 0; y < GameMap.MAX_Y; ++y) {
+                    for (int z = 0; z < GameMap.MAX_Z; ++z) {
+                        MapElement element = selectedMap.getElement(x, y, z);
+                        if (element != null) {
+                            element.render(cam.combined);
+                        }
+                    }    
+                }    
             }
             
             // сетка позиции
@@ -360,12 +388,12 @@ public class FormMapEditor extends javax.swing.JDialog {
     /**
      * Подготовка формы для отображения и запуск
      */
-    public void execute(Map map) {  
+    public void execute(GameMap map) {  
         selectedMap = map;      
-        /*if (selectedMap == null) {
+        if (selectedMap == null) {
             dispose();
             return;
-        } */
+        } 
         
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         config.allowSoftwareMode = true;
@@ -416,6 +444,11 @@ public class FormMapEditor extends javax.swing.JDialog {
         addWindowStateListener(new java.awt.event.WindowStateListener() {
             public void windowStateChanged(java.awt.event.WindowEvent evt) {
                 formWindowStateChanged(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
             }
         });
 
@@ -653,6 +686,10 @@ public class FormMapEditor extends javax.swing.JDialog {
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
         gdxEngine.getCanvas().setSize(pnlView3D.getWidth() - 10, pnlView3D.getHeight() - 21);
     }//GEN-LAST:event_formComponentResized
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        TEXTURES.clear();
+    }//GEN-LAST:event_formWindowClosed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cmbFigures;

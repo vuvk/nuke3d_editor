@@ -21,6 +21,7 @@ import com.bulenkov.darcula.DarculaLaf;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.Global;
 import com.vuvk.n3d.components.PreviewElement;
+import com.vuvk.n3d.resources.GameMap;
 import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Resource;
 import com.vuvk.n3d.resources.Skybox;
@@ -1646,7 +1647,7 @@ public class FormMain extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new FormMapEditor(null, true).execute(null);
+                new FormMapEditor(null, true).execute(new GameMap());
                 
                 formMain = new FormMain();
                 formMain.setVisible(true);
