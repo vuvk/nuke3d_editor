@@ -151,6 +151,7 @@ public class FormMaterialSelector extends javax.swing.JDialog {
         scrlPane = new javax.swing.JScrollPane();
         lstMaterials = new javax.swing.JList<>();
 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Просмотр текстур");
 
         btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_close_white_24dp.png"))); // NOI18N

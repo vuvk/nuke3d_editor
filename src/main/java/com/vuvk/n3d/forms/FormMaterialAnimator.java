@@ -161,8 +161,6 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             imagePreview.redraw();
         }
         
-        form.dispose();
-        
         // выбрать кадр, ранее выбранный
         TableFrames.changeSelection(selectedFrameIndex, 0, false, false);
     }

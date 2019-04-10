@@ -92,8 +92,6 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
                 sidePreviews[side.getNum()].setImage(form.selectedTexture.getImage());
                 sidePreviews[side.getNum()].redraw();
             }
-
-            form.dispose();
         }
 
         @Override
