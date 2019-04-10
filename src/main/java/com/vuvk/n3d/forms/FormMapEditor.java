@@ -31,13 +31,20 @@ import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.Ray;
 import com.vuvk.n3d.Const;
+import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.resources.GameMap;
 import com.vuvk.n3d.resources.MapElement;
+import com.vuvk.n3d.resources.MapFigure;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Side;
 import com.vuvk.n3d.resources.Texture;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.DefaultComboBoxModel;
@@ -52,6 +59,8 @@ import javax.swing.JList;
 public class FormMapEditor extends javax.swing.JDialog {
     
     static GameMap selectedMap = null; 
+    
+    MapFigure selectedFigure = null;
     
     LwjglAWTCanvas gdxEngine;
     PerspectiveCamera cam;
@@ -68,6 +77,9 @@ public class FormMapEditor extends javax.swing.JDialog {
     /** словарь соответствия Материал Nuke3D - Текстура libGDX */
     public static Map<Material, com.badlogic.gdx.graphics.Texture> TEXTURES = new HashMap<>();
     
+    /**
+     * Класс для обработки ввода в GDX
+     */
     class InputCore implements InputProcessor {   
         @Override
         public boolean keyDown(int keycode) {
@@ -358,6 +370,87 @@ public class FormMapEditor extends javax.swing.JDialog {
             
             return this;
         }
+    }
+    
+    /**
+     * Класс для отображения сторон фигуры и управления ими
+     */
+    class FigurePreview extends PanelImagePreview implements MouseListener {
+        /** сторона фигуры, за которую отвечает этот элемент */
+        Side side;
+
+        public FigurePreview(Container window, Side side) {
+            super(window);
+            setStretched(true);
+            setImage(null);
+            this.side = side;
+            
+            addMouseListener(this);
+        }
+        
+        /**
+         * Получить сторону, которая рисуется в превью
+         * @return значение енумератора Side
+         */
+        public Side getSide() {
+            return side;
+        }        
+        
+        @Override
+        public void setImage(BufferedImage image) {
+            if (image != null) {
+                super.setImage(image);
+                setDrawBorder(true);
+            } else {
+                super.setImage(Const.ICONS.get("Add"));
+                setDrawBorder(false);
+            }
+        }
+        
+        /**
+          * вызвать окно выбора материала и назначить на сторону
+          */
+        void chooseMaterial() {
+            /*FormMaterialSelector form = new FormMaterialSelector(FormMain.formMain, true);
+            form.setVisible(true);
+
+            if (form.selectedTexture != null) {
+                selectedFigure.setMaterial(form.selectedMaterial, side);                
+                                
+                sidePreviews[side.getNum()].setImage(form.selectedTexture.getImage());
+                sidePreviews[side.getNum()].redraw();
+                
+            }
+
+            form.dispose();
+            */
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1) {
+                chooseMaterial();
+            } else if (e.getButton() == MouseEvent.BUTTON3) {
+                selectedFigure.setMaterial(null, side);   
+                
+                /*
+                sidePreviews[side.getNum()].setImage(null);
+                sidePreviews[side.getNum()].redraw();  
+                */
+            }
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {}
+
+        @Override
+        public void mouseReleased(MouseEvent e) {}
+
+        @Override
+        public void mouseEntered(MouseEvent e) {}
+
+        @Override
+        public void mouseExited(MouseEvent e) {}  
     }
 
     
