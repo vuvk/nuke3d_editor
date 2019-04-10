@@ -1,5 +1,5 @@
 /**
-    Form for choose texture in Nuke3D Editor
+    Form for choose material in Nuke3D Editor
     Copyright (C) 2019 Anton "Vuvk" Shcherbatykh <vuvk69@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 */
 package com.vuvk.n3d.forms;
 
+import com.vuvk.n3d.resources.Material;
 import com.vuvk.n3d.resources.Texture;
 import com.vuvk.n3d.utils.ImageUtils;
 import java.awt.Component;
@@ -25,9 +26,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -36,18 +35,18 @@ import javax.swing.event.ListSelectionListener;
  *
  * @author Anton "Vuvk" Shcherbatykh
  */
-public class FormTextureSelector extends javax.swing.JDialog {
+public class FormMaterialSelector extends javax.swing.JDialog {
     
-    /** доступен ли выбор текстуры или это просто просмотр */
-    public boolean isApplyButtonVisible = true;
-    /** выбранная текстура */
-    public Texture selectedTexture = null;
+    /** доступен ли выбор материала или это просто просмотр */
+    boolean selectionMode = true;
+    /** выбранный материал */
+    Material selectedMaterial = null;
     
     /**
      * кастомный рендерер для ячеек списка
      */
-    class TextureCellRenderer extends DefaultListCellRenderer {
-        public TextureCellRenderer() {        
+    class MaterialCellRenderer extends DefaultListCellRenderer {
+        public MaterialCellRenderer() {        
             setOpaque(true);
             setHorizontalAlignment(CENTER);
             setVerticalAlignment(CENTER);
@@ -66,8 +65,20 @@ public class FormTextureSelector extends javax.swing.JDialog {
                 setForeground(list.getForeground());
             }         
             
-            Texture txr = (Texture) value;
-            ImageIcon icon = new ImageIcon();
+            Material mat = (Material) value;
+            
+            setIcon(null);  
+            setText(mat.getName());
+            
+            Material.Frame frm = mat.getFrame(0);
+            if (frm == null) {
+                return this;
+            }
+            
+            Texture txr = frm.getTexture();
+            if (txr == null) {
+                return this;
+            }            
             
             double imageWidth = txr.getImage().getWidth();
             double imageHeight = txr.getImage().getHeight();
@@ -83,45 +94,44 @@ public class FormTextureSelector extends javax.swing.JDialog {
                 }
             }
             
+            ImageIcon icon = new ImageIcon();
             icon.setImage(ImageUtils.resizeImage(txr.getImage(), iconWidth, iconHeight));
             
-            setIcon(icon);            
-            setText(txr.getName());
-   
-
+            setIcon(icon);   
+            
             return this;
         }        
     }
     
     /**
-     * Creates new form FormTextureSelector
+     * Creates new form FormMaterialSelector
      */
-    public FormTextureSelector(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    public FormMaterialSelector(java.awt.Frame parent) {
+        super(parent, true);
         initComponents();
         
         setLocationRelativeTo(null);
         
         DefaultListModel listModel = new DefaultListModel();
         //model.setSize(Texture.list.size());
-        for (Texture txr : Texture.TEXTURES) {
-            listModel.addElement(txr);
+        for (Material mat : Material.MATERIALS) {
+            listModel.addElement(mat);
         }
-        lstTextures.setModel(listModel);       
+        lstMaterials.setModel(listModel);       
         
         // задаем кастомный рендерер
-        lstTextures.setCellRenderer(new TextureCellRenderer());
+        lstMaterials.setCellRenderer(new MaterialCellRenderer());
         
         // кастомное событие выбора ячейки        
-        ListSelectionModel selModel = lstTextures.getSelectionModel();
+        ListSelectionModel selModel = lstMaterials.getSelectionModel();
         selModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int index = lstTextures.getSelectedIndex();
-                if (index > -1 && index < Texture.TEXTURES.size()) {
-                    selectedTexture = Texture.TEXTURES.get(index);
+                int index = lstMaterials.getSelectedIndex();
+                if (index > -1 && index < Material.MATERIALS.size()) {
+                    selectedMaterial = Material.MATERIALS.get(index);
                 } else {
-                    selectedTexture = null;
+                    selectedMaterial = null;
                 }
             }
         });
@@ -139,14 +149,9 @@ public class FormTextureSelector extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
         btnApply = new javax.swing.JButton();
         scrlPane = new javax.swing.JScrollPane();
-        lstTextures = new javax.swing.JList<>();
+        lstMaterials = new javax.swing.JList<>();
 
         setTitle("Просмотр текстур");
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowActivated(java.awt.event.WindowEvent evt) {
-                formWindowActivated(evt);
-            }
-        });
 
         btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_close_white_24dp.png"))); // NOI18N
         btnClose.setToolTipText("Закрыть");
@@ -170,24 +175,24 @@ public class FormTextureSelector extends javax.swing.JDialog {
             }
         });
 
-        lstTextures.setModel(new javax.swing.AbstractListModel<String>() {
+        lstMaterials.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5", "Item 6", "Item 7", "Item 8", "Item 9", "Item 10", "Item 11", "Item 12", "Item 13", "Item 14", "Item 15", "Item 16", "Item 17", "Item 18", "Item 19", "Item 20", "Item 21", "Item 22", "Item 23", "Item 24", "Item 25", "Item 26", "Item 27", "Item 28", "Item 29" };
             public int getSize() { return strings.length; }
             public String getElementAt(int i) { return strings[i]; }
         });
-        lstTextures.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        lstTextures.setAutoscrolls(false);
-        lstTextures.setDoubleBuffered(true);
-        lstTextures.setFixedCellHeight(128);
-        lstTextures.setFixedCellWidth(128);
-        lstTextures.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
-        lstTextures.setVisibleRowCount(-1);
-        lstTextures.addMouseListener(new java.awt.event.MouseAdapter() {
+        lstMaterials.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        lstMaterials.setAutoscrolls(false);
+        lstMaterials.setDoubleBuffered(true);
+        lstMaterials.setFixedCellHeight(128);
+        lstMaterials.setFixedCellWidth(128);
+        lstMaterials.setLayoutOrientation(javax.swing.JList.HORIZONTAL_WRAP);
+        lstMaterials.setVisibleRowCount(-1);
+        lstMaterials.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                lstTexturesMouseClicked(evt);
+                lstMaterialsMouseClicked(evt);
             }
         });
-        scrlPane.setViewportView(lstTextures);
+        scrlPane.setViewportView(lstMaterials);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -207,9 +212,9 @@ public class FormTextureSelector extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(10, 10, 10)
+                .addContainerGap()
                 .addComponent(scrlPane, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -219,12 +224,20 @@ public class FormTextureSelector extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        btnApply.setVisible(isApplyButtonVisible);
-    }//GEN-LAST:event_formWindowActivated
-
+    /**
+     * Вызвать окно выбора материала
+     * @param selectionMode true-режим выбора материала, false - режим просмотра всех материалов
+     * @return Материал, если выбран, иначе null
+     */
+    public Material execute(boolean selectionMode) {
+        this.selectionMode = selectionMode;
+        btnApply.setVisible(selectionMode);
+        setVisible(true);
+        return selectedMaterial;
+    }
+    
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
-        selectedTexture = null;
+        selectedMaterial = null;
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_btnCloseActionPerformed
 
@@ -232,21 +245,21 @@ public class FormTextureSelector extends javax.swing.JDialog {
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }//GEN-LAST:event_btnApplyActionPerformed
 
-    private void lstTexturesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstTexturesMouseClicked
-        // если режим выбора текстуры, то на двойной клик закрыть окно
+    private void lstMaterialsMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lstMaterialsMouseClicked
+        // если режим выбора, то на двойной клик закрыть окно
         if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
-            if (lstTextures.getSelectedIndex() != -1) {
-                if (isApplyButtonVisible) {
+            if (lstMaterials.getSelectedIndex() != -1) {
+                if (selectionMode) {
                     dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                 }
             }
         }
-    }//GEN-LAST:event_lstTexturesMouseClicked
+    }//GEN-LAST:event_lstMaterialsMouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnApply;
     private javax.swing.JButton btnClose;
-    private javax.swing.JList<String> lstTextures;
+    private javax.swing.JList<String> lstMaterials;
     private javax.swing.JScrollPane scrlPane;
     // End of variables declaration//GEN-END:variables
 }
