@@ -39,9 +39,9 @@ import javax.swing.event.ListSelectionListener;
 public class FormTextureSelector extends javax.swing.JDialog {
     
     /** доступен ли выбор текстуры или это просто просмотр */
-    public boolean isApplyButtonVisible = true;
+    boolean selectionMode = true;
     /** выбранная текстура */
-    public Texture selectedTexture = null;
+    Texture selectedTexture = null;
     
     /**
      * кастомный рендерер для ячеек списка
@@ -96,8 +96,8 @@ public class FormTextureSelector extends javax.swing.JDialog {
     /**
      * Creates new form FormTextureSelector
      */
-    public FormTextureSelector(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    public FormTextureSelector(java.awt.Frame parent) {
+        super(parent, true);
         initComponents();
         
         setLocationRelativeTo(null);
@@ -142,11 +142,6 @@ public class FormTextureSelector extends javax.swing.JDialog {
         lstTextures = new javax.swing.JList<>();
 
         setTitle("Просмотр текстур");
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowActivated(java.awt.event.WindowEvent evt) {
-                formWindowActivated(evt);
-            }
-        });
 
         btnClose.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/ic_close_white_24dp.png"))); // NOI18N
         btnClose.setToolTipText("Закрыть");
@@ -207,9 +202,9 @@ public class FormTextureSelector extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(10, 10, 10)
+                .addContainerGap()
                 .addComponent(scrlPane, javax.swing.GroupLayout.DEFAULT_SIZE, 465, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(10, 10, 10)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnClose, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -219,10 +214,18 @@ public class FormTextureSelector extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        btnApply.setVisible(isApplyButtonVisible);
-    }//GEN-LAST:event_formWindowActivated
-
+    /**
+     * Вызвать окно выбора текстуры
+     * @param selectionMode true-режим выбора текстуры, false - режим просмотра всех текстур
+     * @return Текстура, если выбрана, иначе null
+     */
+    public Texture execute(boolean selectionMode) {
+        this.selectionMode = selectionMode;
+        btnApply.setVisible(selectionMode);
+        setVisible(true);
+        return selectedTexture;
+    }
+    
     private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         selectedTexture = null;
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
@@ -236,7 +239,7 @@ public class FormTextureSelector extends javax.swing.JDialog {
         // если режим выбора текстуры, то на двойной клик закрыть окно
         if (evt.getButton() == MouseEvent.BUTTON1 && evt.getClickCount() == 2) {
             if (lstTextures.getSelectedIndex() != -1) {
-                if (isApplyButtonVisible) {
+                if (selectionMode) {
                     dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
                 }
             }

@@ -83,11 +83,11 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
           * вызвать окно выбора текстуры и назначить выбранную в сторону
           */
         void chooseTexture() {
-            FormTextureSelector form = new FormTextureSelector(FormMain.formMain, true);
-            form.setVisible(true);
+            FormTextureSelector form = new FormTextureSelector(FormMain.formMain);
+            Texture txr = form.execute(true);
 
-            if (form.selectedTexture != null) {
-                selectedSkybox.setTexture(form.selectedTexture, side);                
+            if (txr != null) {
+                selectedSkybox.setTexture(txr, side);                
                 
                 sidePreviews[side.getNum()].setImage(form.selectedTexture.getImage());
                 sidePreviews[side.getNum()].redraw();
@@ -419,7 +419,7 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
 
     private void btnPreviewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPreviewActionPerformed
         FormMain.closeFormSoundEditor();
-        new FormSkyboxPreview(FormMain.formMain, true).execute(selectedSkybox);
+        new FormSkyboxPreview(FormMain.formMain).execute(selectedSkybox);
     }//GEN-LAST:event_btnPreviewActionPerformed
 
     private void formInternalFrameClosed(javax.swing.event.InternalFrameEvent evt) {//GEN-FIRST:event_formInternalFrameClosed

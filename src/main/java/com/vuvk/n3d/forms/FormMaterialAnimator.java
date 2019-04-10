@@ -19,6 +19,7 @@ package com.vuvk.n3d.forms;
 
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.resources.Material;
+import com.vuvk.n3d.resources.Texture;
 import javax.swing.ImageIcon;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -150,11 +151,11 @@ public class FormMaterialAnimator extends javax.swing.JDialog {
             
         //int prevRow = TableFrames.getSelectedRow();
         
-        FormTextureSelector form = new FormTextureSelector(FormMain.formMain, true);
-        form.setVisible(true);
+        FormTextureSelector form = new FormTextureSelector(FormMain.formMain);
+        Texture txr = form.execute(true);
         
-        if (form.selectedTexture != null) {
-            selectedMaterial.getFrame(selectedFrameIndex).setTexture(form.selectedTexture);
+        if (txr != null) {
+            selectedMaterial.getFrame(selectedFrameIndex).setTexture(txr);
             
             imagePreview.setImage(selectedMaterial.getFrame(selectedFrameIndex).getImage());
             imagePreview.redraw();

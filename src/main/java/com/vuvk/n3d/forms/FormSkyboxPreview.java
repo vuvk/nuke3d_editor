@@ -262,8 +262,8 @@ public class FormSkyboxPreview extends javax.swing.JDialog {
     /**
      * Creates new form FormSkyboxPreview
      */
-    public FormSkyboxPreview(Frame owner, boolean modal) {
-        super(owner, modal);
+    public FormSkyboxPreview(Frame owner) {
+        super(owner, true);
         
         initComponents();
         
