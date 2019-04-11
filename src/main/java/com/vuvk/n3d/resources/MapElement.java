@@ -31,6 +31,9 @@ public abstract class MapElement {
     /** рендерер */
     protected ImmediateModeRenderer20 renderer;
     
+    protected MapElement() {
+        pos = new Vector3();
+    }
     
     /** 
      * Получить вектор позиции

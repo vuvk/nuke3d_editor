@@ -29,9 +29,12 @@ public abstract class MapFigure extends MapElement {
      */
     protected final Material[] sides = new Material[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
     
-    protected MapFigure() {}
+    protected MapFigure() {
+        super();
+    }
     /** конструктор с копированием материалов другой фигуры */
     protected MapFigure(MapFigure other) {
+        this();
         duplicate(other);
     }
     

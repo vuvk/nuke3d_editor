@@ -30,24 +30,24 @@ import java.util.Arrays;
 public class MapCube extends MapFigure {
     
     public MapCube() {
-        renderer = new ImmediateModeRenderer20(false, false, 4);
+        this(null);
     }
     
     /** конструктор с копированием материалов другой фигуры */
     public MapCube(MapFigure other) {
         super(other);
+        renderer = new ImmediateModeRenderer20(false, false, 4);
     }
     
-
     @Override
     public void render(Matrix4 projModelView) {
         com.badlogic.gdx.graphics.Texture txr;
         Material mat;
-        
+
         float x = pos.x,
               y = pos.y,
               z = pos.z;
-        
+
         // back
         mat = sides[Side.BACK.getNum()];
         if (mat != null) {
