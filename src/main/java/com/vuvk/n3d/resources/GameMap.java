@@ -53,7 +53,32 @@ public class GameMap {
     public GameMap() {
         elements = new MapElement[MAX_X][MAX_Y][MAX_Z];
     }
+    
+    /**
+     * Установить элемент в позицию на карте
+     * @param pos Позиция элемента в формате Vector3. Компоненты будут усечены до int
+     * @param element 
+     */
+    public void setElement(Vector3 pos, MapElement element) {
+        setElement((int)pos.x, (int)pos.y, (int)pos.z, element);
+    }
 
+    /**
+     * Установить элемент в позицию на карте
+     * @param x X-компонента позиции
+     * @param y Y-компонента позиции
+     * @param z Z-компонента позиции
+     * @param element Элемент карты
+     */
+    public void setElement(int x, int y, int z, MapElement element) {
+        if (x >= 0 && x <= MAX_X &&
+            y >= 0 && y <= MAX_Y &&
+            z >= 0 && z <= MAX_Z
+           ) {
+            elements[x][y][z] = element;
+        }
+    }
+    
     /**
      * Получить элемент по позиции в массиве элементов
      * @param pos Позиция элемента в формате Vector3. Компоненты будут усечены до int
