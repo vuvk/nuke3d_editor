@@ -44,7 +44,7 @@ public class MapCube extends MapFigure {
         // back
         mat = sides[Side.BACK.getNum()];
         if (mat != null) {
-            txr = FormMapEditor.TEXTURES.get(mat);
+            txr = FormMapEditor.GDX_TEXTURES.get(mat);
             if (txr != null) {
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);

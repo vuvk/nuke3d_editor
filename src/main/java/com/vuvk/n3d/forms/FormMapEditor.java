@@ -62,6 +62,9 @@ public class FormMapEditor extends javax.swing.JDialog {
     
     MapFigure selectedFigure = null;
     
+    /** стороны фигуры */
+    static FigurePreview[] sidePreviews = new FigurePreview[6];
+    
     LwjglAWTCanvas gdxEngine;
     PerspectiveCamera cam;
     ImmediateModeRenderer20 lineRenderer;
@@ -75,7 +78,7 @@ public class FormMapEditor extends javax.swing.JDialog {
     float levelDraw = 0;
     
     /** словарь соответствия Материал Nuke3D - Текстура libGDX */
-    public static Map<Material, com.badlogic.gdx.graphics.Texture> TEXTURES = new HashMap<>();
+    public static Map<Material, com.badlogic.gdx.graphics.Texture> GDX_TEXTURES = new HashMap<>();
     
     /**
      * Класс для обработки ввода в GDX
@@ -257,7 +260,7 @@ public class FormMapEditor extends javax.swing.JDialog {
             Gdx.input.setInputProcessor(new InputCore());
             
             // грузим все известные текстуры
-            TEXTURES.clear();
+            GDX_TEXTURES.clear();
             // пробегаемся по всем материалам и если у материала есть на первом 
             // кадре известная текстура, то грузим её
             for (Material mat : Material.MATERIALS) {
@@ -265,7 +268,7 @@ public class FormMapEditor extends javax.swing.JDialog {
                 if (frm != null) {
                     Texture txr = frm.getTexture();
                     if (txr != null) {
-                        TEXTURES.put(mat, new com.badlogic.gdx.graphics.Texture(txr.getPath()));
+                        GDX_TEXTURES.put(mat, new com.badlogic.gdx.graphics.Texture(txr.getPath()));
                     }
                 }
             }
@@ -411,19 +414,27 @@ public class FormMapEditor extends javax.swing.JDialog {
           * вызвать окно выбора материала и назначить на сторону
           */
         void chooseMaterial() {
-            /*FormMaterialSelector form = new FormMaterialSelector(FormMain.formMain, true);
-            form.setVisible(true);
+            FormMaterialSelector form = new FormMaterialSelector(FormMain.formMain);
+            Material mat = form.execute(true);
 
-            if (form.selectedTexture != null) {
-                selectedFigure.setMaterial(form.selectedMaterial, side);                
-                                
-                sidePreviews[side.getNum()].setImage(form.selectedTexture.getImage());
-                sidePreviews[side.getNum()].redraw();
+            if (mat != null) {
+                selectedFigure.setMaterial(mat, side);                
                 
+                sidePreviews[side.getNum()].setImage(null);
+                setImage(null);
+                Material.Frame frm = mat.getFrame(0);
+                
+                if (frm != null) {
+                    Texture txr = frm.getTexture();
+                    if (txr != null) {
+                        setImage(txr.getImage());
+                    }
+                    
+                    sidePreviews[side.getNum()].setImage(txr.getImage());
+                }
+                    
+                sidePreviews[side.getNum()].redraw();
             }
-
-            form.dispose();
-            */
         }
 
         @Override
@@ -433,10 +444,8 @@ public class FormMapEditor extends javax.swing.JDialog {
             } else if (e.getButton() == MouseEvent.BUTTON3) {
                 selectedFigure.setMaterial(null, side);   
                 
-                /*
                 sidePreviews[side.getNum()].setImage(null);
                 sidePreviews[side.getNum()].redraw();  
-                */
             }
         }
 
@@ -474,6 +483,23 @@ public class FormMapEditor extends javax.swing.JDialog {
         tabPane.setTitleAt(0, "");
         tabPane.setIconAt(0, new ImageIcon(Const.ICONS.get("Cube")));
         tabPane.setToolTipTextAt(0, "Создание сцены из примитивов");
+        
+                
+        for (int i = 0; i < 6; ++i) {
+            sidePreviews[i] = new FigurePreview(this, Side.getByNum(i));
+        }
+        
+        pnlFront .add(sidePreviews[Side.FRONT .getNum()]);        
+        pnlBack  .add(sidePreviews[Side.BACK  .getNum()]);        
+        pnlLeft  .add(sidePreviews[Side.LEFT  .getNum()]);        
+        pnlRight .add(sidePreviews[Side.RIGHT .getNum()]);        
+        pnlTop   .add(sidePreviews[Side.TOP   .getNum()]);        
+        pnlBottom.add(sidePreviews[Side.BOTTOM.getNum()]);
+        
+        for (int i = 0; i < 6; ++i) {
+            sidePreviews[i].setSize(64, 64);
+            sidePreviews[i].setLocation(5, 16);
+        }
         
         setLocationRelativeTo(null);
     }
@@ -781,7 +807,7 @@ public class FormMapEditor extends javax.swing.JDialog {
     }//GEN-LAST:event_formComponentResized
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-        TEXTURES.clear();
+        GDX_TEXTURES.clear();
     }//GEN-LAST:event_formWindowClosed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

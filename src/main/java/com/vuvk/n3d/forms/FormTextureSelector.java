@@ -39,9 +39,9 @@ import javax.swing.event.ListSelectionListener;
 public class FormTextureSelector extends javax.swing.JDialog {
     
     /** доступен ли выбор текстуры или это просто просмотр */
-    boolean selectionMode = true;
+    private boolean selectionMode = true;
     /** выбранная текстура */
-    Texture selectedTexture = null;
+    private Texture selectedTexture = null;
     
     /**
      * кастомный рендерер для ячеек списка

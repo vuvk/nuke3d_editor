@@ -89,13 +89,9 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
             if (txr != null) {
                 selectedSkybox.setTexture(txr, side);                
                 
-                sidePreviews[side.getNum()].setImage(form.selectedTexture.getImage());
+                sidePreviews[side.getNum()].setImage(txr.getImage());
                 sidePreviews[side.getNum()].redraw();
             }
-        }
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
         }
 
         @Override
@@ -110,6 +106,9 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
             }
         }
 
+        @Override
+        public void mouseClicked(MouseEvent e) {}
+        
         @Override
         public void mouseReleased(MouseEvent e) {}
 
@@ -130,12 +129,12 @@ public class FormSkyboxEditor extends javax.swing.JInternalFrame {
             sidePreviews[i] = new SkyboxPreview(this, Side.getByNum(i));
         }
         
-        pnlFront .add(sidePreviews[0]);        
-        pnlBack  .add(sidePreviews[1]);        
-        pnlLeft  .add(sidePreviews[2]);        
-        pnlRight .add(sidePreviews[3]);        
-        pnlTop   .add(sidePreviews[4]);        
-        pnlBottom.add(sidePreviews[5]);
+        pnlFront .add(sidePreviews[Side.FRONT .getNum()]);        
+        pnlBack  .add(sidePreviews[Side.BACK  .getNum()]);        
+        pnlLeft  .add(sidePreviews[Side.LEFT  .getNum()]);        
+        pnlRight .add(sidePreviews[Side.RIGHT .getNum()]);        
+        pnlTop   .add(sidePreviews[Side.TOP   .getNum()]);        
+        pnlBottom.add(sidePreviews[Side.BOTTOM.getNum()]);
         
         for (int i = 0; i < 6; ++i) {
             sidePreviews[i].setSize(128, 128);

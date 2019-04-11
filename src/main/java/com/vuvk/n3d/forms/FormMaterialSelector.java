@@ -38,9 +38,9 @@ import javax.swing.event.ListSelectionListener;
 public class FormMaterialSelector extends javax.swing.JDialog {
     
     /** доступен ли выбор материала или это просто просмотр */
-    boolean selectionMode = true;
+    private boolean selectionMode = true;
     /** выбранный материал */
-    Material selectedMaterial = null;
+    private Material selectedMaterial = null;
     
     /**
      * кастомный рендерер для ячеек списка
