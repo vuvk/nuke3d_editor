@@ -753,7 +753,10 @@ public class FormMain extends javax.swing.JFrame {
         listProjectView.setCellRenderer(new ProjectViewCellRenderer());        
         
         setLocationRelativeTo(null);
-        //fillListProjectView();        
+        //fillListProjectView();       
+        
+        projectOpen();
+        new FormMapEditor(null).execute(new GameMap());
     }
 
     /** This method is called from within the constructor to
@@ -1645,13 +1648,9 @@ public class FormMain extends javax.swing.JFrame {
         //</editor-fold>
                         
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new FormMapEditor(null, true).execute(new GameMap());
-                
-                formMain = new FormMain();
-                formMain.setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            formMain = new FormMain();
+            formMain.setVisible(true);
         }); 
     }
 

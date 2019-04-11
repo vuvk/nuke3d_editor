@@ -33,6 +33,7 @@ import com.badlogic.gdx.math.collision.Ray;
 import com.vuvk.n3d.Const;
 import com.vuvk.n3d.components.PanelImagePreview;
 import com.vuvk.n3d.resources.GameMap;
+import com.vuvk.n3d.resources.MapCube;
 import com.vuvk.n3d.resources.MapElement;
 import com.vuvk.n3d.resources.MapFigure;
 import com.vuvk.n3d.resources.Material;
@@ -279,7 +280,16 @@ public class FormMapEditor extends javax.swing.JDialog {
             cam.up.set(Vector3.Y);
             cam.near = 0.0001f;
             cam.far  = 100;
-            cam.update();
+            cam.update();            
+        
+            selectedFigure = new MapCube();
+        }
+        
+        void mouseClicked() {
+            selectedMap.setElement((int)worldPos.x, 
+                                   (int)worldPos.y, 
+                                   (int)-worldPos.z, 
+                                   new MapCube(selectedFigure));
         }
         
         @Override
@@ -322,6 +332,11 @@ public class FormMapEditor extends javax.swing.JDialog {
                 lineRenderer.begin(cam.combined, GL20.GL_LINES);   
                 drawBox(worldPos, Color.RED);
                 lineRenderer.end();
+                
+                // рисуем?
+                if (Gdx.input.justTouched()) {
+                    mouseClicked();
+                }
             }            
                         
             cam.position.set(camPosPoint.x, camPosPoint.y + levelDraw, camPosPoint.z);
@@ -369,7 +384,7 @@ public class FormMapEditor extends javax.swing.JDialog {
             } else {
                 setBackground(list.getBackground());
                 setForeground(list.getForeground());
-            }   
+            }
             
             return this;
         }
@@ -459,15 +474,15 @@ public class FormMapEditor extends javax.swing.JDialog {
         public void mouseEntered(MouseEvent e) {}
 
         @Override
-        public void mouseExited(MouseEvent e) {}  
+        public void mouseExited(MouseEvent e) {}
     }
 
     
     /**
      * Creates new form FormMapEditor
      */
-    public FormMapEditor(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    public FormMapEditor(java.awt.Frame parent) {
+        super(parent, true);
         initComponents();
         
         ComboBoxFiguresRenderer renderer = new ComboBoxFiguresRenderer();
@@ -483,8 +498,7 @@ public class FormMapEditor extends javax.swing.JDialog {
         tabPane.setTitleAt(0, "");
         tabPane.setIconAt(0, new ImageIcon(Const.ICONS.get("Cube")));
         tabPane.setToolTipTextAt(0, "Создание сцены из примитивов");
-        
-                
+                        
         for (int i = 0; i < 6; ++i) {
             sidePreviews[i] = new FigurePreview(this, Side.getByNum(i));
         }
