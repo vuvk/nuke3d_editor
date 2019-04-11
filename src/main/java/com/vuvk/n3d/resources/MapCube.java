@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.Matrix4;
 import com.vuvk.n3d.forms.FormMapEditor;
+import java.util.Arrays;
 
 /**
  * Класс примитива - куб, из которых построена сцена
@@ -31,6 +32,12 @@ public class MapCube extends MapFigure {
     public MapCube() {
         renderer = new ImmediateModeRenderer20(false, false, 4);
     }
+    
+    /** конструктор с копированием материалов другой фигуры */
+    public MapCube(MapFigure other) {
+        super(other);
+    }
+    
 
     @Override
     public void render(Matrix4 projModelView) {

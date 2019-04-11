@@ -29,6 +29,11 @@ public abstract class MapFigure extends MapElement {
      */
     protected final Material[] sides = new Material[6]; // 0 - FRONT, 1 - BACK, 2 - LEFT, 3 - RIGHT, 4 - TOP, 5 - BOTTOM
     
+    protected MapFigure() {}
+    /** конструктор с копированием материалов другой фигуры */
+    protected MapFigure(MapFigure other) {
+        duplicate(other);
+    }
     
     /**
      * Установить материал на сторону
@@ -46,6 +51,24 @@ public abstract class MapFigure extends MapElement {
      */
     public Material getMaterial(Side side) {
         return sides[side.getNum()];
+    }
+    
+    /**
+     * копирование материалов другой фигуры
+     * @param other Другая фигура
+     */
+    public void duplicate(MapFigure other) {     
+        if (equals(other)) {
+            return;
+        }
+        
+        for (int i = 0; i < sides.length; ++i) {
+            if (other != null) {        
+                sides[i] = other.sides[i];
+            } else {       
+                sides[i] = null;
+            }
+        }    
     }
     
     /**
