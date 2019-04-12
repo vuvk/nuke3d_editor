@@ -76,7 +76,9 @@ public class GameMap {
             z >= 0 && z <= MAX_Z
            ) {
             elements[x][y][z] = element;
-            element.setPos(x, y, -z);
+            if (element != null) {
+                element.setPos(x, y, -z);
+            }
         }
     }
     

@@ -17,7 +17,9 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.Matrix4;
 import com.vuvk.n3d.forms.FormMapEditor;
@@ -36,7 +38,7 @@ public class MapCube extends MapFigure {
     /** конструктор с копированием материалов другой фигуры */
     public MapCube(MapFigure other) {
         super(other);
-        renderer = new ImmediateModeRenderer20(false, false, 4);
+        renderer = new ImmediateModeRenderer20(false, false, 1);
     }
     
     @Override
@@ -47,22 +49,47 @@ public class MapCube extends MapFigure {
         float x = pos.x,
               y = pos.y,
               z = pos.z;
+        
+        // front
+        mat = sides[Side.FRONT.getNum()];
+        if (mat != null) {
+            txr = FormMapEditor.GDX_TEXTURES.get(mat);
+            if (txr != null) {                
+                txr.bind();
+                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.texCoord(1, 1);
+                renderer.vertex(x, y, z - 1);
+                
+                renderer.texCoord(1, 0);
+                renderer.vertex(x, y + 1, z - 1);
+                
+                renderer.texCoord(0, 0);
+                renderer.vertex(x + 1, y + 1, z - 1);
+                
+                renderer.texCoord(0, 1);
+                renderer.vertex(x + 1, y, z - 1);
+                renderer.end();
+            }
+        }
 
         // back
         mat = sides[Side.BACK.getNum()];
         if (mat != null) {
             txr = FormMapEditor.GDX_TEXTURES.get(mat);
-            if (txr != null) {
+            if (txr != null) {                
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
-                renderer.vertex(x, y, z);
                 renderer.texCoord(0, 1);
-                renderer.vertex(x + 1, y, z);
+                renderer.vertex(x, y, z);
+                
                 renderer.texCoord(1, 1);
-                renderer.vertex(x + 1, y + 1, z);
+                renderer.vertex(x + 1, y, z);
+                
                 renderer.texCoord(1, 0);
-                renderer.vertex(x, y + 1, z);
+                renderer.vertex(x + 1, y + 1, z);
+                
                 renderer.texCoord(0, 0);
+                renderer.vertex(x, y + 1, z);
                 renderer.end();
             }
         }
