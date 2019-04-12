@@ -19,6 +19,7 @@ package com.vuvk.n3d.forms;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.backends.lwjgl.LwjglAWTCanvas;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
@@ -71,7 +72,7 @@ public class FormMapEditor extends javax.swing.JDialog {
     ImmediateModeRenderer20 lineRenderer;
 //  ImmediateModeRenderer20 figureRenderer;
     
-    Vector3 camPosPoint  = new Vector3(5, 8, -2.5f);
+    Vector3 camPosPoint  = new Vector3(5, 8, -6.5f);
     Vector3 camViewPoint = new Vector3(5, 0, -4.5f);
     Vector3 worldPos;
     
@@ -102,6 +103,28 @@ public class FormMapEditor extends javax.swing.JDialog {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+            if (worldPos != null) {
+                switch (button) {
+                    // нарисовать
+                    case Input.Buttons.LEFT :
+                        selectedMap.setElement((int)worldPos.x, 
+                                               (int)worldPos.y, 
+                                               (int)-worldPos.z, 
+                                               new MapCube(selectedFigure));
+                        break;
+                        
+                    // удалить
+                    case Input.Buttons.RIGHT :
+                        selectedMap.setElement((int)worldPos.x, 
+                                               (int)worldPos.y, 
+                                               (int)-worldPos.z, 
+                                               null);
+                        break;
+                        
+                } 
+                return true;
+            }
+            
             return false;
         }
 
@@ -285,13 +308,6 @@ public class FormMapEditor extends javax.swing.JDialog {
             selectedFigure = new MapCube();
         }
         
-        void mouseClicked() {
-            selectedMap.setElement((int)worldPos.x, 
-                                   (int)worldPos.y, 
-                                   (int)-worldPos.z, 
-                                   new MapCube(selectedFigure));
-        }
-        
         @Override
         public void render() {         
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -304,6 +320,15 @@ public class FormMapEditor extends javax.swing.JDialog {
                 drawGrid(10, 10, Color.DARK_GRAY);
                 lineRenderer.end();
             }
+                        
+            // сетка позиции
+            Gdx.gl.glLineWidth(3);
+            lineRenderer.begin(cam.combined, GL20.GL_LINES);   
+            drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
+            /*drawLine(Vector3.Zero, Vector3.X, Color.RED);
+            drawLine(Vector3.Zero, Vector3.Y, Color.YELLOW);
+            drawLine(Vector3.Zero, new Vector3(0, 0, -1), Color.BLUE);*/
+            lineRenderer.end();
             
             // рисуем элементы
             for (int x = 0; x < GameMap.MAX_X; ++x) {
@@ -317,26 +342,12 @@ public class FormMapEditor extends javax.swing.JDialog {
                 }    
             }
             
-            // сетка позиции
-            Gdx.gl.glLineWidth(3);
-            lineRenderer.begin(cam.combined, GL20.GL_LINES);   
-            drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
-            /*drawLine(Vector3.Zero, Vector3.X, Color.RED);
-            drawLine(Vector3.Zero, Vector3.Y, Color.YELLOW);
-            drawLine(Vector3.Zero, new Vector3(0, 0, -1), Color.BLUE);*/
-            lineRenderer.end();
-            
             // позиция курсора
             if (worldPos != null) {
                 Gdx.gl.glLineWidth(3);
                 lineRenderer.begin(cam.combined, GL20.GL_LINES);   
                 drawBox(worldPos, Color.RED);
                 lineRenderer.end();
-                
-                // рисуем?
-                if (Gdx.input.justTouched()) {
-                    mouseClicked();
-                }
             }            
                         
             cam.position.set(camPosPoint.x, camPosPoint.y + levelDraw, camPosPoint.z);
