@@ -77,7 +77,7 @@ public class GameMap {
            ) {
             elements[x][y][z] = element;
             if (element != null) {
-                element.setPos(x, y, -z);
+                element.setPos(x, y, z);
             }
         }
     }
@@ -99,9 +99,9 @@ public class GameMap {
      * @return Элемент карты, если есть, иначе null
      */
     public MapElement getElement(int x, int y, int z) {
-        if (x >= 0 && x <= MAX_X &&
-            y >= 0 && y <= MAX_Y &&
-            z >= 0 && z <= MAX_Z
+        if (x >= 0 && x < MAX_X &&
+            y >= 0 && y < MAX_Y &&
+            z >= 0 && z < MAX_Z
            ) {
             return elements[x][y][z];
         }
