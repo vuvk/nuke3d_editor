@@ -72,8 +72,8 @@ public class FormMapEditor extends javax.swing.JDialog {
     ImmediateModeRenderer20 lineRenderer;
 //  ImmediateModeRenderer20 figureRenderer;
     
-    Vector3 camPosPoint  = new Vector3(5, 8, -6.5f);
-    Vector3 camViewPoint = new Vector3(5, 0, -4.5f);
+    Vector3 camPosPoint  = new Vector3(5, 8, 7.5f);
+    Vector3 camViewPoint = new Vector3(5, 0, 5.5f);
     Vector3 worldPos;
     
     /** уровень рисования по высоте */
@@ -109,7 +109,7 @@ public class FormMapEditor extends javax.swing.JDialog {
                     case Input.Buttons.LEFT :
                         selectedMap.setElement((int)worldPos.x, 
                                                (int)worldPos.y, 
-                                               (int)-worldPos.z, 
+                                               (int)worldPos.z, 
                                                new MapCube(selectedFigure));
                         break;
                         
@@ -117,7 +117,7 @@ public class FormMapEditor extends javax.swing.JDialog {
                     case Input.Buttons.RIGHT :
                         selectedMap.setElement((int)worldPos.x, 
                                                (int)worldPos.y, 
-                                               (int)-worldPos.z, 
+                                               (int)worldPos.z, 
                                                null);
                         break;
                         
@@ -130,12 +130,12 @@ public class FormMapEditor extends javax.swing.JDialog {
 
         @Override
         public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-            return false;
+            return true;
         }
 
         @Override
         public boolean touchDragged(int screenX, int screenY, int pointer) {
-            return false;
+            return true;
         }
 
         @Override
@@ -148,8 +148,8 @@ public class FormMapEditor extends javax.swing.JDialog {
             Vector3 pos = new Vector3();
             Intersector.intersectRayPlane(ray, plane, pos);
             
-            if (pos.x >= 0 && pos.x <=  10 &&
-                pos.z <= 0 && pos.z >= -10
+            if (pos.x >= 0 && pos.x <= 10 &&
+                pos.z >= 0 && pos.z <= 10
                ) {
                 worldPos = new Vector3((int)pos.x, levelDraw, (int)pos.z);
                 return true;
@@ -170,8 +170,8 @@ public class FormMapEditor extends javax.swing.JDialog {
             levelDraw += amount;
             if (levelDraw < 0) {
                 levelDraw = 0;
-            } else if (levelDraw > GameMap.MAX_Y) {
-                levelDraw = GameMap.MAX_Y;
+            } else if (levelDraw > GameMap.MAX_Y - 1) {
+                levelDraw = GameMap.MAX_Y - 1;
             }
             
             if (worldPos != null) {
@@ -215,14 +215,14 @@ public class FormMapEditor extends javax.swing.JDialog {
             for (int i = 0; i <= horCount; ++i) {
                 // draw vertical
                 drawLine(x + i * stepWidth, y, z,
-                         x + i * stepWidth, y, z - verCount * stepHeight,
+                         x + i * stepWidth, y, z + verCount * stepHeight,
                          color);
             }
 
             for (int i = 0; i <= verCount; ++i) {
                 // draw horizontal
-                drawLine(x,         y, z - i * stepHeight,
-                         x + verCount * stepWidth, y, z - i * stepHeight,
+                drawLine(x,                        y, z + i * stepHeight,
+                         x + verCount * stepWidth, y, z + i * stepHeight,
                          color);
             }
         }
@@ -236,46 +236,50 @@ public class FormMapEditor extends javax.swing.JDialog {
         }
         
         public void drawBox(Vector3 pos, Color color) {
-            drawLine(pos.x,     pos.y,     pos.z,
-                     pos.x,     pos.y + 1, pos.z,
+            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z - 0.001f,
+                     pos.x - 0.001f, pos.y + 1.001f, pos.z - 0.001f,
                      color);
-            drawLine(pos.x,     pos.y,     pos.z,
-                     pos.x + 1, pos.y,     pos.z,
+            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z - 0.001f,
+                     pos.x + 1.001f, pos.y - 0.001f, pos.z - 0.001f,
                      color);
-            drawLine(pos.x,     pos.y,     pos.z,
-                     pos.x,     pos.y,     pos.z - 1,
+            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z - 0.001f,
+                     pos.x - 0.001f, pos.y - 0.001f, pos.z + 1.001f,
                      color);             
-            drawLine(pos.x,     pos.y,     pos.z - 1,
-                     pos.x,     pos.y + 1, pos.z - 1,
+            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z + 1.001f,
+                     pos.x - 0.001f, pos.y + 1.001f, pos.z + 1.001f,
                      color);
-            drawLine(pos.x,     pos.y,     pos.z - 1,
-                     pos.x + 1, pos.y,     pos.z - 1,
+            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z + 1.001f,
+                     pos.x + 1.001f, pos.y - 0.001f, pos.z + 1.001f,
                      color);              
-            drawLine(pos.x + 1, pos.y,     pos.z,
-                     pos.x + 1, pos.y + 1, pos.z,
+            drawLine(pos.x + 1.001f, pos.y - 0.001f, pos.z - 0.001f,
+                     pos.x + 1.001f, pos.y + 1.001f, pos.z - 0.001f,
                      color);       
-            drawLine(pos.x + 1, pos.y,     pos.z - 1,
-                     pos.x + 1, pos.y + 1, pos.z - 1,
+            drawLine(pos.x + 1.001f, pos.y - 0.001f, pos.z + 1.001f,
+                     pos.x + 1.001f, pos.y + 1.001f, pos.z + 1.001f,
                      color);   
-            drawLine(pos.x + 1, pos.y,     pos.z,
-                     pos.x + 1, pos.y,     pos.z - 1,
+            drawLine(pos.x + 1.001f, pos.y - 0.001f, pos.z - 0.001f,
+                     pos.x + 1.001f, pos.y - 0.001f, pos.z + 1.001f,
                      color);        
-            drawLine(pos.x,     pos.y + 1, pos.z,
-                     pos.x,     pos.y + 1, pos.z - 1,
+            drawLine(pos.x - 0.001f, pos.y + 1.001f, pos.z - 0.001f,
+                     pos.x - 0.001f, pos.y + 1.001f, pos.z + 1.001f,
                      color);      
-            drawLine(pos.x + 1, pos.y + 1, pos.z,
-                     pos.x + 1, pos.y + 1, pos.z - 1,
+            drawLine(pos.x + 1.001f, pos.y + 1.001f, pos.z - 0.001f,
+                     pos.x + 1.001f, pos.y + 1.001f, pos.z + 1.001f,
                      color);     
-            drawLine(pos.x,     pos.y + 1, pos.z,
-                     pos.x + 1, pos.y + 1, pos.z,
+            drawLine(pos.x - 0.001f, pos.y + 1.001f, pos.z - 0.001f,
+                     pos.x + 1.001f, pos.y + 1.001f, pos.z - 0.001f,
                      color);      
-            drawLine(pos.x,     pos.y + 1, pos.z - 1,
-                     pos.x + 1, pos.y + 1, pos.z - 1,
+            drawLine(pos.x - 0.001f, pos.y + 1.001f, pos.z + 1.001f,
+                     pos.x + 1.001f, pos.y + 1.001f, pos.z + 1.001f,
                      color);        
         }
 
         @Override
-        public void create() {            
+        public void create() {
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            //Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+            //Gdx.gl.glCullFace(GL20.GL_BACK);
+        
             Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
             
             lineRenderer = new ImmediateModeRenderer20(false, true, 0);
@@ -320,19 +324,10 @@ public class FormMapEditor extends javax.swing.JDialog {
                 drawGrid(10, 10, Color.DARK_GRAY);
                 lineRenderer.end();
             }
-                        
-            // сетка позиции
-            Gdx.gl.glLineWidth(3);
-            lineRenderer.begin(cam.combined, GL20.GL_LINES);   
-            drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
-            /*drawLine(Vector3.Zero, Vector3.X, Color.RED);
-            drawLine(Vector3.Zero, Vector3.Y, Color.YELLOW);
-            drawLine(Vector3.Zero, new Vector3(0, 0, -1), Color.BLUE);*/
-            lineRenderer.end();
             
-            // рисуем элементы
+            // рисуем элементы ниже
             for (int x = 0; x < GameMap.MAX_X; ++x) {
-                for (int y = 0; y < GameMap.MAX_Y; ++y) {
+                for (int y = 0; y < levelDraw; ++y) {
                     for (int z = 0; z < GameMap.MAX_Z; ++z) {
                         MapElement element = selectedMap.getElement(x, y, z);
                         if (element != null) {
@@ -341,10 +336,29 @@ public class FormMapEditor extends javax.swing.JDialog {
                     }    
                 }    
             }
+                        
+            // сетка позиции
+            Gdx.gl.glLineWidth(3);
+            lineRenderer.begin(cam.combined, GL20.GL_LINES);   
+            drawGrid(0, levelDraw - 0.02f, 0, 10, 10, Color.LIGHT_GRAY);
+            /*drawLine(Vector3.Zero, Vector3.X, Color.RED);
+            drawLine(Vector3.Zero, Vector3.Y, Color.YELLOW);
+            drawLine(Vector3.Zero, new Vector3(0, 0, -1), Color.BLUE);*/
+            lineRenderer.end();
+            
+            // рисуем элементы на текущем уровне рисования
+            for (int x = 0; x < GameMap.MAX_X; ++x) {
+                for (int z = 0; z < GameMap.MAX_Z; ++z) {
+                    MapElement element = selectedMap.getElement(x, (int) levelDraw, z);
+                    if (element != null) {
+                        element.render(cam.combined);
+                    }
+                }     
+            }
             
             // позиция курсора
             if (worldPos != null) {
-                Gdx.gl.glLineWidth(3);
+                Gdx.gl.glLineWidth(5);
                 lineRenderer.begin(cam.combined, GL20.GL_LINES);   
                 drawBox(worldPos, Color.RED);
                 lineRenderer.end();
@@ -543,6 +557,7 @@ public class FormMapEditor extends javax.swing.JDialog {
         config.allowSoftwareMode = true;
         config.resizable = true;
         config.vSyncEnabled = true;
+        config.depth = 32;
         
         gdxEngine = new LwjglAWTCanvas(new MapPlayer(), config);
         Canvas canvas = gdxEngine.getCanvas();
