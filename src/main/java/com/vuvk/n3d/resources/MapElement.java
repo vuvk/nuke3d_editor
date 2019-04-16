@@ -17,6 +17,7 @@
 */
 package com.vuvk.n3d.resources;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -33,6 +34,7 @@ public abstract class MapElement {
     
     protected MapElement() {
         pos = new Vector3();
+        renderer = new ImmediateModeRenderer20(false, true, 1);
     }
     
     /** 
@@ -96,5 +98,12 @@ public abstract class MapElement {
     /**
      * Рисование в 3D-режиме
      */
-    public abstract void render(Matrix4 projModelView);
+    public void render(Matrix4 projModelView) {
+        render(projModelView, Color.WHITE);
+    }
+    
+    /**
+     * Рисование в 3D-режиме с цветом
+     */
+    public abstract void render(Matrix4 projModelView, Color color);
 }

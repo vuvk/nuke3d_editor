@@ -18,6 +18,7 @@
 package com.vuvk.n3d.resources;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
@@ -33,17 +34,16 @@ import java.util.Arrays;
 public class MapCube extends MapFigure {
     
     public MapCube() {
-        this(null);
+        super();
     }
     
     /** конструктор с копированием материалов другой фигуры */
     public MapCube(MapFigure other) {
         super(other);
-        renderer = new ImmediateModeRenderer20(true, false, 1);
     }
     
     @Override
-    public void render(Matrix4 projModelView) {
+    public void render(Matrix4 projModelView, Color color) {
         com.badlogic.gdx.graphics.Texture txr;
         Material mat;
 
@@ -58,18 +58,22 @@ public class MapCube extends MapFigure {
             if (txr != null) {                
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.color(color);
                 renderer.texCoord(1, 1);
                 renderer.vertex(x, y, z);
                 renderer.normal(0, 0, -1);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 0);
                 renderer.vertex(x, y + 1, z);
                 renderer.normal(0, 0, -1);
                 
+                renderer.color(color);
                 renderer.texCoord(0, 0);
                 renderer.vertex(x + 1, y + 1, z);
                 renderer.normal(0, 0, -1);
                 
+                renderer.color(color);
                 renderer.texCoord(0, 1);
                 renderer.vertex(x + 1, y, z);
                 renderer.normal(0, 0, -1);
@@ -84,18 +88,22 @@ public class MapCube extends MapFigure {
             if (txr != null) {                
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.color(color);
                 renderer.texCoord(0, 1);
                 renderer.vertex(x, y, z + 1);
                 renderer.normal(0, 0, 1);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 1);
                 renderer.vertex(x + 1, y, z + 1);
                 renderer.normal(0, 0, 1);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 0);
                 renderer.vertex(x + 1, y + 1, z + 1);
                 renderer.normal(0, 0, 1);
                 
+                renderer.color(color);
                 renderer.texCoord(0, 0);
                 renderer.vertex(x, y + 1, z + 1);
                 renderer.normal(0, 0, 1);
@@ -110,18 +118,22 @@ public class MapCube extends MapFigure {
             if (txr != null) {                
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.color(color);
                 renderer.texCoord(0, 1);
                 renderer.vertex(x, y, z);
                 renderer.normal(-1, 0, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 1);
                 renderer.vertex(x, y, z + 1);
                 renderer.normal(-1, 0, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 0);
                 renderer.vertex(x, y + 1, z + 1);
                 renderer.normal(-1, 0, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(0, 0);
                 renderer.vertex(x, y + 1, z);
                 renderer.normal(-1, 0, 0);
@@ -136,18 +148,22 @@ public class MapCube extends MapFigure {
             if (txr != null) {                
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.color(color);
                 renderer.texCoord(0, 1);
                 renderer.vertex(x + 1, y, z + 1);
                 renderer.normal(1, 0, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 1);
                 renderer.vertex(x + 1, y, z);
                 renderer.normal(1, 0, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 0);
                 renderer.vertex(x + 1, y + 1, z);
                 renderer.normal(1, 0, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(0, 0);
                 renderer.vertex(x + 1, y + 1, z + 1);
                 renderer.normal(1, 0, 0);
@@ -162,18 +178,22 @@ public class MapCube extends MapFigure {
             if (txr != null) {                
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.color(color);
                 renderer.texCoord(0, 1);
                 renderer.vertex(x + 1, y, z + 1);
                 renderer.normal(0, -1, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 1);
                 renderer.vertex(x, y, z + 1);
                 renderer.normal(0, -1, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 0);
                 renderer.vertex(x, y, z);
                 renderer.normal(0, -1, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(0, 0);
                 renderer.vertex(x + 1, y, z);
                 renderer.normal(0, -1, 0);
@@ -188,18 +208,22 @@ public class MapCube extends MapFigure {
             if (txr != null) {                
                 txr.bind();
                 renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+                renderer.color(color);
                 renderer.texCoord(0, 1);
                 renderer.vertex(x, y + 1, z + 1);
                 renderer.normal(0, 1, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 1);
                 renderer.vertex(x + 1, y + 1, z + 1);
                 renderer.normal(0, 1, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(1, 0);
                 renderer.vertex(x + 1, y + 1, z);
                 renderer.normal(0, 1, 0);
                 
+                renderer.color(color);
                 renderer.texCoord(0, 0);
                 renderer.vertex(x, y + 1, z);
                 renderer.normal(0, 1, 0);

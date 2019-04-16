@@ -26,6 +26,15 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Plane;
@@ -71,6 +80,12 @@ public class FormMapEditor extends javax.swing.JDialog {
     PerspectiveCamera cam;
     ImmediateModeRenderer20 lineRenderer;
 //  ImmediateModeRenderer20 figureRenderer;
+    
+    Model boxModel;
+    ModelInstance boxInstance;
+    ModelBatch modelBatch;
+    final float boxSize = 1.05f;
+    final float boxHalfSize = 0.5f;
     
     Vector3 camPosPoint  = new Vector3(5, 8, 7.5f);
     Vector3 camViewPoint = new Vector3(5, 0, 5.5f);
@@ -236,56 +251,65 @@ public class FormMapEditor extends javax.swing.JDialog {
         }
         
         public void drawBox(Vector3 pos, Color color) {
-            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z - 0.001f,
-                     pos.x - 0.001f, pos.y + 1.001f, pos.z - 0.001f,
+            final float offset = 0.035f;
+            final float ng = -offset;
+            final float ps = 1f + offset;
+            
+            drawLine(pos.x + ng, pos.y + ng, pos.z + ng,
+                     pos.x + ng, pos.y + ps, pos.z + ng,
                      color);
-            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z - 0.001f,
-                     pos.x + 1.001f, pos.y - 0.001f, pos.z - 0.001f,
+            drawLine(pos.x + ng, pos.y + ng, pos.z + ng,
+                     pos.x + ps, pos.y + ng, pos.z + ng,
                      color);
-            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z - 0.001f,
-                     pos.x - 0.001f, pos.y - 0.001f, pos.z + 1.001f,
+            drawLine(pos.x + ng, pos.y + ng, pos.z + ng,
+                     pos.x + ng, pos.y + ng, pos.z + ps,
                      color);             
-            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z + 1.001f,
-                     pos.x - 0.001f, pos.y + 1.001f, pos.z + 1.001f,
+            drawLine(pos.x + ng, pos.y + ng, pos.z + ps,
+                     pos.x + ng, pos.y + ps, pos.z + ps,
                      color);
-            drawLine(pos.x - 0.001f, pos.y - 0.001f, pos.z + 1.001f,
-                     pos.x + 1.001f, pos.y - 0.001f, pos.z + 1.001f,
+            drawLine(pos.x + ng, pos.y + ng, pos.z + ps,
+                     pos.x + ps, pos.y + ng, pos.z + ps,
                      color);              
-            drawLine(pos.x + 1.001f, pos.y - 0.001f, pos.z - 0.001f,
-                     pos.x + 1.001f, pos.y + 1.001f, pos.z - 0.001f,
+            drawLine(pos.x + ps, pos.y + ng, pos.z + ng,
+                     pos.x + ps, pos.y + ps, pos.z + ng,
                      color);       
-            drawLine(pos.x + 1.001f, pos.y - 0.001f, pos.z + 1.001f,
-                     pos.x + 1.001f, pos.y + 1.001f, pos.z + 1.001f,
+            drawLine(pos.x + ps, pos.y + ng, pos.z + ps,
+                     pos.x + ps, pos.y + ps, pos.z + ps,
                      color);   
-            drawLine(pos.x + 1.001f, pos.y - 0.001f, pos.z - 0.001f,
-                     pos.x + 1.001f, pos.y - 0.001f, pos.z + 1.001f,
+            drawLine(pos.x + ps, pos.y + ng, pos.z + ng,
+                     pos.x + ps, pos.y + ng, pos.z + ps,
                      color);        
-            drawLine(pos.x - 0.001f, pos.y + 1.001f, pos.z - 0.001f,
-                     pos.x - 0.001f, pos.y + 1.001f, pos.z + 1.001f,
+            drawLine(pos.x + ng, pos.y + ps, pos.z + ng,
+                     pos.x + ng, pos.y + ps, pos.z + ps,
                      color);      
-            drawLine(pos.x + 1.001f, pos.y + 1.001f, pos.z - 0.001f,
-                     pos.x + 1.001f, pos.y + 1.001f, pos.z + 1.001f,
+            drawLine(pos.x + ps, pos.y + ps, pos.z + ng,
+                     pos.x + ps, pos.y + ps, pos.z + ps,
                      color);     
-            drawLine(pos.x - 0.001f, pos.y + 1.001f, pos.z - 0.001f,
-                     pos.x + 1.001f, pos.y + 1.001f, pos.z - 0.001f,
+            drawLine(pos.x + ng, pos.y + ps, pos.z + ng,
+                     pos.x + ps, pos.y + ps, pos.z + ng,
                      color);      
-            drawLine(pos.x - 0.001f, pos.y + 1.001f, pos.z + 1.001f,
-                     pos.x + 1.001f, pos.y + 1.001f, pos.z + 1.001f,
+            drawLine(pos.x + ng, pos.y + ps, pos.z + ps,
+                     pos.x + ps, pos.y + ps, pos.z + ps,
                      color);        
         }
 
         @Override
-        public void create() {
-            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-            //Gdx.gl.glEnable(GL20.GL_CULL_FACE);
-            //Gdx.gl.glCullFace(GL20.GL_BACK);
-        
+        public void create() {     
             Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            
+            Gdx.input.setInputProcessor(new InputCore());
             
             lineRenderer = new ImmediateModeRenderer20(false, true, 0);
 //          figureRenderer = new ImmediateModeRenderer20(false, false, 4);
+            modelBatch = new ModelBatch();
             
-            Gdx.input.setInputProcessor(new InputCore());
+            // создаем модель куба для отображения позиции курсора 
+            boxModel = new ModelBuilder()
+                       .createBox(boxSize, boxSize, boxSize, 
+                                  new com.badlogic.gdx.graphics.g3d.Material(ColorAttribute.createDiffuse(Color.RED), 
+                                                                             new BlendingAttribute(0.8f)), 
+                                  VertexAttributes.Usage.Position | VertexAttributes.Usage.ColorUnpacked);
+            boxInstance = new ModelInstance(boxModel);
             
             // грузим все известные текстуры
             GDX_TEXTURES.clear();
@@ -315,7 +339,10 @@ public class FormMapEditor extends javax.swing.JDialog {
         @Override
         public void render() {         
             Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);         
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);      
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glEnable(GL20.GL_CULL_FACE);
+            Gdx.gl.glCullFace(GL20.GL_BACK);      
                                              
             // сетка основания
             if (levelDraw > 0) { 
@@ -331,7 +358,11 @@ public class FormMapEditor extends javax.swing.JDialog {
                     for (int z = 0; z < GameMap.MAX_Z; ++z) {
                         MapElement element = selectedMap.getElement(x, y, z);
                         if (element != null) {
-                            element.render(cam.combined);
+                            if (worldPos != null && worldPos.equals(new Vector3(x, y, z))) {
+                                element.render(cam.combined, Color.RED);
+                            } else {
+                                element.render(cam.combined);
+                            }
                         }
                     }    
                 }    
@@ -340,7 +371,7 @@ public class FormMapEditor extends javax.swing.JDialog {
             // сетка позиции
             Gdx.gl.glLineWidth(3);
             lineRenderer.begin(cam.combined, GL20.GL_LINES);   
-            drawGrid(0, levelDraw - 0.02f, 0, 10, 10, Color.LIGHT_GRAY);
+            drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
             /*drawLine(Vector3.Zero, Vector3.X, Color.RED);
             drawLine(Vector3.Zero, Vector3.Y, Color.YELLOW);
             drawLine(Vector3.Zero, new Vector3(0, 0, -1), Color.BLUE);*/
@@ -351,17 +382,31 @@ public class FormMapEditor extends javax.swing.JDialog {
                 for (int z = 0; z < GameMap.MAX_Z; ++z) {
                     MapElement element = selectedMap.getElement(x, (int) levelDraw, z);
                     if (element != null) {
-                        element.render(cam.combined);
+                        if (worldPos != null && worldPos.equals(new Vector3(x, levelDraw, z))) {
+                            element.render(cam.combined, Color.RED);
+                        } else {
+                            element.render(cam.combined);
+                        }
                     }
                 }     
             }
             
             // позиция курсора
-            if (worldPos != null) {
-                Gdx.gl.glLineWidth(5);
+            if (worldPos != null/* && selectedMap.getElement(worldPos) == null*/) {
+                //Gdx.gl.glCullFace(GL20.GL_FRONT);    
+                //Gdx.gl.glDisable(GL20.GL_CULL_FACE);
+                Gdx.gl.glLineWidth(3);
                 lineRenderer.begin(cam.combined, GL20.GL_LINES);   
                 drawBox(worldPos, Color.RED);
                 lineRenderer.end();
+                /*
+                boxInstance.transform.setTranslation(worldPos.x + boxHalfSize, 
+                                                     worldPos.y + boxHalfSize, 
+                                                     worldPos.z + boxHalfSize);
+                modelBatch.begin(cam);
+                modelBatch.render(boxInstance);
+                modelBatch.end();
+                */
             }            
                         
             cam.position.set(camPosPoint.x, camPosPoint.y + levelDraw, camPosPoint.z);
@@ -380,6 +425,8 @@ public class FormMapEditor extends javax.swing.JDialog {
         
         @Override
         public void dispose() {
+            boxModel.dispose();
+            modelBatch.dispose();
         }            
     }
     
