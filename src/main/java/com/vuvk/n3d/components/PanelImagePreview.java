@@ -136,11 +136,10 @@ public class PanelImagePreview extends JPanel {
             g.setColor(Color.black);
             
             // если размеры картинки большие или включен режим растяжения
-            if (imageWidth == width || imageHeight == height || isStretched()) {
+            if (imageWidth == width || imageHeight == height || stretched) {
                 // если стороны равны, то рисовать во всю картинку
                 if (imageWidth == imageHeight) {
                     g.drawImage(image, 0, 0, width, height, null);
-                    g.drawRect(0, 0, width - 1, height - 1);
                     
                     bX = bY = 0;
                     bW = width - 1;
