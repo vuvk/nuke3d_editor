@@ -26,13 +26,17 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
+import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.MeshPartBuilder;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
@@ -70,6 +74,15 @@ import javax.swing.JList;
  */
 public class FormMapEditor extends javax.swing.JDialog {
     
+    /** режимы мышки */
+    enum MouseMode {
+        UNKNOWN,
+        DRAW,
+        DELETE
+    }
+    /** текущий режим мышки */
+    MouseMode mouseMode = MouseMode.UNKNOWN;
+    
     static GameMap selectedMap = null; 
     
     MapFigure selectedFigure = null;
@@ -78,6 +91,7 @@ public class FormMapEditor extends javax.swing.JDialog {
     static FigurePreview[] sidePreviews = new FigurePreview[6];
     
     LwjglAWTCanvas gdxEngine;
+//  Environment environment;
     PerspectiveCamera cam;
     ImmediateModeRenderer20 lineRenderer;
 //  ImmediateModeRenderer20 figureRenderer;
@@ -94,9 +108,41 @@ public class FormMapEditor extends javax.swing.JDialog {
     
     /** уровень рисования по высоте */
     float levelDraw = 0;
-    
+    /** показывать ли сетку рисования */
+    boolean showGrid = true;
+    /** ведется ли рисование мышкой */
+    boolean drawMode = false;
+    boolean deleteMode = false;
+            
+            
     /** словарь соответствия Материал Nuke3D - Текстура libGDX */
     public static Map<Material, com.badlogic.gdx.graphics.Texture> GDX_TEXTURES = new HashMap<>();
+    
+    
+    /** нарисовать выбранную фигуру или удалить в точке worldPos */
+    void drawFigure() {
+        if (worldPos != null) {
+            switch (mouseMode) {
+                case DRAW:                        
+                    selectedMap.setElement((int)worldPos.x,
+                                           (int)worldPos.y,
+                                           (int)worldPos.z,
+                                           new MapCube(selectedFigure));
+                    break;
+
+                case DELETE:                        
+                    selectedMap.setElement((int)worldPos.x, 
+                                           (int)worldPos.y, 
+                                           (int)worldPos.z, 
+                                           null);
+                    break;
+
+                default:
+                case UNKNOWN:
+                    break;
+            }
+        }
+    }
     
     /**
      * Класс для обработки ввода в GDX
@@ -119,39 +165,32 @@ public class FormMapEditor extends javax.swing.JDialog {
 
         @Override
         public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-            if (worldPos != null) {
-                switch (button) {
-                    // нарисовать
-                    case Input.Buttons.LEFT :
-                        selectedMap.setElement((int)worldPos.x, 
-                                               (int)worldPos.y, 
-                                               (int)worldPos.z, 
-                                               new MapCube(selectedFigure));
-                        break;
-                        
-                    // удалить
-                    case Input.Buttons.RIGHT :
-                        selectedMap.setElement((int)worldPos.x, 
-                                               (int)worldPos.y, 
-                                               (int)worldPos.z, 
-                                               null);
-                        break;
-                        
-                } 
-                return true;
-            }
+            switch (button) {
+                // нарисовать
+                case Input.Buttons.LEFT :
+                    mouseMode = MouseMode.DRAW;
+                    break;
+
+                // удалить
+                case Input.Buttons.RIGHT :
+                    mouseMode = MouseMode.DELETE;
+                    break;
+
+            } 
+            return true;
+        }
+
+        @Override
+        public boolean touchUp(int screenX, int screenY, int pointer, int button) {            
+            drawFigure();
             
-            return false;
-        }
-
-        @Override
-        public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+            mouseMode = MouseMode.UNKNOWN;
             return true;
         }
 
         @Override
-        public boolean touchDragged(int screenX, int screenY, int pointer) {
-            return true;
+        public boolean touchDragged(int screenX, int screenY, int pointer) {            
+            return mouseMoved(screenX, screenY);
         }
 
         @Override
@@ -168,11 +207,13 @@ public class FormMapEditor extends javax.swing.JDialog {
                 pos.z >= 0 && pos.z <= 10
                ) {
                 worldPos = new Vector3((int)pos.x, levelDraw, (int)pos.z);
-                return true;
             } else {
                 worldPos = null;
-                return false;
             }
+            
+            drawFigure();
+                        
+            return true;
         }
 
         @Override
@@ -193,6 +234,8 @@ public class FormMapEditor extends javax.swing.JDialog {
             if (worldPos != null) {
                 worldPos.y = levelDraw;
             }
+            
+            gdxEngine.getApplicationListener().render();
                 
             return true;            
         }
@@ -296,10 +339,16 @@ public class FormMapEditor extends javax.swing.JDialog {
 
         @Override
         public void create() {     
-            Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-            
+            // перерисовка только по необходимости
+            Gdx.graphics.setContinuousRendering(false);
+            Gdx.graphics.requestRendering();
             Gdx.input.setInputProcessor(new InputCore());
+
+            Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);            
             
+//          environment = new Environment();
+//          environment.add(new DirectionalLight());
+                        
             lineRenderer = new ImmediateModeRenderer20(false, true, 0);
 //          figureRenderer = new ImmediateModeRenderer20(false, false, 4);
             modelBatch = new ModelBatch();
@@ -314,6 +363,14 @@ public class FormMapEditor extends javax.swing.JDialog {
             
             // грузим все известные текстуры
             GDX_TEXTURES.clear();
+            
+            // текстура для пустых материалов
+            Pixmap pxm = new Pixmap(8, 8, Pixmap.Format.RGB888);
+            pxm.setColor(Color.MAGENTA);
+            pxm.fill();
+            com.badlogic.gdx.graphics.Texture emptyTxr = new com.badlogic.gdx.graphics.Texture(pxm);
+            GDX_TEXTURES.put(null, emptyTxr);
+            
             // пробегаемся по всем материалам и если у материала есть на первом 
             // кадре известная текстура, то грузим её
             for (Material mat : Material.MATERIALS) {
@@ -322,6 +379,8 @@ public class FormMapEditor extends javax.swing.JDialog {
                     Texture txr = frm.getTexture();
                     if (txr != null) {
                         GDX_TEXTURES.put(mat, new com.badlogic.gdx.graphics.Texture(txr.getPath()));
+                    } else {
+                        GDX_TEXTURES.put(mat, emptyTxr);                        
                     }
                 }
             }
@@ -343,10 +402,10 @@ public class FormMapEditor extends javax.swing.JDialog {
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);      
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glEnable(GL20.GL_CULL_FACE);
-            Gdx.gl.glCullFace(GL20.GL_BACK);      
-                                             
+            Gdx.gl.glCullFace(GL20.GL_BACK);     
+                                                 
             // сетка основания
-            if (levelDraw > 0) { 
+            if (levelDraw > 0 || !showGrid) { 
                 Gdx.gl.glLineWidth(1);
                 lineRenderer.begin(cam.combined, GL20.GL_LINES);  
                 drawGrid(10, 10, Color.DARK_GRAY);
@@ -359,10 +418,10 @@ public class FormMapEditor extends javax.swing.JDialog {
                     for (int z = 0; z < GameMap.MAX_Z; ++z) {
                         MapElement element = selectedMap.getElement(x, y, z);
                         if (element != null) {
-                            if (worldPos != null && worldPos.equals(new Vector3(x, y, z))) {
-                                element.render(cam.combined, Color.RED);
-                            } else {
-                                element.render(cam.combined);
+                            if (levelDraw - y >= 2) {
+                                element.render(cam.combined, Color.GRAY);   
+                            } else {   
+                                element.render(cam.combined, Color.LIGHT_GRAY);                          
                             }
                         }
                     }    
@@ -370,13 +429,12 @@ public class FormMapEditor extends javax.swing.JDialog {
             }
                         
             // сетка позиции
-            Gdx.gl.glLineWidth(3);
-            lineRenderer.begin(cam.combined, GL20.GL_LINES);   
-            drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
-            /*drawLine(Vector3.Zero, Vector3.X, Color.RED);
-            drawLine(Vector3.Zero, Vector3.Y, Color.YELLOW);
-            drawLine(Vector3.Zero, new Vector3(0, 0, -1), Color.BLUE);*/
-            lineRenderer.end();
+            if (showGrid) {
+                Gdx.gl.glLineWidth(3);
+                lineRenderer.begin(cam.combined, GL20.GL_LINES);   
+                drawGrid(0, levelDraw, 0, 10, 10, Color.LIGHT_GRAY);
+                lineRenderer.end();
+            }
             
             // рисуем элементы на текущем уровне рисования
             for (int x = 0; x < GameMap.MAX_X; ++x) {
@@ -639,6 +697,7 @@ public class FormMapEditor extends javax.swing.JDialog {
         btnFill = new javax.swing.JButton();
         pnlTools = new javax.swing.JPanel();
         tglSelect = new javax.swing.JToggleButton();
+        tglShowGrid = new javax.swing.JToggleButton();
         pnlView3D = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -865,6 +924,20 @@ public class FormMapEditor extends javax.swing.JDialog {
             }
         });
 
+        tglShowGrid.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/show_grid.png"))); // NOI18N
+        tglShowGrid.setSelected(true);
+        tglShowGrid.setToolTipText("Показывать сетку");
+        tglShowGrid.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        tglShowGrid.setMaximumSize(new java.awt.Dimension(64, 64));
+        tglShowGrid.setMinimumSize(new java.awt.Dimension(64, 64));
+        tglShowGrid.setPreferredSize(new java.awt.Dimension(64, 64));
+        tglShowGrid.setSelectedIcon(new javax.swing.ImageIcon(getClass().getResource("/com/vuvk/n3d/ico/show_grid.png"))); // NOI18N
+        tglShowGrid.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                tglShowGridStateChanged(evt);
+            }
+        });
+
         javax.swing.GroupLayout pnlToolsLayout = new javax.swing.GroupLayout(pnlTools);
         pnlTools.setLayout(pnlToolsLayout);
         pnlToolsLayout.setHorizontalGroup(
@@ -872,13 +945,17 @@ public class FormMapEditor extends javax.swing.JDialog {
             .addGroup(pnlToolsLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(tglSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(tglShowGrid, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         pnlToolsLayout.setVerticalGroup(
             pnlToolsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlToolsLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tglSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(pnlToolsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(tglShowGrid, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tglSelect, javax.swing.GroupLayout.PREFERRED_SIZE, 64, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -965,6 +1042,11 @@ public class FormMapEditor extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_btnFillActionPerformed
 
+    private void tglShowGridStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_tglShowGridStateChanged
+        showGrid = tglShowGrid.isSelected();
+        Gdx.graphics.requestRendering();
+    }//GEN-LAST:event_tglShowGridStateChanged
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnFill;
@@ -982,5 +1064,6 @@ public class FormMapEditor extends javax.swing.JDialog {
     private javax.swing.JPanel pnlView3D;
     private javax.swing.JTabbedPane tabPane;
     private javax.swing.JToggleButton tglSelect;
+    private javax.swing.JToggleButton tglShowGrid;
     // End of variables declaration//GEN-END:variables
 }
