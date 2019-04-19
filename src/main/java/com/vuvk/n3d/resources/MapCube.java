@@ -17,15 +17,10 @@
 */
 package com.vuvk.n3d.resources;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer20;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.vuvk.n3d.forms.FormMapEditor;
-import java.util.Arrays;
 
 /**
  * Класс примитива - куб, из которых построена сцена
@@ -50,185 +45,173 @@ public class MapCube extends MapFigure {
         float x = pos.x,
               y = pos.y,
               z = pos.z;
-                
+                        
         // front
         mat = sides[Side.FRONT.getNum()];
-        if (mat != null) {
-            txr = FormMapEditor.GDX_TEXTURES.get(mat);
-            if (txr != null) {                
-                txr.bind();
-                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
-                renderer.color(color);
-                renderer.texCoord(1, 1);
-                renderer.vertex(x, y, z);
-                renderer.normal(0, 0, -1);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 0);
-                renderer.vertex(x, y + 1, z);
-                renderer.normal(0, 0, -1);
-                
-                renderer.color(color);
-                renderer.texCoord(0, 0);
-                renderer.vertex(x + 1, y + 1, z);
-                renderer.normal(0, 0, -1);
-                
-                renderer.color(color);
-                renderer.texCoord(0, 1);
-                renderer.vertex(x + 1, y, z);
-                renderer.normal(0, 0, -1);
-                renderer.end();
-            }
+        txr = FormMapEditor.GDX_TEXTURES.get(mat);
+        if (txr != null) {                
+            txr.bind();
+            renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+            renderer.color(color);
+            renderer.texCoord(1, 1);
+            renderer.vertex(x, y, z);
+            renderer.normal(0, 0, -1);
+
+            renderer.color(color);
+            renderer.texCoord(1, 0);
+            renderer.vertex(x, y + 1, z);
+            renderer.normal(0, 0, -1);
+
+            renderer.color(color);
+            renderer.texCoord(0, 0);
+            renderer.vertex(x + 1, y + 1, z);
+            renderer.normal(0, 0, -1);
+
+            renderer.color(color);
+            renderer.texCoord(0, 1);
+            renderer.vertex(x + 1, y, z);
+            renderer.normal(0, 0, -1);
+            renderer.end();
         }
 
         // back
         mat = sides[Side.BACK.getNum()];
-        if (mat != null) {
-            txr = FormMapEditor.GDX_TEXTURES.get(mat);
-            if (txr != null) {                
-                txr.bind();
-                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
-                renderer.color(color);
-                renderer.texCoord(0, 1);
-                renderer.vertex(x, y, z + 1);
-                renderer.normal(0, 0, 1);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 1);
-                renderer.vertex(x + 1, y, z + 1);
-                renderer.normal(0, 0, 1);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 0);
-                renderer.vertex(x + 1, y + 1, z + 1);
-                renderer.normal(0, 0, 1);
-                
-                renderer.color(color);
-                renderer.texCoord(0, 0);
-                renderer.vertex(x, y + 1, z + 1);
-                renderer.normal(0, 0, 1);
-                renderer.end();
-            }
+        txr = FormMapEditor.GDX_TEXTURES.get(mat);
+        if (txr != null) {                
+            txr.bind();
+            renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+            renderer.color(color);
+            renderer.texCoord(0, 1);
+            renderer.vertex(x, y, z + 1);
+            renderer.normal(0, 0, 1);
+
+            renderer.color(color);
+            renderer.texCoord(1, 1);
+            renderer.vertex(x + 1, y, z + 1);
+            renderer.normal(0, 0, 1);
+
+            renderer.color(color);
+            renderer.texCoord(1, 0);
+            renderer.vertex(x + 1, y + 1, z + 1);
+            renderer.normal(0, 0, 1);
+
+            renderer.color(color);
+            renderer.texCoord(0, 0);
+            renderer.vertex(x, y + 1, z + 1);
+            renderer.normal(0, 0, 1);
+            renderer.end();
         }
 
         // left
         mat = sides[Side.LEFT.getNum()];
-        if (mat != null) {
-            txr = FormMapEditor.GDX_TEXTURES.get(mat);
-            if (txr != null) {                
-                txr.bind();
-                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
-                renderer.color(color);
-                renderer.texCoord(0, 1);
-                renderer.vertex(x, y, z);
-                renderer.normal(-1, 0, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 1);
-                renderer.vertex(x, y, z + 1);
-                renderer.normal(-1, 0, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 0);
-                renderer.vertex(x, y + 1, z + 1);
-                renderer.normal(-1, 0, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(0, 0);
-                renderer.vertex(x, y + 1, z);
-                renderer.normal(-1, 0, 0);
-                renderer.end();
-            }
+        txr = FormMapEditor.GDX_TEXTURES.get(mat);
+        if (txr != null) {                
+            txr.bind();
+            renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+            renderer.color(color);
+            renderer.texCoord(0, 1);
+            renderer.vertex(x, y, z);
+            renderer.normal(-1, 0, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 1);
+            renderer.vertex(x, y, z + 1);
+            renderer.normal(-1, 0, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 0);
+            renderer.vertex(x, y + 1, z + 1);
+            renderer.normal(-1, 0, 0);
+
+            renderer.color(color);
+            renderer.texCoord(0, 0);
+            renderer.vertex(x, y + 1, z);
+            renderer.normal(-1, 0, 0);
+            renderer.end();
         }
 
         // right
         mat = sides[Side.RIGHT.getNum()];
-        if (mat != null) {
-            txr = FormMapEditor.GDX_TEXTURES.get(mat);
-            if (txr != null) {                
-                txr.bind();
-                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
-                renderer.color(color);
-                renderer.texCoord(0, 1);
-                renderer.vertex(x + 1, y, z + 1);
-                renderer.normal(1, 0, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 1);
-                renderer.vertex(x + 1, y, z);
-                renderer.normal(1, 0, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 0);
-                renderer.vertex(x + 1, y + 1, z);
-                renderer.normal(1, 0, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(0, 0);
-                renderer.vertex(x + 1, y + 1, z + 1);
-                renderer.normal(1, 0, 0);
-                renderer.end();
-            }
+        txr = FormMapEditor.GDX_TEXTURES.get(mat);
+        if (txr != null) {                
+            txr.bind();
+            renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+            renderer.color(color);
+            renderer.texCoord(0, 1);
+            renderer.vertex(x + 1, y, z + 1);
+            renderer.normal(1, 0, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 1);
+            renderer.vertex(x + 1, y, z);
+            renderer.normal(1, 0, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 0);
+            renderer.vertex(x + 1, y + 1, z);
+            renderer.normal(1, 0, 0);
+
+            renderer.color(color);
+            renderer.texCoord(0, 0);
+            renderer.vertex(x + 1, y + 1, z + 1);
+            renderer.normal(1, 0, 0);
+            renderer.end();
         }
 
         // bottom
         mat = sides[Side.BOTTOM.getNum()];
-        if (mat != null) {
-            txr = FormMapEditor.GDX_TEXTURES.get(mat);
-            if (txr != null) {                
-                txr.bind();
-                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
-                renderer.color(color);
-                renderer.texCoord(0, 1);
-                renderer.vertex(x + 1, y, z + 1);
-                renderer.normal(0, -1, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 1);
-                renderer.vertex(x, y, z + 1);
-                renderer.normal(0, -1, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 0);
-                renderer.vertex(x, y, z);
-                renderer.normal(0, -1, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(0, 0);
-                renderer.vertex(x + 1, y, z);
-                renderer.normal(0, -1, 0);
-                renderer.end();
-            }
+        txr = FormMapEditor.GDX_TEXTURES.get(mat);
+        if (txr != null) {                
+            txr.bind();
+            renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+            renderer.color(color);
+            renderer.texCoord(0, 1);
+            renderer.vertex(x + 1, y, z + 1);
+            renderer.normal(0, -1, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 1);
+            renderer.vertex(x, y, z + 1);
+            renderer.normal(0, -1, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 0);
+            renderer.vertex(x, y, z);
+            renderer.normal(0, -1, 0);
+
+            renderer.color(color);
+            renderer.texCoord(0, 0);
+            renderer.vertex(x + 1, y, z);
+            renderer.normal(0, -1, 0);
+            renderer.end();
         }
 
         // top
         mat = sides[Side.TOP.getNum()];
-        if (mat != null) {
-            txr = FormMapEditor.GDX_TEXTURES.get(mat);
-            if (txr != null) {                
-                txr.bind();
-                renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
-                renderer.color(color);
-                renderer.texCoord(0, 1);
-                renderer.vertex(x, y + 1, z + 1);
-                renderer.normal(0, 1, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 1);
-                renderer.vertex(x + 1, y + 1, z + 1);
-                renderer.normal(0, 1, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(1, 0);
-                renderer.vertex(x + 1, y + 1, z);
-                renderer.normal(0, 1, 0);
-                
-                renderer.color(color);
-                renderer.texCoord(0, 0);
-                renderer.vertex(x, y + 1, z);
-                renderer.normal(0, 1, 0);
-                renderer.end();
-            }
+        txr = FormMapEditor.GDX_TEXTURES.get(mat);
+        if (txr != null) {                
+            txr.bind();
+            renderer.begin(projModelView, GL20.GL_TRIANGLE_FAN);
+            renderer.color(color);
+            renderer.texCoord(0, 1);
+            renderer.vertex(x, y + 1, z + 1);
+            renderer.normal(0, 1, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 1);
+            renderer.vertex(x + 1, y + 1, z + 1);
+            renderer.normal(0, 1, 0);
+
+            renderer.color(color);
+            renderer.texCoord(1, 0);
+            renderer.vertex(x + 1, y + 1, z);
+            renderer.normal(0, 1, 0);
+
+            renderer.color(color);
+            renderer.texCoord(0, 0);
+            renderer.vertex(x, y + 1, z);
+            renderer.normal(0, 1, 0);
+            renderer.end();
         }
     }
     
