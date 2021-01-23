@@ -1,7 +1,5 @@
 # Level Editor of Nuke3D - FPS Game Constructor 
 
-[![Build Status](https://travis-ci.org/vuvk/nuke3d_editor.svg?branch=master)](https://travis-ci.org/vuvk/nuke3d_editor)
-
 Nuke3D is the game constructor of first-person shooters.
 
 # Features
